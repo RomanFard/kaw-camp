@@ -1,54 +1,63 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { products } from "@/data/products";
 
-const exploreItems = [
-  { productId: "1",  title: "چادر کوهنوردی",      image: "https://picsum.photos/seed/ex1/600/420",  height: 420 },
-  { productId: "2",  title: "کوله‌پشتی حرفه‌ای",   image: "https://picsum.photos/seed/ex2/600/340",  height: 340 },
-  { productId: "3",  title: "کیسه‌خواب پَر",       image: "https://picsum.photos/seed/ex3/600/300",  height: 300 },
-  { productId: "4",  title: "اجاق گاز کمپینگ",    image: "https://picsum.photos/seed/ex4/600/520",  height: 520 },
-  { productId: "5",  title: "فانوس LED",          image: "https://picsum.photos/seed/ex5/600/280",  height: 280 },
-  { productId: "6",  title: "قمقمه استیل",        image: "https://picsum.photos/seed/ex6/600/320",  height: 320 },
-  { productId: "7",  title: "تشک بادی",            image: "https://picsum.photos/seed/ex7/600/360",  height: 360 },
-  { productId: "8",  title: "عصای کوهنوردی",       image: "https://picsum.photos/seed/ex8/600/400",  height: 400 },
-  { productId: "9",  title: "کاپشن پَر",           image: "https://picsum.photos/seed/ex9/600/460",  height: 460 },
-  { productId: "10", title: "شلوار کوهنوردی",     image: "https://picsum.photos/seed/ex10/600/340", height: 340 },
-  { productId: "11", title: "دستکش ضدآب",          image: "https://picsum.photos/seed/ex11/600/380", height: 380 },
-  { productId: "12", title: "عینک آفتابی",         image: "https://picsum.photos/seed/ex12/600/340", height: 340 },
-  { productId: "13", title: "ساعت GPS",             image: "https://picsum.photos/seed/ex13/600/400", height: 400 },
-  { productId: "14", title: "کلاه کوهنوردی",       image: "https://picsum.photos/seed/ex14/600/300", height: 300 },
-  { productId: "15", title: "کفش کوهنوردی",        image: "https://picsum.photos/seed/ex15/600/480", height: 480 },
-  { productId: "16", title: "جوراب پشمی",          image: "https://picsum.photos/seed/ex16/600/300", height: 300 },
-];
+function getCategoryEmoji(cat: string) {
+  const map: Record<string, string> = {
+    tent: "⛺", sleep: "🛏️", mattress: "🟦", backpack: "🎒",
+    clothing: "🧥", shoes: "🥾", socks: "🧦", gaiters: "🦵",
+    tools: "🧰", lighting: "🔦", bottle: "🥤", cooking: "🍳",
+    sunglasses: "🕶️", watch: "⌚", bicycle: "🚲", accessories: "🎁",
+  };
+  return map[cat] || "📦";
+}
 
 export default function ExplorePage() {
+  const items = products.slice(0, 16);
+
   return (
     <main className="min-h-screen bg-[#F7F1E3]">
       <Header />
 
-      <div className="mx-auto max-w-[1600px] px-6 py-6">
-        {/* گالری ماسونری */}
-        <div className="columns-2 gap-4 md:columns-3 lg:columns-4 xl:columns-5">
-          {exploreItems.map((item, index) => (
-            <a
-              key={index}
-              href={`/product/${item.productId}`}
-              className="group relative mb-4 block overflow-hidden rounded-xl"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ height: `${item.height}px` }}
-              />
+      <div className="mx-auto max-w-[1600px] px-3 py-4 md:px-6 md:py-6">
+        <div className="grid grid-cols-3 gap-1 md:gap-2">
+          {items.map((product, index) => {
+            const pattern = index % 6;
+            let colSpan = "col-span-1";
+            let aspect = "aspect-square";
 
-              {/* Overlay روی هاور */}
-              <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <h3 className="line-clamp-2 text-sm font-bold text-white md:text-base">
-                  {item.title}
-                </h3>
-              </div>
-            </a>
-          ))}
+            if (pattern === 0) {
+              colSpan = "col-span-2";
+              aspect = "aspect-[4/3]";
+            } else if (pattern === 3) {
+              colSpan = "col-span-1 row-span-2";
+              aspect = "aspect-[3/4]";
+            }
+
+            return (
+              <a
+                key={product.id}
+                href={`/product/${product.id}`}
+                className={
+                  "group relative overflow-hidden rounded-sm bg-gradient-to-br from-[#F7F1E3] to-[#EFE7D2] md:rounded-lg " +
+                  colSpan
+                }
+              >
+                <div className={"flex w-full items-center justify-center " + aspect}>
+                  <span className="text-5xl transition duration-500 group-hover:scale-110 md:text-6xl">
+                    {getCategoryEmoji(product.category)}
+                  </span>
+
+                  {/* Overlay روی هاور */}
+                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 via-transparent to-transparent p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:p-3">
+                    <span className="line-clamp-2 text-xs font-bold text-white md:text-sm">
+                      {product.name}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
         </div>
       </div>
 

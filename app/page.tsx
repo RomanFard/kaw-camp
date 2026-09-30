@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import HeroSlider from "@/components/HeroSlider";
 import CategoryGrid from "@/components/CategoryGrid";
-import ProductGrid from "@/components/ProductGrid";
+import DiscountProducts from "@/components/DiscountProducts";
 import DiscountBanner from "@/components/DiscountBanner";
 import Footer from "@/components/Footer";
 
@@ -11,7 +11,7 @@ export default function Home() {
       <Header />
       <HeroSlider />
       <CategoryGrid />
-      <ProductGrid />
+     <DiscountProducts />
       <DiscountBanner />
       <Footer />
     </main>

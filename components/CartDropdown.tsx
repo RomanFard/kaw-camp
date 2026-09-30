@@ -3,7 +3,25 @@
 import { useState } from "react";
 import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
-
+import { getProductPlaceholder } from "@/lib/placeholder";
+function getCategoryEmojiFromName(name: string) {
+  if (name.includes("چادر")) return "⛺";
+  if (name.includes("کوله")) return "🎒";
+  if (name.includes("کیسه")) return "🛏️";
+  if (name.includes("تشک") || name.includes("زیرانداز")) return "🟦";
+  if (name.includes("گاز") || name.includes("اجاق") || name.includes("پخت")) return "🍳";
+  if (name.includes("فانوس") || name.includes("لامپ") || name.includes("پروژکتور")) return "🔦";
+  if (name.includes("قمقمه") || name.includes("لیوان")) return "🥤";
+  if (name.includes("عصا")) return "🧰";
+  if (name.includes("کاپشن") || name.includes("شلوار") || name.includes("دستکش") || name.includes("کلاه")) return "🧥";
+  if (name.includes("کفش")) return "🥾";
+  if (name.includes("جوراب")) return "🧦";
+  if (name.includes("گتر")) return "🦵";
+  if (name.includes("عینک")) return "🕶️";
+  if (name.includes("ساعت")) return "⌚";
+  if (name.includes("دوچرخه")) return "🚲";
+  return "📦";
+}
 export default function CartDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const { items, removeItem, totalItems, totalPrice } = useCart();
@@ -37,9 +55,9 @@ export default function CartDropdown() {
             </span>
           )}
         </span>
-        <span className="text-lg font-bold">
-          {formatPrice(totalPrice)}
-        </span>
+        <span className="hidden text-lg font-bold md:inline">
+  {formatPrice(totalPrice)}
+</span>
       </button>
 
       {/* Backdrop تاریک */}
@@ -101,11 +119,11 @@ export default function CartDropdown() {
                     href={"/product/" + item.id}
                     className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-[#EDE4CE] bg-[#F7F1E3]"
                   >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="h-full w-full object-cover"
-                    />
+                   <img
+  src={getProductPlaceholder(item.name, getCategoryEmojiFromName(item.name))}
+  alt={item.name}
+  className="h-full w-full object-cover"
+/>
                   </a>
 
                   {/* اطلاعات */}

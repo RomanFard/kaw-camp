@@ -24,6 +24,7 @@ export type Product = {
   oldPrice?: number;
   category: Category;
   image: string;
+  images?: string[];
   rating: number;
   reviews: number;
   inStock: boolean;
@@ -405,6 +406,7 @@ export const products: Product[] = [
     name: "پروژکتور کمپینگ نیرچرهایک مدل CNK2300BI012",
     slug: "naturehike-camping-lantern-cnk2300bi012",
     price: 8_280_000,
+        oldPrice: 9_500_000,
     category: "lighting",
     image: "https://picsum.photos/seed/projector1/800/800",
     rating: 4,
@@ -427,6 +429,49 @@ export const products: Product[] = [
       { label: "نیرچرهایک", value: "naturehike" },
       { label: "سفید و سبز", value: "white-green" },
       { label: "سفید و قرمز", value: "white-red" },
+    ],
+  },
+    {
+    id: "19",
+    name: "چادر بادی ۴ نفره نیچرهایک مدل CNK2550WS017",
+    slug: "naturehike-inflatable-tent-cnk2550ws017",
+    price: 15_500_000,
+    oldPrice: 18_000_000,
+    category: "tent",
+       image: "/images/products/tent-naturehike-1.jpg",
+    images: [
+      "/images/products/tent-naturehike-1.jpg",
+      "/images/products/tent-naturehike-2.jpg",
+      "/images/products/tent-naturehike-3.jpg",
+    ],
+    rating: 4.9,
+    reviews: 0,
+    inStock: true,
+    shortDesc: "چادر بادی جادار ۳ تا ۴ نفره با سازه TPU و نصب فوق سریع",
+    description:
+      "چادر بادی نیچرهایک مدل CNK2550WS017 یک چادر جادار و کاربردی برای کمپینگ خانوادگی، آفرود و طبیعت‌گردی است که با استفاده از سازه بادی TPU، فرآیند برپایی چادر را سریع‌تر و ساده‌تر می‌کند. این مدل با ظرفیت ۳ تا ۴ نفر، فضای داخلی مناسب، سایبان بزرگ، تهویه مناسب و ساختار دو لایه، برای افرادی طراحی شده که در کمپینگ به فضای بیشتر و راحتی بالاتر اهمیت می‌دهند.",
+    features: [
+      "سازه بادی از جنس TPU",
+      "نصب سریع با استفاده از پمپ باد",
+      "ظرفیت مناسب برای ۳ تا ۴ نفر",
+      "ساختار دو لایه",
+      "پارچه پلی‌استر 150D با پوشش PU",
+      "کف مقاوم از پلی‌استر 210D",
+      "مقاومت در برابر نفوذ آب",
+      "چندین پنجره و دریچه برای تهویه بهتر",
+      "توری B3 برای جلوگیری از ورود حشرات",
+      "سایبان بزرگ و کاربردی",
+      "مناسب برای کمپینگ خانوادگی، آفرود و طبیعت‌گردی",
+      "وزن حدود ۹ کیلوگرم",
+      "ابعاد باز: ۲۴۰ × ۲۴۰ × ۱۸۰ سانتی‌متر",
+      "ابعاد بسته‌بندی: ۷۰ × ۳۰ × ۳۰ سانتی‌متر",
+      "سایبان حدود ۹.۷ مترمربع",
+    ],
+    brand: "Naturehike",
+    englishName: "Naturehike Inflatable Tent Model CNK2550WS017",
+    colors: [
+      { label: "بژ", value: "beige" },
+      { label: "خاکی", value: "khaki" },
     ],
   },
 ];
