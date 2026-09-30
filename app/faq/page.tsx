@@ -1,0 +1,213 @@
+"use client";
+
+import { useState } from "react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
+const faqs = [
+  {
+    category: "خرید و سفارش",
+    icon: "🛒",
+    items: [
+      {
+        q: "چطور می‌توانم سفارش ثبت کنم؟",
+        a: "کافیست محصول مورد نظر را به سبد خرید اضافه کنید و پس از تکمیل سبد، روی دکمه «تسویه حساب» کلیک کنید. سپس اطلاعات خود را وارد کرده و پرداخت را انجام دهید.",
+      },
+      {
+        q: "آیا می‌توانم سفارش خود را لغو کنم؟",
+        a: "تا قبل از ارسال سفارش، امکان لغو وجود دارد. کافیست با پشتیبانی تماس بگیرید. پس از ارسال، لغو سفارش امکان‌پذیر نیست ولی می‌توانید از حق بازگشت کالا استفاده کنید.",
+      },
+      {
+        q: "حداقل مبلغ سفارش چقدر است؟",
+        a: "حداقل مبلغ سفارش ۱۰۰,۰۰۰ تومان است. برای خریدهای بالای ۲ میلیون تومان، ارسال رایگان می‌باشد.",
+      },
+    ],
+  },
+  {
+    category: "ارسال و تحویل",
+    icon: "🚚",
+    items: [
+      {
+        q: "هزینه ارسال چقدر است؟",
+        a: "هزینه ارسال ۸۰,۰۰۰ تومان است. برای سفارشات بالای ۲ میلیون تومان ارسال رایگان می‌باشد.",
+      },
+      {
+        q: "چند روز طول می‌کشد سفارش به دستم برسد؟",
+        a: "بسته به مقصد، بین ۳ تا ۷ روز کاری. برای شهرهای بزرگ معمولاً ۳ روز و برای شهرهای کوچک تا ۷ روز.",
+      },
+      {
+        q: "آیا امکان تحویل حضوری وجود دارد؟",
+        a: "بله، برای مشتریان بانه و اطراف، امکان تحویل حضوری در فروشگاه وجود دارد و هزینه ارسال محاسبه نمی‌شود.",
+      },
+    ],
+  },
+  {
+    category: "پرداخت",
+    icon: "💳",
+    items: [
+      {
+        q: "چه روش‌های پرداختی وجود دارد؟",
+        a: "پرداخت آنلاین از طریق درگاه‌های امن بانکی و همچنین پرداخت در محل (برای برخی شهرها).",
+      },
+      {
+        q: "آیا پرداخت امن است؟",
+        a: "بله، تمام پرداخت‌ها از طریق درگاه‌های مورد تایید شاپرک و با رمز پویا انجام می‌شود.",
+      },
+    ],
+  },
+  {
+    category: "بازگشت و گارانتی",
+    icon: "↩️",
+    items: [
+      {
+        q: "چند روز فرصت بازگشت کالا دارم؟",
+        a: "تا ۷ روز پس از دریافت کالا، در صورت عدم استفاده و سالم بودن بسته‌بندی، می‌توانید کالا را بازگردانید.",
+      },
+      {
+        q: "هزینه ارسال بازگشت با کیست؟",
+        a: "در صورت ایراد کالا یا ارسال اشتباه، هزینه بر عهده فروشگاه است. در صورت انصراف از خرید، هزینه بر عهده مشتری.",
+      },
+      {
+        q: "گارانتی محصولات چقدر است؟",
+        a: "بسته به نوع محصول متفاوت است. اکثر محصولات دارای گارانتی اصالت و سلامت کالا هستند. جزئیات در صفحه محصول درج شده است.",
+      },
+    ],
+  },
+  {
+    category: "حساب کاربری",
+    icon: "👤",
+    items: [
+      {
+        q: "چطور می‌توانم ثبت‌نام کنم؟",
+        a: "روی دکمه «ورود / ثبت‌نام» در بالای صفحه کلیک کنید و با شماره موبایل و رمز عبور، ثبت‌نام کنید.",
+      },
+      {
+        q: "رمز عبورم را فراموش کرده‌ام، چه کنم؟",
+        a: "در صفحه ورود، گزینه «ورود با کد یکبار مصرف» را انتخاب کنید. کد از طریق پیامک برای شما ارسال می‌شود.",
+      },
+    ],
+  },
+];
+
+export default function FaqPage() {
+  const [openIndex, setOpenIndex] = useState<string | null>("0-0");
+
+  return (
+    <main className="min-h-screen bg-[#F7F1E3]">
+      <Header />
+
+      <div className="mx-auto max-w-[1600px] px-6 py-8">
+        {/* مسیر ناوبری */}
+        <nav className="mb-6 text-sm text-gray-500">
+          <a href="/" className="hover:text-amber-600">خانه</a>
+          <span className="mx-2">/</span>
+          <span className="text-gray-800">سوالات متداول</span>
+        </nav>
+
+        {/* هدر صفحه */}
+        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center md:p-12">
+          <span className="inline-block rounded-full bg-amber-50 px-5 py-2 text-sm font-semibold text-amber-600">
+            سوالات متداول
+          </span>
+          <h1 className="mt-5 text-2xl font-bold text-gray-900 md:text-3xl">
+            پاسخ سوالات پرتکرار شما
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-gray-600">
+            اگر سوالی دارید، ابتدا اینجا را بررسی کنید. اگر پاسخ سوال خود را
+            پیدا نکردید، با ما تماس بگیرید.
+          </p>
+        </div>
+
+        {/* بخش سوالات */}
+        <div className="mx-auto max-w-4xl space-y-6">
+          {faqs.map((group, gi) => (
+            <div
+              key={gi}
+              className="overflow-hidden rounded-2xl border border-[#E8DFC8] bg-white"
+            >
+              {/* عنوان دسته */}
+              <div className="flex items-center gap-3 border-b border-[#EDE4CE] bg-[#F7F1E3]/50 px-6 py-4">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-xl text-white">
+                  {group.icon}
+                </span>
+                <h2 className="text-base font-bold text-gray-800">
+                  {group.category}
+                </h2>
+              </div>
+
+              {/* آیتم‌ها */}
+              <div>
+                {group.items.map((item, ii) => {
+                  const key = `${gi}-${ii}`;
+                  const isOpen = openIndex === key;
+
+                  return (
+                    <div
+                      key={ii}
+                      className="border-b border-[#EDE4CE] last:border-0"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setOpenIndex(isOpen ? null : key)}
+                        className="flex w-full items-center justify-between gap-4 px-6 py-4 text-right transition hover:bg-[#F7F1E3]/30"
+                      >
+                        <span className="flex-1 text-sm font-bold text-gray-800 md:text-base">
+                          {item.q}
+                        </span>
+                        <span
+                          className={
+                            "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-base font-bold transition " +
+                            (isOpen
+                              ? "bg-amber-500 text-white rotate-180"
+                              : "bg-[#F7F1E3] text-amber-600")
+                          }
+                        >
+                          ⌄
+                        </span>
+                      </button>
+
+                      {isOpen && (
+                        <div className="border-t border-[#EDE4CE] bg-[#F7F1E3]/30 px-6 py-4">
+                          <p className="text-sm leading-7 text-gray-600">
+                            {item.a}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA تماس */}
+        <div className="mx-auto mt-8 max-w-4xl rounded-2xl bg-gradient-to-l from-amber-600 to-amber-500 p-8 text-center text-white">
+          <h2 className="text-xl font-bold md:text-2xl">
+            پاسخ سوال خود را پیدا نکردید؟
+          </h2>
+          <p className="mt-3 text-base text-white/90">
+            تیم پشتیبانی ما آماده کمک به شماست
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="/contact"
+              className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-amber-600 transition hover:bg-amber-50"
+            >
+              ارسال پیام
+            </a>
+            <a
+              href="tel:09180540019"
+              dir="ltr"
+              className="rounded-lg border-2 border-white/60 bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+            >
+              ۰۹۱۸-۰۵۴-۰۰۱۹
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </main>
+  );
+}
