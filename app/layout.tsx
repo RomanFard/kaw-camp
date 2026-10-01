@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/components/context/CartContext";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 export const metadata: Metadata = {
   title: "KAW CAMP | فروشگاه تخصصی کمپینگ و کوهنوردی",
@@ -22,6 +23,10 @@ export default function RootLayout({
       </head>
       <body className="font-[IranYekan] bg-[#F7F1E3]">
         <CartProvider>{children}</CartProvider>
+        <CartProvider>
+  {children}
+  <MobileBottomNav />
+</CartProvider>
       </body>
     </html>
   );

@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 @layer base {
+  @media (max-width: 767px) {
+  body {
+    padding-bottom: 70px;
+  }
+}
   * {
     box-sizing: border-box;
     min-width: 0;

@@ -22,10 +22,10 @@ export default function Header() {
 
   return (
     <>
-      <header dir="rtl" className="w-full bg-[#F7F1E3] text-gray-900">
-        {/* نوار بالایی (دسکتاپ) */}
-        <div className="hidden w-full bg-amber-500 py-2.5 text-base font-semibold text-white md:block">
-          <div className="mx-auto max-w-[1600px] px-6">
+      <header dir="rtl" className="w-full bg-white text-gray-900">
+        {/* نوار بالایی نارنجی */}
+        <div className="w-full bg-amber-500 py-2 text-[11px] font-semibold text-white md:py-2.5 md:text-base">
+          <div className="mx-auto max-w-[1600px] px-4 text-center md:px-6 md:text-right">
             <span>کردستان - بانه - کوچه پاساژ نور - پاساژ ارغوانی - بلوک ۲</span>
           </div>
         </div>
@@ -33,81 +33,60 @@ export default function Header() {
         {/* نوار اصلی */}
         <div className="border-b border-[#E8DFC8]">
           <div className="mx-auto max-w-[1600px] px-4 md:px-6">
-            {/* ═══ موبایل ═══ */}
-            <div className="py-3 md:hidden">
-              {/* ردیف بالا */}
-              <div className="flex items-center justify-between gap-3">
-                {/* دکمه منو */}
-                <button
-                  type="button"
-                  onClick={() => setMobileOpen(true)}
-                  aria-label="منو"
-                  className="flex items-center gap-1.5 text-gray-800"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                    className="h-6 w-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
-                    />
-                  </svg>
-                  <span className="text-sm font-bold">منو</span>
-                </button>
+{/* ═══ موبایل ═══ */}
+<div className="py-3 md:hidden">
+  <div className="flex items-center gap-2">
+    {/* دکمه منو (راست) */}
+    <button
+      type="button"
+      onClick={() => setMobileOpen(true)}
+      aria-label="منو"
+      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={2.5}
+        stroke="currentColor"
+        className="h-5 w-5"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+        />
+      </svg>
+    </button>
 
-                {/* لوگو */}
-                <a href="/" className="flex-shrink-0">
-                  <Image
-                    src="/images/logo.png"
-                    alt="کو کمپ"
-                    width={200}
-                    height={200}
-                    priority
-                    className="h-12 w-auto"
-                  />
-                </a>
+    {/* نوار جستجو (پهن، وسط) */}
+    <div className="flex-1">
+      <SearchButton />
+    </div>
 
-                {/* سبد */}
-                <div className="flex items-center gap-1">
-                  <CartDropdown />
-                </div>
-              </div>
-
-              {/* نوار جستجو */}
-              <div className="mt-3">
-                <SearchButton />
-              </div>
-
-              {/* لینک‌های سریع */}
-              <div className="mt-2 flex items-center justify-center gap-3 border-t border-[#EDE4CE] pt-2">
-                <a
-                  href="/products"
-                  className="text-xs font-semibold text-gray-700 hover:text-amber-600"
-                >
-                  همه محصولات
-                </a>
-                <span className="text-gray-300">|</span>
-                <a
-                  href="/explore"
-                  className="text-xs font-semibold text-gray-700 hover:text-amber-600"
-                >
-                  اکسپلور
-                </a>
-                <span className="text-gray-300">|</span>
-                <a
-                  href="/blog"
-                  className="text-xs font-semibold text-gray-700 hover:text-amber-600"
-                >
-                  وبلاگ
-                </a>
-              </div>
-            </div>
+    {/* دکمه پروفایل (چپ) */}
+    <a
+      href="/login"
+      aria-label="حساب کاربری"
+      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={2}
+        stroke="currentColor"
+        className="h-5 w-5"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+        />
+      </svg>
+    </a>
+  </div>
+</div>
 
             {/* ═══ دسکتاپ ═══ */}
             <div className="hidden grid-cols-3 items-center gap-4 py-4 md:grid">
@@ -208,7 +187,7 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-2 rounded-lg border border-[#E8DFC8] bg-white px-4 py-2.5 text-sm text-gray-400 transition hover:border-amber-500"
+        className="flex w-full items-center gap-2 rounded-full border border-[#E8DFC8] bg-[#F7F1E3]/40 px-4 py-2.5 text-sm text-gray-400 transition hover:border-amber-500"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -216,7 +195,7 @@ function SearchButton() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-5 w-5"
+          className="h-5 w-5 text-amber-500"
         >
           <path
             strokeLinecap="round"
@@ -228,10 +207,7 @@ function SearchButton() {
       </button>
 
       {open && (
-        <SearchPanel
-          onClose={() => setOpen(false)}
-          forceOpen={true}
-        />
+        <SearchPanel onClose={() => setOpen(false)} forceOpen={true} />
       )}
     </>
   );
