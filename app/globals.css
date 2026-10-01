@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @layer base {
-  @media (max-width: 767px) {
+@media (max-width: 767px) {
   body {
-    padding-bottom: 70px;
+    padding-bottom: 85px;
   }
 }
   * {

@@ -21,12 +21,11 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/gh/AmirAbbasVafaee/persian-fonts-cdn@main/css/iran-yekan.css"
         />
       </head>
-      <body className="font-[IranYekan] bg-[#F7F1E3]">
-        <CartProvider>{children}</CartProvider>
+      <body className="font-[IranYekan] bg-gray-50">
         <CartProvider>
-  {children}
-  <MobileBottomNav />
-</CartProvider>
+          {children}
+          <MobileBottomNav />
+        </CartProvider>
       </body>
     </html>
   );

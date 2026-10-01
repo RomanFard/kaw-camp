@@ -187,15 +187,28 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-2 rounded-full border border-[#E8DFC8] bg-[#F7F1E3]/40 px-4 py-2.5 text-sm text-gray-400 transition hover:border-amber-500"
+        className="flex w-full items-center gap-2 rounded-full border border-[#E8DFC8] bg-[#F7F1E3]/40 px-3 py-2 text-sm text-gray-400 transition hover:border-amber-500"
       >
+        {/* لوگو داخل جستجو */}
+        <Image
+          src="/images/logo.png"
+          alt="کو کمپ"
+          width={60}
+          height={60}
+          className="h-7 w-auto flex-shrink-0"
+        />
+
+        {/* خط جداکننده */}
+        <span className="h-5 w-px flex-shrink-0 bg-[#E8DFC8]"></span>
+
+        {/* آیکون ذره‌بین */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-5 w-5 text-amber-500"
+          className="h-4 w-4 flex-shrink-0 text-amber-500"
         >
           <path
             strokeLinecap="round"
@@ -203,7 +216,11 @@ function SearchButton() {
             d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
           />
         </svg>
-        <span>جستجو در کو کمپ...</span>
+
+        {/* متن */}
+        <span className="flex-1 text-right text-xs md:text-sm">
+          جستجو در کو کمپ...
+        </span>
       </button>
 
       {open && (
