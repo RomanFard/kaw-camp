@@ -47,16 +47,17 @@ export default function ProductPageClient({ product }: { product: Product }) {
           <div className="md:grid md:grid-cols-2 md:gap-6">
             {/* گالری تصاویر */}
             <div className="mb-6 md:mb-0">
-              <ProductGallery
-                images={
-                  product.images && product.images.length > 0
-                    ? product.images
-                    : [product.image]
-                }
-                productName={product.name}
-                fallbackEmoji={getCategoryEmoji(product.category)}
-                activeImageIndex={currentImageIndex >= 0 ? currentImageIndex : 0}
-              />
+<ProductGallery
+  images={
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image]
+  }
+  productName={product.name}
+  productCategory={product.category}
+  fallbackEmoji={getCategoryEmoji(product.category)}
+  activeImageIndex={currentImageIndex >= 0 ? currentImageIndex : 0}
+/>
             </div>
 
             {/* اطلاعات محصول */}

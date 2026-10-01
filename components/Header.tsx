@@ -23,21 +23,21 @@ export default function Header() {
   return (
     <>
       <header dir="rtl" className="w-full bg-[#F7F1E3] text-gray-900">
-        {/* ─────── نوار بالایی (دسکتاپ) ─────── */}
+        {/* نوار بالایی (دسکتاپ) */}
         <div className="hidden w-full bg-amber-500 py-2.5 text-base font-semibold text-white md:block">
           <div className="mx-auto max-w-[1600px] px-6">
             <span>کردستان - بانه - کوچه پاساژ نور - پاساژ ارغوانی - بلوک ۲</span>
           </div>
         </div>
 
-        {/* ─────── نوار اصلی ─────── */}
+        {/* نوار اصلی */}
         <div className="border-b border-[#E8DFC8]">
           <div className="mx-auto max-w-[1600px] px-4 md:px-6">
-            {/* ═══ موبایل: چیدمان جدید ═══ */}
+            {/* ═══ موبایل ═══ */}
             <div className="py-3 md:hidden">
-              {/* ردیف بالا: منو + لوگو + سبد */}
+              {/* ردیف بالا */}
               <div className="flex items-center justify-between gap-3">
-                {/* دکمه منو (راست) */}
+                {/* دکمه منو */}
                 <button
                   type="button"
                   onClick={() => setMobileOpen(true)}
@@ -61,7 +61,7 @@ export default function Header() {
                   <span className="text-sm font-bold">منو</span>
                 </button>
 
-                {/* لوگو (وسط) */}
+                {/* لوگو */}
                 <a href="/" className="flex-shrink-0">
                   <Image
                     src="/images/logo.png"
@@ -73,21 +73,44 @@ export default function Header() {
                   />
                 </a>
 
-                {/* سبد خرید (چپ) */}
+                {/* سبد */}
                 <div className="flex items-center gap-1">
                   <CartDropdown />
                 </div>
               </div>
 
-              {/* ردیف پایین: نوار جستجو */}
+              {/* نوار جستجو */}
               <div className="mt-3">
                 <SearchButton />
               </div>
+
+              {/* لینک‌های سریع */}
+              <div className="mt-2 flex items-center justify-center gap-3 border-t border-[#EDE4CE] pt-2">
+                <a
+                  href="/products"
+                  className="text-xs font-semibold text-gray-700 hover:text-amber-600"
+                >
+                  همه محصولات
+                </a>
+                <span className="text-gray-300">|</span>
+                <a
+                  href="/explore"
+                  className="text-xs font-semibold text-gray-700 hover:text-amber-600"
+                >
+                  اکسپلور
+                </a>
+                <span className="text-gray-300">|</span>
+                <a
+                  href="/blog"
+                  className="text-xs font-semibold text-gray-700 hover:text-amber-600"
+                >
+                  وبلاگ
+                </a>
+              </div>
             </div>
 
-            {/* ═══ دسکتاپ: ۳ ستونه ═══ */}
+            {/* ═══ دسکتاپ ═══ */}
             <div className="hidden grid-cols-3 items-center gap-4 py-4 md:grid">
-              {/* ستون راست: لوگو */}
               <a href="/" className="flex items-center justify-start">
                 <Image
                   src="/images/logo.png"
@@ -99,14 +122,12 @@ export default function Header() {
                 />
               </a>
 
-              {/* ستون وسط: متن */}
               <div className="pt-16 text-center">
                 <h1 className="text-lg font-semibold text-gray-900">
                   فروشگاه لوازم کمپینگ و کوهنوردی
                 </h1>
               </div>
 
-              {/* ستون چپ: آیکون‌ها */}
               <div className="flex items-center justify-end gap-7 pt-16">
                 <a
                   href="/login"
@@ -144,7 +165,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ─────── منوی ناوبری دسکتاپ ─────── */}
+        {/* منوی دسکتاپ */}
         <nav className="hidden border-b border-[#E8DFC8] bg-[#F7F1E3] md:block">
           <div className="mx-auto flex max-w-[1600px] items-center gap-10 px-6">
             <CategoriesMenu />
@@ -169,7 +190,7 @@ export default function Header() {
         </nav>
       </header>
 
-      {/* ─────── دراور منوی موبایل ─────── */}
+      {/* دراور موبایل */}
       <MobileMenuDrawer
         isOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
@@ -178,7 +199,7 @@ export default function Header() {
   );
 }
 
-/* ─────── دکمه جستجوی موبایل ─────── */
+/* دکمه جستجوی موبایل */
 function SearchButton() {
   const [open, setOpen] = useState(false);
 

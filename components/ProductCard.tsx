@@ -1,43 +1,31 @@
 import { Product } from "@/data/products";
 import { formatPrice } from "@/lib/utils";
-
-function getCategoryEmoji(cat: string) {
-  const map: Record<string, string> = {
-    tent: "⛺",
-    sleep: "🛏️",
-    mattress: "🟦",
-    backpack: "🎒",
-    clothing: "🧥",
-    shoes: "🥾",
-    socks: "🧦",
-    gaiters: "🦵",
-    tools: "🧰",
-    lighting: "🔦",
-    bottle: "🥤",
-    cooking: "🍳",
-    sunglasses: "🕶️",
-    watch: "⌚",
-    bicycle: "🚲",
-    accessories: "🎁",
-  };
-  return map[cat] || "📦";
-}
+import { getProductImage } from "@/lib/productImages";
 
 export default function ProductCard({ product }: { product: Product }) {
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
 
+  // اگه عکس لوکال داره، ازش استفاده کن، وگرنه از عکس دسته‌بندی
+  const image =
+    product.image && product.image.startsWith("/")
+      ? product.image
+      : getProductImage(product.category, product.id);
+
   return (
     <a
       href={`/product/${product.id}`}
       className="group relative flex flex-col overflow-hidden rounded-xl border border-[#E8DFC8] bg-white transition hover:border-amber-400 hover:shadow-lg"
     >
-      {/* ─────── تصویر (ایموجی) ─────── */}
-      <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-gradient-to-br from-[#F7F1E3] to-[#EFE7D2]">
-        <span className="text-7xl transition duration-500 group-hover:scale-110 md:text-8xl">
-          {getCategoryEmoji(product.category)}
-        </span>
+      {/* تصویر */}
+      <div className="relative block aspect-square overflow-hidden bg-[#F7F1E3]">
+        <img
+          src={image}
+          alt={product.name}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
 
         {discount > 0 && (
           <span className="absolute right-3 top-3 z-10 rounded-md bg-amber-500 px-2 py-1 text-xs font-bold text-white shadow">
@@ -58,7 +46,7 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      {/* ─────── اطلاعات ─────── */}
+      {/* اطلاعات */}
       <div className="flex flex-1 flex-col p-4">
         <h3 className="line-clamp-2 min-h-[3rem] text-sm font-bold text-gray-800 transition group-hover:text-amber-600">
           {product.name}

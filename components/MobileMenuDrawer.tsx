@@ -1,20 +1,20 @@
 "use client";
 
 const menuItems = [
-  { label: "کفش کوهنوردی", href: "/products?cat=shoes", emoji: "🥾" },
-  { label: "جوراب کوهنوردی", href: "/products?cat=socks", emoji: "🧦" },
-  { label: "گتر کوهنوردی", href: "/products?cat=gaiters", emoji: "🦵" },
-  { label: "ابزار فنی", href: "/products?cat=tools", emoji: "🧰" },
-  { label: "کیسه خواب", href: "/products?cat=sleep", emoji: "🛏️" },
-  { label: "زیرانداز", href: "/products?cat=mattress", emoji: "🟦" },
-  { label: "لامپ و چراغ", href: "/products?cat=lighting", emoji: "🔦" },
-  { label: "چادر", href: "/products?cat=tent", emoji: "⛺" },
-  { label: "لیوان، قمقمه و فلاسک", href: "/products?cat=bottle", emoji: "🥤" },
-  { label: "لوازم پخت و پز", href: "/products?cat=cooking", emoji: "🍳" },
-  { label: "عینک اسپرت", href: "/products?cat=sunglasses", emoji: "🕶️" },
-  { label: "ساعت ورزشی", href: "/products?cat=watch", emoji: "⌚" },
-  { label: "دوچرخه", href: "/products?cat=bicycle", emoji: "🚲" },
-  { label: "تماس با ما", href: "/contact", emoji: "📞" },
+  { label: "کفش کوهنوردی", href: "/products?cat=shoes" },
+  { label: "جوراب کوهنوردی", href: "/products?cat=socks" },
+  { label: "گتر کوهنوردی", href: "/products?cat=gaiters" },
+  { label: "ابزار فنی", href: "/products?cat=tools" },
+  { label: "کیسه خواب", href: "/products?cat=sleep" },
+  { label: "زیرانداز", href: "/products?cat=mattress" },
+  { label: "لامپ و چراغ", href: "/products?cat=lighting" },
+  { label: "چادر", href: "/products?cat=tent" },
+  { label: "لیوان، قمقمه و فلاسک", href: "/products?cat=bottle" },
+  { label: "لوازم پخت و پز", href: "/products?cat=cooking" },
+  { label: "عینک اسپرت", href: "/products?cat=sunglasses" },
+  { label: "ساعت ورزشی", href: "/products?cat=watch" },
+  { label: "دوچرخه", href: "/products?cat=bicycle" },
+  { label: "تماس با ما", href: "/contact" },
 ];
 
 const userItems = [
@@ -126,10 +126,7 @@ export default function MobileMenuDrawer({
                 onClick={onClose}
                 className="flex items-center justify-between border-b border-[#EDE4CE] px-4 py-3.5 text-sm font-semibold text-gray-800 transition hover:bg-[#F7F1E3]/50"
               >
-                <span className="flex items-center gap-3">
-                  <span className="text-xl">{item.emoji}</span>
-                  <span>{item.label}</span>
-                </span>
+                <span>{item.label}</span>
                 <span className="text-gray-300">‹</span>
               </a>
             </li>
