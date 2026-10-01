@@ -3,7 +3,7 @@
 @layer base {
 @media (max-width: 767px) {
   body {
-    padding-bottom: 85px;
+    padding-bottom: 100px;
   }
 }
   * {

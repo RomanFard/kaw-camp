@@ -188,19 +188,19 @@ export default function CartPage() {
                 </span>
               </div>
 
-              <button
-                type="button"
-                className="mt-5 w-full rounded-lg bg-green-700 py-3 text-base font-bold text-white transition hover:bg-green-800"
-              >
-                ادامه فرآیند خرید
-              </button>
+             <a
+  href="/checkout"
+  className="mt-5 block w-full rounded-lg bg-green-700 py-3 text-center text-base font-bold text-white transition hover:bg-green-800"
+>
+  ادامه فرآیند خرید
+</a>
 
               <a
-                href="/products"
-                className="mt-3 block text-center text-sm text-amber-600 hover:underline"
-              >
-                ← ادامه خرید
-              </a>
+  href="/products"
+  className="mt-3 block w-full rounded-lg border-2 border-amber-500 bg-white py-3 text-center text-sm font-bold text-amber-600 transition hover:bg-amber-50"
+>
+  ← ادامه خرید
+</a>
             </aside>
           </div>
         )}

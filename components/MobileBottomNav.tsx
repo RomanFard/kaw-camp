@@ -113,7 +113,7 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
   const { totalItems } = useCart();
 
-  if (pathname === "/checkout") return null;
+  
 
   return (
     <nav
