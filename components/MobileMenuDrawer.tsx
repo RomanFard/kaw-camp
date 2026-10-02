@@ -54,7 +54,7 @@ export default function MobileMenuDrawer({
         {/* بدنه: دو ستونه */}
         <div className="flex flex-1 overflow-hidden">
 {/* ستون راست: دسته‌های اصلی */}
-<div className="w-[100px] flex-shrink-0 overflow-y-auto border-l border-[#EDE4CE] bg-[#F7F1E3]/30">
+<div className="w-[88px] flex-shrink-0 overflow-y-auto border-l border-[#EDE4CE] bg-[#F7F1E3]/30">
   {megaMenu.map((cat) => {
     const isActive = cat.key === activeKey;
     return (
@@ -63,25 +63,25 @@ export default function MobileMenuDrawer({
         type="button"
         onClick={() => setActiveKey(cat.key)}
         className={
-          "flex w-full flex-col items-center gap-1 border-b border-[#EDE4CE] px-1 py-2 text-center transition " +
+          "flex w-full flex-col items-center gap-0.5 border-b border-[#EDE4CE] px-0.5 py-1.5 text-center transition " +
           (isActive
             ? "bg-white text-amber-600"
             : "text-gray-700 hover:bg-white")
         }
       >
-        {/* تصویر متعادل */}
-        <span className="relative flex h-11 w-11 items-center justify-center">
+        {/* تصویر فشرده */}
+        <span className="relative flex h-9 w-9 items-center justify-center">
           <Image
             src={cat.icon}
             alt={cat.label}
-            width={40}
-            height={40}
-            className="h-10 w-10 object-contain"
+            width={36}
+            height={36}
+            className="h-8 w-8 object-contain"
           />
         </span>
         <span
           className={
-            "text-[10px] leading-tight " +
+            "text-[9px] leading-tight " +
             (isActive ? "font-bold" : "font-semibold")
           }
         >
