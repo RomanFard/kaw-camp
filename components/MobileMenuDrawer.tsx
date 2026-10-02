@@ -28,81 +28,90 @@ export default function MobileMenuDrawer({
       />
 
       {/* Drawer - تمام صفحه */}
-<aside
-  className={
-    "fixed right-0 top-0 z-[210] flex h-screen w-full max-w-[400px] flex-col bg-white shadow-2xl transition-transform duration-300 " +
-    (isOpen ? "translate-x-0" : "translate-x-full")
-  }
-  dir="rtl"
->
-{/* هدر بالا */}
-<div className="flex flex-shrink-0 items-center justify-between border-b border-[#EDE4CE] bg-white px-3 py-2.5">
-  <span className="w-8"></span>
-  <span className="text-sm font-black text-amber-600">
-    دسته‌بندی کالاها
-  </span>
-  <button
-    type="button"
-    onClick={onClose}
-    aria-label="بستن"
-    className="flex h-8 w-8 items-center justify-center rounded-full text-xl font-light text-gray-700 transition hover:bg-gray-100"
-  >
-    ✕
-  </button>
-</div>
+      <aside
+        className={
+          "fixed right-0 top-0 z-[210] flex h-screen w-full max-w-[400px] flex-col bg-white shadow-2xl transition-transform duration-300 md:hidden " +
+          (isOpen ? "translate-x-0" : "translate-x-full")
+        }
+        dir="rtl"
+      >
+        {/* هدر بالا */}
+        <div className="flex flex-shrink-0 items-center justify-between border-b border-[#EDE4CE] bg-white px-3 py-2.5">
+          <span className="w-8"></span>
+          <span className="text-sm font-black text-amber-600">
+            دسته‌بندی کالاها
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="بستن"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-xl font-light text-gray-700 transition hover:bg-gray-100"
+          >
+            ✕
+          </button>
+        </div>
 
         {/* بدنه: دو ستونه */}
         <div className="flex flex-1 overflow-hidden">
-{/* ستون راست: دسته‌های اصلی */}
-<div className="w-[88px] flex-shrink-0 overflow-y-auto border-l border-[#EDE4CE] bg-[#F7F1E3]/30">
-  {megaMenu.map((cat) => {
-    const isActive = cat.key === activeKey;
-    return (
-      <button
-        key={cat.key}
-        type="button"
-        onClick={() => setActiveKey(cat.key)}
-        className={
-          "flex w-full flex-col items-center gap-0.5 border-b border-[#EDE4CE] px-0.5 py-1.5 text-center transition " +
-          (isActive
-            ? "bg-white text-amber-600"
-            : "text-gray-700 hover:bg-white")
-        }
-      >
-        {/* تصویر فشرده */}
-        <span className="relative flex h-9 w-9 items-center justify-center">
-          <Image
-            src={cat.icon}
-            alt={cat.label}
-            width={36}
-            height={36}
-            className="h-8 w-8 object-contain"
-          />
-        </span>
-        <span
-          className={
-            "text-[9px] leading-tight " +
-            (isActive ? "font-bold" : "font-semibold")
-          }
-        >
-          {cat.label}
-        </span>
-      </button>
-    );
-  })}
-</div>
+          {/* ستون راست: دسته‌های اصلی */}
+          <div className="w-[88px] flex-shrink-0 overflow-y-auto border-l border-[#EDE4CE] bg-[#F7F1E3]/30">
+            {megaMenu.map((cat) => {
+              const isActive = cat.key === activeKey;
+              return (
+                <button
+                  key={cat.key}
+                  type="button"
+                  onClick={() => setActiveKey(cat.key)}
+                  className={
+                    "flex w-full flex-col items-center gap-0.5 border-b border-[#EDE4CE] px-0.5 py-1.5 text-center transition " +
+                    (isActive
+                      ? "bg-white text-amber-600"
+                      : "text-gray-700 hover:bg-white")
+                  }
+                >
+                  {/* عکس واقعی (به جای آیکون) */}
+                  <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-md bg-white">
+                    <img
+                      src={cat.photo || cat.icon}
+                      alt={cat.label}
+                      className="h-full w-full object-contain"
+                    />
+                  </span>
+                  <span
+                    className={
+                      "text-[9px] leading-tight " +
+                      (isActive ? "font-bold" : "font-semibold")
+                    }
+                  >
+                    {cat.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
           {/* ستون چپ: زیردسته‌ها */}
           <div className="flex-1 overflow-y-auto bg-white px-3 py-3">
+            {/* عکس بزرگ دسته + نام */}
+            <div className="mb-4 overflow-hidden rounded-xl border border-[#EDE4CE] bg-[#F7F1E3]/30">
+              <div className="relative aspect-square w-full">
+                <img
+                  src={activeCategory.photo || activeCategory.icon}
+                  alt={activeCategory.label}
+                  className="h-full w-full object-contain p-4"
+                />
+              </div>
+            </div>
+
             {/* لینک همه محصولات */}
-<a
-  href={`/products?cat=${activeCategory.key}`}
-  onClick={onClose}
-  className="mb-3 flex items-center justify-between border-b border-[#EDE4CE] pb-2 text-xs font-bold text-amber-600"
->
-  <span>همه محصولات {activeCategory.label}</span>
-  <span className="text-base">›</span>
-</a>
+            <a
+              href={`/products?cat=${activeCategory.key}`}
+              onClick={onClose}
+              className="mb-3 flex items-center justify-between border-b border-[#EDE4CE] pb-2 text-xs font-bold text-amber-600"
+            >
+              <span>همه محصولات {activeCategory.label}</span>
+              <span className="text-base">›</span>
+            </a>
 
             {/* گروه‌ها */}
             {activeCategory.groups.map((group, gi) => (
@@ -127,28 +136,28 @@ export default function MobileMenuDrawer({
                   ))}
                 </ul>
 
- {/* اگه گروه "ظرفیت" بود، دکمه‌های نارنجی */}
-{group.title.includes("ظرفیت") && (
-  <div className="mt-2.5 flex flex-wrap gap-1.5">
-    {[
-      "چادر ۱ نفره",
-      "چادر ۲ نفره",
-      "چادر ۳ نفره",
-      "چادر ۴ نفره",
-      "چادر ۶ تا ۸ نفره",
-      "چادر ۱۰ نفره و بالاتر",
-    ].map((cap) => (
-      <a
-        key={cap}
-        href={`/products?cat=tent&capacity=${cap}`}
-        onClick={onClose}
-        className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-semibold text-amber-700 transition hover:border-amber-400 hover:bg-amber-100"
-      >
-        {cap}
-      </a>
-    ))}
-  </div>
-)}
+                {/* اگه گروه "ظرفیت" بود، دکمه‌های نارنجی */}
+                {group.title.includes("ظرفیت") && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {[
+                      "چادر ۱ نفره",
+                      "چادر ۲ نفره",
+                      "چادر ۳ نفره",
+                      "چادر ۴ نفره",
+                      "چادر ۶ تا ۸ نفره",
+                      "چادر ۱۰ نفره و بالاتر",
+                    ].map((cap) => (
+                      <a
+                        key={cap}
+                        href={`/products?cat=tent&capacity=${cap}`}
+                        onClick={onClose}
+                        className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-semibold text-amber-700 transition hover:border-amber-400 hover:bg-amber-100"
+                      >
+                        {cap}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

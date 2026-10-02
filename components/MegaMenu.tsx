@@ -93,16 +93,17 @@ export default function MegaMenu({
             <div className="flex gap-8">
               {/* تصویر بزرگ (راست) */}
               <div className="flex w-[260px] flex-shrink-0 flex-col items-center">
-                <div className="flex h-[260px] w-full items-center justify-center rounded-2xl border border-[#E8DFC8] bg-[#F7F1E3]/40 p-6">
+                <div className="relative h-[260px] w-full overflow-hidden rounded-2xl border border-[#E8DFC8] bg-[#F7F1E3]">
                   <Image
-                    src={activeCategory.icon}
+                    src={activeCategory.photo || activeCategory.icon}
                     alt={activeCategory.label}
-                    width={200}
-                    height={200}
-                    className="h-full w-full object-contain"
+                    fill
+                    sizes="260px"
+                    className="object-contain p-4"
                   />
                 </div>
 
+                {/* لینک مشاهده همه */}
                 <a
                   href={`/products?cat=${activeCategory.key}`}
                   onClick={onClose}
@@ -112,7 +113,7 @@ export default function MegaMenu({
                 </a>
               </div>
 
-              {/* لیست زیردسته‌ها */}
+              {/* لیست زیردسته‌ها (چپ) */}
               <div className="flex-1">
                 <h3 className="mb-5 border-b border-[#EDE4CE] pb-3 text-xl font-black text-gray-900">
                   {activeCategory.label}

@@ -11,16 +11,17 @@ export type MegaMenuGroup = {
 export type MegaMenuCategory = {
   key: string;
   label: string;
-  icon: string;      // مسیر تصویر
+  icon: string;
+  photo: string;
   groups: MegaMenuGroup[];
 };
 
 export const megaMenu: MegaMenuCategory[] = [
-  // ۱. چادر و سایبان
   {
     key: "tent",
     label: "چادر و سایبان",
     icon: "/images/categories/tent.svg",
+    photo: "/images/categories/photos/tent.jpg",
     groups: [
       {
         title: "براساس استفاده",
@@ -55,11 +56,11 @@ export const megaMenu: MegaMenuCategory[] = [
     ],
   },
 
-  // ۲. چراغ و روشنایی
   {
     key: "lighting",
     label: "چراغ و روشنایی",
     icon: "/images/categories/lighting.svg",
+    photo: "/images/categories/photos/lighting.jpg",
     groups: [
       {
         title: "چراغ قوه",
@@ -82,11 +83,11 @@ export const megaMenu: MegaMenuCategory[] = [
     ],
   },
 
-  // ۳. پخت و پز
   {
     key: "cooking",
     label: "پخت و پز",
     icon: "/images/categories/cooking.svg",
+    photo: "/images/categories/photos/cooking.jpg",
     groups: [
       {
         title: "اجاق",
@@ -108,11 +109,11 @@ export const megaMenu: MegaMenuCategory[] = [
     ],
   },
 
-  // ۴. لوازم خواب و شب‌مانی
   {
     key: "sleep",
     label: "لوازم خواب و شب‌مانی",
     icon: "/images/categories/sleep.svg",
+    photo: "/images/categories/photos/sleep.jpg",
     groups: [
       {
         title: "کیسه خواب",
@@ -142,11 +143,11 @@ export const megaMenu: MegaMenuCategory[] = [
     ],
   },
 
-  // ۵. میز و صندلی
   {
     key: "table",
     label: "میز و صندلی",
     icon: "/images/categories/table.svg",
+    photo: "/images/categories/photos/chair.jpg",
     groups: [
       {
         title: "محصولات",
@@ -161,11 +162,11 @@ export const megaMenu: MegaMenuCategory[] = [
     ],
   },
 
-  // ۶. تجهیزات و ابزار
   {
     key: "tools",
     label: "تجهیزات و ابزار",
     icon: "/images/categories/tools.svg",
+    photo: "/images/categories/photos/bottle.jpg",
     groups: [
       {
         title: "ابزار",
@@ -179,11 +180,11 @@ export const megaMenu: MegaMenuCategory[] = [
     ],
   },
 
-  // ۷. زیرانداز کمپینگ
   {
     key: "mattress",
     label: "زیرانداز کمپینگ",
     icon: "/images/categories/mattress.svg",
+    photo: "/images/categories/photos/mattress.jpg",
     groups: [
       {
         title: "محصولات",
@@ -197,11 +198,11 @@ export const megaMenu: MegaMenuCategory[] = [
     ],
   },
 
-  // ۸. کیف و کوله‌پشتی
   {
     key: "backpack",
     label: "کیف و کوله‌پشتی",
     icon: "/images/categories/backpack.svg",
+    photo: "/images/categories/photos/backpack.jpg",
     groups: [
       {
         title: "محصولات",
@@ -215,11 +216,11 @@ export const megaMenu: MegaMenuCategory[] = [
     ],
   },
 
-  // ۹. پوشاک کوهنوردی
   {
     key: "clothing",
     label: "پوشاک کوهنوردی",
     icon: "/images/categories/clothing.svg",
+    photo: "/images/categories/photos/clothing.jpg",
     groups: [
       {
         title: "محصولات",
@@ -230,6 +231,24 @@ export const megaMenu: MegaMenuCategory[] = [
           { label: "کلاه", href: "/products?cat=clothing" },
           { label: "جوراب", href: "/products?cat=socks" },
           { label: "گتر", href: "/products?cat=gaiters" },
+        ],
+      },
+    ],
+  },
+
+  {
+    key: "shoes",
+    label: "کفش کوهنوردی",
+    icon: "/images/categories/clothing.svg",
+    photo: "/images/categories/photos/boots.jpg",
+    groups: [
+      {
+        title: "محصولات",
+        items: [
+          { label: "کفش کوهنوردی چرم", href: "/products?cat=shoes" },
+          { label: "کفش سبک کوهنوردی", href: "/products?cat=shoes" },
+          { label: "کفش ضدآب", href: "/products?cat=shoes" },
+          { label: "نیم بوت", href: "/products?cat=shoes" },
         ],
       },
     ],

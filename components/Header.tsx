@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import MegaMenu from "./MegaMenu";
 import CartDropdown from "./CartDropdown";
 import SearchPanel from "./SearchPanel";
 import MobileMenuDrawer from "./MobileMenuDrawer";
@@ -20,15 +19,7 @@ const menuItems = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [megaOpen, setMegaOpen] = useState(false);
-  const [megaActiveKey, setMegaActiveKey] = useState("tent");
-
-  function openMegaMenu(categoryKey?: string) {
-    if (categoryKey) {
-      setMegaActiveKey(categoryKey);
-    }
-    setMegaOpen(true);
-  }
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <>
@@ -46,7 +37,7 @@ export default function Header() {
             {/* ═══ موبایل ═══ */}
             <div className="py-3 md:hidden">
               <div className="flex items-center gap-2">
-                {/* لوگو (راست) */}
+                {/* لوگو */}
                 <a href="/" className="flex-shrink-0">
                   <Image
                     src="/images/logo.png"
@@ -148,11 +139,12 @@ export default function Header() {
         {/* منوی دسکتاپ */}
         <nav className="hidden border-b border-[#E8DFC8] bg-[#F7F1E3] md:block">
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-6">
-            {/* دکمه دسته‌بندی (سمت راست) */}
+            {/* دکمه باز کردن منوی کناری (راست) */}
             <button
               type="button"
-              onClick={() => openMegaMenu()}
-              className="flex items-center gap-3 rounded-lg bg-white px-5 py-3 text-sm font-bold text-gray-800 shadow-sm transition hover:bg-amber-50 hover:text-amber-600 md:text-base"
+              onClick={() => setSidebarOpen(true)}
+              onMouseEnter={() => setSidebarOpen(true)}
+              className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-bold text-gray-700 transition hover:bg-white hover:text-amber-600 md:text-base"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -172,7 +164,7 @@ export default function Header() {
             </button>
 
             {/* منوی میانی */}
-            <ul className="flex flex-1 flex-wrap items-center justify-center gap-x-10 gap-y-2 py-5 text-lg font-semibold">
+            <ul className="flex flex-1 flex-wrap items-center justify-center gap-x-8 gap-y-2 py-5 text-base font-semibold lg:gap-x-10 lg:text-lg">
               {menuItems.map((item) => (
                 <li key={item.label}>
                   <a
@@ -188,19 +180,17 @@ export default function Header() {
                 </li>
               ))}
             </ul>
+
+            {/* فضای خالی برای تعادل */}
+            <div className="hidden w-[180px] lg:block"></div>
           </div>
         </nav>
       </header>
 
       {/* نوار کناری راست (دسکتاپ) */}
-      <RightSidebar onOpenMegaMenu={openMegaMenu} />
-
-      {/* مگا منو (دسکتاپ) */}
-      <MegaMenu
-        isOpen={megaOpen}
-        onClose={() => setMegaOpen(false)}
-        activeKey={megaActiveKey}
-        onActiveKeyChange={setMegaActiveKey}
+      <RightSidebar
+        forceOpen={sidebarOpen}
+        onForceClose={() => setSidebarOpen(false)}
       />
 
       {/* دراور موبایل */}
