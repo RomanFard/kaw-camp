@@ -61,7 +61,7 @@ export default function ReturnsPage() {
         </nav>
 
         {/* هدر صفحه */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center md:p-12">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
           <span className="inline-block rounded-full bg-amber-50 px-5 py-2 text-sm font-semibold text-amber-600">
             رویه بازگشت کالا
           </span>
@@ -84,7 +84,7 @@ export default function ReturnsPage() {
             {conditions.map((cond, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-[#E8DFC8] bg-white p-6 text-center transition hover:shadow-md"
+                className="rounded-2xl border border-[#D4C5A0] bg-white p-6 text-center transition hover:shadow-md"
               >
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-3xl">
                   {cond.icon}
@@ -101,7 +101,7 @@ export default function ReturnsPage() {
         </div>
 
         {/* مراحل بازگشت */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-6 md:p-8">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-6 md:p-8">
           <h2 className="mb-6 text-lg font-bold text-gray-800">
             مراحل بازگشت کالا
           </h2>
@@ -132,7 +132,7 @@ export default function ReturnsPage() {
         </div>
 
         {/* نکات مهم */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-6 md:p-8">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-6 md:p-8">
           <h2 className="mb-5 text-lg font-bold text-gray-800">
             نکات مهم
           </h2>

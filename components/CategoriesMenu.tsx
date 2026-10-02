@@ -77,7 +77,7 @@ export default function CategoriesMenu() {
       <div
         onMouseLeave={() => setIsOpen(false)}
         className={
-          "absolute right-0 top-full z-50 w-72 origin-top overflow-hidden border border-t-0 border-[#E8DFC8] bg-white shadow-xl transition-all duration-300 ease-out " +
+          "absolute right-0 top-full z-50 w-72 origin-top overflow-hidden border border-t-0 border-[#D4C5A0] bg-white shadow-xl transition-all duration-300 ease-out " +
           (isOpen
             ? "visible translate-y-0 scale-y-100 opacity-100"
             : "invisible -translate-y-2 scale-y-95 opacity-0")

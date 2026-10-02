@@ -9,9 +9,9 @@ export default function ProductTabs({ product }: { product: Product }) {
   const [active, setActive] = useState(0);
 
   return (
-    <div className="rounded-xl border border-[#E8DFC8] bg-white">
+    <div className="rounded-xl border border-[#D4C5A0] bg-white">
       {/* نوار تب‌ها */}
-      <div className="flex overflow-x-auto border-b border-[#E8DFC8]">
+      <div className="flex overflow-x-auto border-b border-[#D4C5A0]">
         {tabs.map((t, i) => (
           <button
             key={t}
@@ -136,7 +136,7 @@ export default function ProductTabs({ product }: { product: Product }) {
             </span>
           </div>
 
-          <div className="rounded-xl border-2 border-dashed border-[#E8DFC8] bg-[#F7F1E3]/30 p-8 text-center">
+          <div className="rounded-xl border-2 border-dashed border-[#D4C5A0] bg-[#F7F1E3]/30 p-8 text-center">
             <p className="text-5xl">💬</p>
             <p className="mt-4 text-base font-bold text-gray-700">
               هنوز دیدگاهی ثبت نشده
@@ -160,7 +160,7 @@ export default function ProductTabs({ product }: { product: Product }) {
           <h2 className="mb-4 text-base font-bold text-gray-800">
             پیشنهاد ما به شما
           </h2>
-          <div className="rounded-xl border-2 border-dashed border-[#E8DFC8] bg-[#F7F1E3]/30 p-8 text-center">
+          <div className="rounded-xl border-2 border-dashed border-[#D4C5A0] bg-[#F7F1E3]/30 p-8 text-center">
             <p className="text-5xl">🎯</p>
             <p className="mt-4 text-base font-bold text-gray-700">
               به‌زودی محصولات مشابه اینجا نمایش داده می‌شود

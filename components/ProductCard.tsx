@@ -16,7 +16,7 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <a
       href={`/product/${product.id}`}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-[#E8DFC8] bg-white transition hover:border-amber-400 hover:shadow-lg"
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-[#D4C5A0] bg-white transition hover:border-amber-400 hover:shadow-lg"
     >
       {/* تصویر */}
       <div className="relative block aspect-square overflow-hidden bg-[#F7F1E3]">

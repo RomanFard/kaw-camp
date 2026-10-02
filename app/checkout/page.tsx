@@ -49,7 +49,7 @@ export default function CheckoutPage() {
 
         {items.length === 0 ? (
           /* سبد خالی */
-          <div className="rounded-2xl border border-[#E8DFC8] bg-white p-12 text-center">
+          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-12 text-center">
             <p className="text-6xl">🛒</p>
             <p className="mt-4 text-lg font-bold text-gray-800">
               سبد خرید شما خالی است
@@ -69,7 +69,7 @@ export default function CheckoutPage() {
             {/* فرم - سمت راست */}
             <div className="space-y-4">
               {/* اطلاعات گیرنده */}
-              <div className="rounded-xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
                 <h2 className="mb-5 text-lg font-bold text-gray-800">
                   اطلاعات گیرنده
                 </h2>
@@ -83,7 +83,7 @@ export default function CheckoutPage() {
                       type="text"
                       value={form.firstName}
                       onChange={(e) => updateField("firstName", e.target.value)}
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -95,7 +95,7 @@ export default function CheckoutPage() {
                       type="text"
                       value={form.lastName}
                       onChange={(e) => updateField("lastName", e.target.value)}
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -108,7 +108,7 @@ export default function CheckoutPage() {
                       dir="ltr"
                       value={form.phone}
                       onChange={(e) => updateField("phone", e.target.value)}
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -121,14 +121,14 @@ export default function CheckoutPage() {
                       dir="ltr"
                       value={form.email}
                       onChange={(e) => updateField("email", e.target.value)}
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                     />
                   </div>
                 </div>
               </div>
 
               {/* آدرس */}
-              <div className="rounded-xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
                 <h2 className="mb-5 text-lg font-bold text-gray-800">
                   آدرس تحویل
                 </h2>
@@ -142,7 +142,7 @@ export default function CheckoutPage() {
                       type="text"
                       value={form.province}
                       onChange={(e) => updateField("province", e.target.value)}
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -154,7 +154,7 @@ export default function CheckoutPage() {
                       type="text"
                       value={form.city}
                       onChange={(e) => updateField("city", e.target.value)}
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -166,7 +166,7 @@ export default function CheckoutPage() {
                       rows={3}
                       value={form.address}
                       onChange={(e) => updateField("address", e.target.value)}
-                      className="w-full resize-none rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                      className="w-full resize-none rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -179,20 +179,20 @@ export default function CheckoutPage() {
                       dir="ltr"
                       value={form.postalCode}
                       onChange={(e) => updateField("postalCode", e.target.value)}
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                     />
                   </div>
                 </div>
               </div>
 
               {/* روش ارسال */}
-              <div className="rounded-xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
                 <h2 className="mb-5 text-lg font-bold text-gray-800">
                   روش ارسال
                 </h2>
 
                 <div className="space-y-3">
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#E8DFC8] p-4 transition hover:bg-[#F7F1E3]/30">
+                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#D4C5A0] p-4 transition hover:bg-[#F7F1E3]/30">
                     <input
                       type="radio"
                       name="shipping"
@@ -214,7 +214,7 @@ export default function CheckoutPage() {
                     </div>
                   </label>
 
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#E8DFC8] p-4 transition hover:bg-[#F7F1E3]/30">
+                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#D4C5A0] p-4 transition hover:bg-[#F7F1E3]/30">
                     <input
                       type="radio"
                       name="shipping"
@@ -239,13 +239,13 @@ export default function CheckoutPage() {
               </div>
 
               {/* روش پرداخت */}
-              <div className="rounded-xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
                 <h2 className="mb-5 text-lg font-bold text-gray-800">
                   روش پرداخت
                 </h2>
 
                 <div className="space-y-3">
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#E8DFC8] p-4 transition hover:bg-[#F7F1E3]/30">
+                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#D4C5A0] p-4 transition hover:bg-[#F7F1E3]/30">
                     <input
                       type="radio"
                       name="payment"
@@ -265,7 +265,7 @@ export default function CheckoutPage() {
                     <span className="text-xl">💳</span>
                   </label>
 
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#E8DFC8] p-4 transition hover:bg-[#F7F1E3]/30">
+                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#D4C5A0] p-4 transition hover:bg-[#F7F1E3]/30">
                     <input
                       type="radio"
                       name="payment"
@@ -288,7 +288,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* توضیحات */}
-              <div className="rounded-xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
                 <h2 className="mb-3 text-lg font-bold text-gray-800">
                   توضیحات سفارش (اختیاری)
                 </h2>
@@ -297,7 +297,7 @@ export default function CheckoutPage() {
                   value={form.note}
                   onChange={(e) => updateField("note", e.target.value)}
                   placeholder="مثلاً: لطفاً قبل از ارسال تماس بگیرید"
-                  className="w-full resize-none rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                  className="w-full resize-none rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                 />
               </div>
             </div>
@@ -305,7 +305,7 @@ export default function CheckoutPage() {
             {/* خلاصه سفارش - سمت چپ */}
             <aside className="sticky top-4 h-fit space-y-4">
               {/* لیست محصولات */}
-              <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+              <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
                 <h2 className="mb-4 border-b border-[#EDE4CE] pb-3 text-lg font-bold text-gray-800">
                   سفارش شما ({totalItems} کالا)
                 </h2>
@@ -339,7 +339,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* جمع کل */}
-              <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+              <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
                 <div className="space-y-3 border-b border-[#EDE4CE] pb-4 text-sm">
                   <div className="flex justify-between text-gray-600">
                     <span>جمع کالاها</span>

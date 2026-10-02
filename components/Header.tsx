@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import MegaMenu from "./MegaMenu";
 import CategoriesMenu from "./CategoriesMenu";
 import CartDropdown from "./CartDropdown";
 import SearchPanel from "./SearchPanel";
@@ -31,33 +32,21 @@ export default function Header() {
         </div>
 
         {/* نوار اصلی */}
-        <div className="border-b border-[#E8DFC8]">
+        <div className="border-b border-[#D4C5A0]">
           <div className="mx-auto max-w-[1600px] px-4 md:px-6">
 {/* ═══ موبایل ═══ */}
 <div className="py-3 md:hidden">
   <div className="flex items-center gap-2">
-    {/* دکمه منو (راست) */}
-    <button
-      type="button"
-      onClick={() => setMobileOpen(true)}
-      aria-label="منو"
-      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={2.5}
-        stroke="currentColor"
-        className="h-5 w-5"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
-        />
-      </svg>
-    </button>
+    {/* لوگو (راست) */}
+    <a href="/" className="flex-shrink-0">
+      <Image
+        src="/images/logo.png"
+        alt="کو کمپ"
+        width={60}
+        height={60}
+        className="h-9 w-auto"
+      />
+    </a>
 
     {/* نوار جستجو (پهن، وسط) */}
     <div className="flex-1">
@@ -144,29 +133,29 @@ export default function Header() {
           </div>
         </div>
 
-        {/* منوی دسکتاپ */}
-        <nav className="hidden border-b border-[#E8DFC8] bg-[#F7F1E3] md:block">
-          <div className="mx-auto flex max-w-[1600px] items-center gap-10 px-6">
-            <CategoriesMenu />
+{/* منوی دسکتاپ */}
+<nav className="hidden border-b border-[#D4C5A0] bg-[#F7F1E3] md:block">
+  <div className="mx-auto flex max-w-[1600px] items-center gap-10 px-6">
+    <MegaMenu />
 
-            <ul className="flex flex-wrap items-center gap-x-10 gap-y-2 py-5 text-lg font-semibold">
-              {menuItems.map((item) => (
-                <li key={item.label}>
-                  <a
-                    href={item.href}
-                    className={
-                      item.href === "/"
-                        ? "text-amber-600"
-                        : "hover:text-amber-600"
-                    }
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
+    <ul className="flex flex-wrap items-center gap-x-10 gap-y-2 py-5 text-lg font-semibold">
+      {menuItems.map((item) => (
+        <li key={item.label}>
+          <a
+            href={item.href}
+            className={
+              item.href === "/"
+                ? "text-amber-600"
+                : "hover:text-amber-600"
+            }
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
       </header>
 
       {/* دراور موبایل */}
@@ -187,20 +176,8 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-2 rounded-full border border-[#E8DFC8] bg-[#F7F1E3]/40 px-3 py-2 text-sm text-gray-400 transition hover:border-amber-500"
+        className="flex w-full items-center gap-2 rounded-full border border-[#D4C5A0] bg-[#F7F1E3]/40 px-4 py-2.5 text-sm text-gray-400 transition hover:border-amber-500"
       >
-        {/* لوگو داخل جستجو */}
-        <Image
-          src="/images/logo.png"
-          alt="کو کمپ"
-          width={60}
-          height={60}
-          className="h-7 w-auto flex-shrink-0"
-        />
-
-        {/* خط جداکننده */}
-        <span className="h-5 w-px flex-shrink-0 bg-[#E8DFC8]"></span>
-
         {/* آیکون ذره‌بین */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -208,7 +185,7 @@ function SearchButton() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-4 w-4 flex-shrink-0 text-amber-500"
+          className="h-5 w-5 flex-shrink-0 text-amber-500"
         >
           <path
             strokeLinecap="round"

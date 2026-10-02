@@ -60,7 +60,7 @@ export default async function SearchPage({
         {/* حالت ۱: بدون query */}
         {!query && (
           <div className="mx-auto max-w-2xl">
-            <div className="rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center md:p-12">
+            <div className="rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
               <p className="text-6xl">🔍</p>
               <p className="mt-5 text-lg font-bold text-gray-800 md:text-xl">
                 چی میخوای پیدا کنی؟
@@ -79,7 +79,7 @@ export default async function SearchPage({
                     <a
                       key={term}
                       href={"/search?q=" + encodeURIComponent(term)}
-                      className="rounded-full border border-[#E8DFC8] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
+                      className="rounded-full border border-[#D4C5A0] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
                     >
                       {term}
                     </a>
@@ -93,7 +93,7 @@ export default async function SearchPage({
         {/* حالت ۲: query داریم ولی نتیجه‌ای نیست */}
         {query && totalResults === 0 && (
           <div className="mx-auto max-w-2xl">
-            <div className="rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center md:p-12">
+            <div className="rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
               <p className="text-6xl">😔</p>
               <p className="mt-5 text-lg font-bold text-gray-800 md:text-xl">
                 نتیجه‌ای برای «{query}» پیدا نشد
@@ -111,7 +111,7 @@ export default async function SearchPage({
                     <a
                       key={term}
                       href={"/search?q=" + encodeURIComponent(term)}
-                      className="rounded-full border border-[#E8DFC8] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
+                      className="rounded-full border border-[#D4C5A0] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
                     >
                       {term}
                     </a>
@@ -133,7 +133,7 @@ export default async function SearchPage({
         {query && totalResults > 0 && (
           <>
             {/* هدر نتایج */}
-            <div className="mb-5 rounded-xl border border-[#E8DFC8] bg-white px-4 py-4 md:px-5">
+            <div className="mb-5 rounded-xl border border-[#D4C5A0] bg-white px-4 py-4 md:px-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-sm text-gray-600 md:text-base">
                   <span className="font-bold text-gray-800">
@@ -206,7 +206,7 @@ export default async function SearchPage({
                       "rounded-full px-3 py-1 text-xs font-semibold transition " +
                       (!cat
                         ? "bg-amber-500 text-white"
-                        : "border border-[#E8DFC8] bg-white text-gray-700 hover:border-amber-500")
+                        : "border border-[#D4C5A0] bg-white text-gray-700 hover:border-amber-500")
                     }
                   >
                     همه ({totalResults})
@@ -228,7 +228,7 @@ export default async function SearchPage({
                           "rounded-full px-3 py-1 text-xs font-semibold transition " +
                           (cat === c.key
                             ? "bg-amber-500 text-white"
-                            : "border border-[#E8DFC8] bg-white text-gray-700 hover:border-amber-500")
+                            : "border border-[#D4C5A0] bg-white text-gray-700 hover:border-amber-500")
                         }
                       >
                         {c.label} ({count})
@@ -247,7 +247,7 @@ export default async function SearchPage({
             </div>
 
             {/* پیشنهاد جستجوهای مرتبط */}
-            <div className="mt-8 rounded-xl border border-[#E8DFC8] bg-white p-5 md:p-6">
+            <div className="mt-8 rounded-xl border border-[#D4C5A0] bg-white p-5 md:p-6">
               <p className="mb-3 text-sm font-bold text-gray-800 md:text-base">
                 🔎 جستجوهای مرتبط
               </p>
@@ -259,7 +259,7 @@ export default async function SearchPage({
                     <a
                       key={term}
                       href={"/search?q=" + encodeURIComponent(term)}
-                      className="rounded-full border border-[#E8DFC8] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
+                      className="rounded-full border border-[#D4C5A0] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
                     >
                       {term}
                     </a>

@@ -42,7 +42,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
       {/* ─────── محتوای اصلی (راست) ─────── */}
       <div className="min-w-0 space-y-4 md:space-y-6">
         {/* کارت محصول */}
-        <div className="rounded-xl border border-[#E8DFC8] bg-white p-4 md:p-6">
+        <div className="rounded-xl border border-[#D4C5A0] bg-white p-4 md:p-6">
           {/* ─── دسکتاپ: گالری سمت چپ، اطلاعات سمت راست ─── */}
           <div className="md:grid md:grid-cols-2 md:gap-6">
             {/* گالری تصاویر */}

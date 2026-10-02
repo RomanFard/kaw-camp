@@ -59,7 +59,7 @@ export default function AccountPage() {
           {/* سایدبار */}
           <aside className="space-y-4">
             {/* کارت کاربر */}
-            <div className="rounded-2xl border border-[#E8DFC8] bg-white p-6 text-center">
+            <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6 text-center">
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-500 text-4xl text-white">
                 👤
               </div>
@@ -72,7 +72,7 @@ export default function AccountPage() {
             </div>
 
             {/* منو */}
-            <div className="rounded-2xl border border-[#E8DFC8] bg-white p-2">
+            <div className="rounded-2xl border border-[#D4C5A0] bg-white p-2">
               {menuItems.map((item) => (
                 <button
                   key={item.key}
@@ -117,7 +117,7 @@ export default function AccountPage() {
                   ].map((stat, i) => (
                     <div
                       key={i}
-                      className="rounded-2xl border border-[#E8DFC8] bg-white p-5"
+                      className="rounded-2xl border border-[#D4C5A0] bg-white p-5"
                     >
                       <span className="text-3xl">{stat.icon}</span>
                       <div className="mt-3 text-2xl font-black text-amber-600">
@@ -131,7 +131,7 @@ export default function AccountPage() {
                 </div>
 
                 {/* آخرین سفارش‌ها */}
-                <div className="rounded-2xl border border-[#E8DFC8] bg-white p-6">
+                <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
                   <div className="mb-4 flex items-center justify-between">
                     <h2 className="text-lg font-bold text-gray-800">
                       آخرین سفارش‌ها
@@ -173,7 +173,7 @@ export default function AccountPage() {
                 </div>
 
                 {/* پروفایل کامل */}
-                <div className="rounded-2xl border border-[#E8DFC8] bg-white p-6">
+                <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
                   <h2 className="mb-5 text-lg font-bold text-gray-800">
                     اطلاعات حساب
                   </h2>
@@ -186,7 +186,7 @@ export default function AccountPage() {
                       <input
                         type="text"
                         defaultValue="علی محمدی"
-                        className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                        className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                       />
                     </div>
 
@@ -198,7 +198,7 @@ export default function AccountPage() {
                         type="tel"
                         dir="ltr"
                         defaultValue="09123456789"
-                        className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                        className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                       />
                     </div>
 
@@ -210,7 +210,7 @@ export default function AccountPage() {
                         type="email"
                         dir="ltr"
                         placeholder="example@email.com"
-                        className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                        className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                       />
                     </div>
                   </div>
@@ -227,7 +227,7 @@ export default function AccountPage() {
 
             {/* سفارش‌ها */}
             {active === "orders" && (
-              <div className="rounded-2xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
                 <h2 className="mb-5 text-lg font-bold text-gray-800">
                   سفارش‌های من
                 </h2>
@@ -283,7 +283,7 @@ export default function AccountPage() {
 
             {/* آدرس‌ها */}
             {active === "addresses" && (
-              <div className="rounded-2xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
                 <div className="mb-5 flex items-center justify-between">
                   <h2 className="text-lg font-bold text-gray-800">
                     آدرس‌های من
@@ -358,12 +358,12 @@ export default function AccountPage() {
 
             {/* علاقه‌مندی‌ها */}
             {active === "favorites" && (
-              <div className="rounded-2xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
                 <h2 className="mb-5 text-lg font-bold text-gray-800">
                   علاقه‌مندی‌های من
                 </h2>
 
-                <div className="rounded-xl border-2 border-dashed border-[#E8DFC8] bg-[#F7F1E3]/30 p-12 text-center">
+                <div className="rounded-xl border-2 border-dashed border-[#D4C5A0] bg-[#F7F1E3]/30 p-12 text-center">
                   <p className="text-5xl">❤️</p>
                   <p className="mt-4 text-base font-bold text-gray-700">
                     هنوز محصولی به علاقه‌مندی‌ها اضافه نکرده‌اید
@@ -380,7 +380,7 @@ export default function AccountPage() {
 
             {/* پروفایل */}
             {active === "profile" && (
-              <div className="rounded-2xl border border-[#E8DFC8] bg-white p-6">
+              <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
                 <h2 className="mb-5 text-lg font-bold text-gray-800">
                   اطلاعات حساب
                 </h2>
@@ -393,7 +393,7 @@ export default function AccountPage() {
                     <input
                       type="text"
                       defaultValue="علی محمدی"
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -405,7 +405,7 @@ export default function AccountPage() {
                       type="tel"
                       dir="ltr"
                       defaultValue="09123456789"
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -417,7 +417,7 @@ export default function AccountPage() {
                       type="email"
                       dir="ltr"
                       placeholder="example@email.com"
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -428,7 +428,7 @@ export default function AccountPage() {
                     <input
                       type="password"
                       placeholder="••••••••"
-                      className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                     />
                   </div>
                 </div>

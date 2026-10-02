@@ -169,7 +169,7 @@ export default function SearchPanel({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="جستجوی محصول، برند، کد یا مدل..."
-                className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500 md:text-base"
+                className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500 md:text-base"
               />
               {query && (
                 <button
@@ -194,7 +194,7 @@ export default function SearchPanel({
               type="button"
               onClick={closePanel}
               aria-label="بستن"
-              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg border border-[#E8DFC8] text-xl text-gray-600 transition hover:bg-[#F7F1E3]"
+              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg border border-[#D4C5A0] text-xl text-gray-600 transition hover:bg-[#F7F1E3]"
             >
               ✕
             </button>
@@ -215,7 +215,7 @@ export default function SearchPanel({
                       key={term}
                       type="button"
                       onClick={() => searchFor(term)}
-                      className="rounded-full border border-[#E8DFC8] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
+                      className="rounded-full border border-[#D4C5A0] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
                     >
                       {term}
                     </button>
@@ -227,7 +227,7 @@ export default function SearchPanel({
             {/* حالت ۲: نتیجه‌ای نیست */}
             {query.trim() && totalResults === 0 && (
               <div className="space-y-4">
-                <div className="rounded-xl border-2 border-dashed border-[#E8DFC8] bg-[#F7F1E3]/30 p-6 text-center md:p-8">
+                <div className="rounded-xl border-2 border-dashed border-[#D4C5A0] bg-[#F7F1E3]/30 p-6 text-center md:p-8">
                   <p className="text-5xl">🔍</p>
                   <p className="mt-4 text-base font-bold text-gray-700">
                     نتیجه‌ای برای «{query}» پیدا نشد
@@ -263,7 +263,7 @@ export default function SearchPanel({
                         key={term}
                         type="button"
                         onClick={() => searchFor(term)}
-                        className="rounded-full border border-[#E8DFC8] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
+                        className="rounded-full border border-[#D4C5A0] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
                       >
                         {term}
                       </button>
@@ -286,7 +286,7 @@ export default function SearchPanel({
                   </span>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-[#E8DFC8] bg-white">
+                <div className="overflow-hidden rounded-xl border border-[#D4C5A0] bg-white">
                   {topResults.map(({ product, matchReason }) => (
                     <button
                       key={product.id}

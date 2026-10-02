@@ -41,7 +41,7 @@ export default function AddToCartSection({
 
   return (
     <aside className="space-y-4">
-      <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+      <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
         {/* قیمت */}
         <div className="border-b border-[#EDE4CE] pb-4">
           {product.oldPrice && (
@@ -87,7 +87,7 @@ export default function AddToCartSection({
                     "rounded-lg border-2 px-4 py-2 text-sm font-semibold transition " +
                     (selectedColor === c.label
                       ? "border-amber-500 bg-amber-50 text-amber-700"
-                      : "border-[#E8DFC8] bg-white text-gray-700 hover:border-amber-300")
+                      : "border-[#D4C5A0] bg-white text-gray-700 hover:border-amber-300")
                   }
                 >
                   {c.label}
@@ -108,7 +108,7 @@ export default function AddToCartSection({
         )}
 
         {/* تعداد */}
-        <div className="mt-4 flex items-center justify-center gap-3 rounded-lg border border-[#E8DFC8] p-1">
+        <div className="mt-4 flex items-center justify-center gap-3 rounded-lg border border-[#D4C5A0] p-1">
           <button
             type="button"
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -155,7 +155,7 @@ export default function AddToCartSection({
       </div>
 
       {/* فروشنده */}
-      <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+      <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
         <div className="flex items-center justify-between border-b border-[#EDE4CE] pb-3">
           <span className="text-sm font-bold text-gray-800">فروشنده</span>
           <span className="text-sm font-bold text-amber-600">کو کمپ</span>

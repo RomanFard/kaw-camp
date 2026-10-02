@@ -49,7 +49,7 @@ export default function ProductGallery({
   return (
     <div className="w-full">
       {/* عکس بزرگ */}
-      <div className="mx-auto w-full max-w-[400px] overflow-hidden rounded-xl border border-[#E8DFC8] bg-white md:max-w-[440px]">
+      <div className="mx-auto w-full max-w-[400px] overflow-hidden rounded-xl border border-[#D4C5A0] bg-white md:max-w-[440px]">
         <img
           src={finalImages[safeIndex]}
           alt={productName}
@@ -69,7 +69,7 @@ export default function ProductGallery({
                 "aspect-square overflow-hidden rounded-lg border-2 bg-white transition " +
                 (i === safeIndex
                   ? "border-amber-500"
-                  : "border-[#E8DFC8] opacity-70 hover:opacity-100")
+                  : "border-[#D4C5A0] opacity-70 hover:opacity-100")
               }
             >
               <img

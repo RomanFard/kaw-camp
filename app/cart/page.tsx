@@ -35,7 +35,7 @@ export default function CartPage() {
 
         {items.length === 0 ? (
           /* سبد خالی */
-          <div className="rounded-2xl border border-[#E8DFC8] bg-white p-12 text-center">
+          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-12 text-center">
             <p className="text-6xl">🛒</p>
             <p className="mt-4 text-lg font-bold text-gray-800">
               سبد خرید شما خالی است
@@ -58,7 +58,7 @@ export default function CartPage() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 rounded-xl border border-[#E8DFC8] bg-white p-4"
+                  className="flex gap-4 rounded-xl border border-[#D4C5A0] bg-white p-4"
                 >
                   {/* تصویر */}
                   <a
@@ -87,7 +87,7 @@ export default function CartPage() {
 
                     <div className="mt-auto flex items-center justify-between">
                       {/* تعداد */}
-                      <div className="flex items-center gap-2 rounded-lg border border-[#E8DFC8] px-2 py-1">
+                      <div className="flex items-center gap-2 rounded-lg border border-[#D4C5A0] px-2 py-1">
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -150,7 +150,7 @@ export default function CartPage() {
             </div>
 
             {/* سایدبار - خلاصه سفارش */}
-            <aside className="sticky top-4 h-fit rounded-xl border border-[#E8DFC8] bg-white p-6">
+            <aside className="sticky top-4 h-fit rounded-xl border border-[#D4C5A0] bg-white p-6">
               <h2 className="mb-4 text-lg font-bold text-gray-800">
                 خلاصه سفارش
               </h2>

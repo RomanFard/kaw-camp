@@ -70,7 +70,7 @@ export default function ShippingPage() {
         </nav>
 
         {/* هدر */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center md:p-12">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
           <span className="inline-block rounded-full bg-amber-50 px-5 py-2 text-sm font-semibold text-amber-600">
             رویه ارسال
           </span>
@@ -84,7 +84,7 @@ export default function ShippingPage() {
         </div>
 
         {/* مراحل ارسال */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-6 md:p-8">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-6 md:p-8">
           <h2 className="mb-6 text-lg font-bold text-gray-800">
             مراحل ارسال سفارش
           </h2>
@@ -128,7 +128,7 @@ export default function ShippingPage() {
                   "relative rounded-2xl border bg-white p-6 transition " +
                   (method.featured
                     ? "border-amber-500 shadow-lg"
-                    : "border-[#E8DFC8] hover:shadow-md")
+                    : "border-[#D4C5A0] hover:shadow-md")
                 }
               >
                 {method.featured && (
@@ -171,7 +171,7 @@ export default function ShippingPage() {
         </div>
 
         {/* نکات مهم */}
-        <div className="rounded-2xl border border-[#E8DFC8] bg-white p-6 md:p-8">
+        <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6 md:p-8">
           <h2 className="mb-5 text-lg font-bold text-gray-800">
             نکات مهم درباره ارسال
           </h2>
@@ -199,7 +199,7 @@ export default function ShippingPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-8 rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center">
+        <div className="mt-8 rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center">
           <p className="text-base text-gray-600">
             سوالی درباره ارسال سفارش دارید؟
           </p>
@@ -212,7 +212,7 @@ export default function ShippingPage() {
             </a>
             <a
               href="/faq"
-              className="rounded-lg border border-[#E8DFC8] bg-white px-6 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
+              className="rounded-lg border border-[#D4C5A0] bg-white px-6 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
             >
               سوالات متداول
             </a>

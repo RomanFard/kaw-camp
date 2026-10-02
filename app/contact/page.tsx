@@ -20,7 +20,7 @@ export default function ContactPage() {
 
         <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
           {/* فرم تماس - سمت راست */}
-          <div className="rounded-xl border border-[#E8DFC8] bg-white p-6 md:p-8">
+          <div className="rounded-xl border border-[#D4C5A0] bg-white p-6 md:p-8">
             <h2 className="mb-2 text-lg font-bold text-gray-800">
               فرم تماس
             </h2>
@@ -36,7 +36,7 @@ export default function ContactPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                    className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                   />
                 </div>
 
@@ -47,7 +47,7 @@ export default function ContactPage() {
                   <input
                     type="tel"
                     dir="ltr"
-                    className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                    className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                   />
                 </div>
 
@@ -58,7 +58,7 @@ export default function ContactPage() {
                   <input
                     type="email"
                     dir="ltr"
-                    className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                    className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
                   />
                 </div>
 
@@ -68,7 +68,7 @@ export default function ContactPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                    className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                   />
                 </div>
 
@@ -78,7 +78,7 @@ export default function ContactPage() {
                   </label>
                   <textarea
                     rows={6}
-                    className="w-full resize-none rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                    className="w-full resize-none rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
@@ -95,7 +95,7 @@ export default function ContactPage() {
           {/* اطلاعات تماس - سمت چپ */}
           <aside className="space-y-4">
             {/* آدرس */}
-            <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+            <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
               <div className="flex items-start gap-4">
                 <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-amber-500 text-xl text-white">
                   📍
@@ -110,7 +110,7 @@ export default function ContactPage() {
             </div>
 
             {/* تلفن */}
-            <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+            <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
               <div className="flex items-start gap-4">
                 <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-amber-500 text-xl text-white">
                   📞
@@ -129,7 +129,7 @@ export default function ContactPage() {
             </div>
 
             {/* ایمیل */}
-            <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+            <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
               <div className="flex items-start gap-4">
                 <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-amber-500 text-xl text-white">
                   ✉️
@@ -148,7 +148,7 @@ export default function ContactPage() {
             </div>
 
             {/* ساعات کاری */}
-            <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+            <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
               <div className="flex items-start gap-4">
                 <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-amber-500 text-xl text-white">
                   🕐
@@ -167,7 +167,7 @@ export default function ContactPage() {
             </div>
 
             {/* شبکه‌های اجتماعی */}
-            <div className="rounded-xl border border-[#E8DFC8] bg-white p-5">
+            <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
               <h3 className="mb-4 text-base font-bold text-gray-800">
                 ما را دنبال کنید
               </h3>

@@ -77,7 +77,7 @@ export default function RulesPage() {
         </nav>
 
         {/* هدر صفحه */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center md:p-12">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
           <span className="inline-block rounded-full bg-amber-50 px-5 py-2 text-sm font-semibold text-amber-600">
             قوانین و مقررات
           </span>
@@ -95,7 +95,7 @@ export default function RulesPage() {
           {rules.map((rule) => (
             <div
               key={rule.title}
-              className="rounded-2xl border border-[#E8DFC8] bg-white p-6 transition hover:shadow-md"
+              className="rounded-2xl border border-[#D4C5A0] bg-white p-6 transition hover:shadow-md"
             >
               <div className="mb-4 flex items-center gap-3">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-2xl">
@@ -122,7 +122,7 @@ export default function RulesPage() {
         </div>
 
         {/* CTA پایین */}
-        <div className="mt-8 rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center">
+        <div className="mt-8 rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center">
           <p className="text-base text-gray-600">
             سوال یا ابهامی دارید؟ با ما تماس بگیرید.
           </p>
@@ -135,7 +135,7 @@ export default function RulesPage() {
             </a>
             <a
               href="/faq"
-              className="rounded-lg border border-[#E8DFC8] bg-white px-6 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
+              className="rounded-lg border border-[#D4C5A0] bg-white px-6 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
             >
               سوالات متداول
             </a>

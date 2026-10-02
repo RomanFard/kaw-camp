@@ -4,7 +4,7 @@ export default function Footer() {
       {/* ۴ کارت ویژگی */}
       <div className="mx-auto max-w-[1600px] px-6 pt-8">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <div className="flex items-center justify-between rounded-2xl border border-[#E8DFC8] bg-white px-5 py-5 shadow-sm">
+          <div className="flex items-center justify-between rounded-2xl border border-[#D4C5A0] bg-white px-5 py-5 shadow-sm">
             <span className="text-base font-semibold text-gray-800">خرید آسان</span>
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500 text-white">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-6 w-6">
@@ -13,7 +13,7 @@ export default function Footer() {
             </span>
           </div>
 
-          <div className="flex items-center justify-between rounded-2xl border border-[#E8DFC8] bg-white px-5 py-5 shadow-sm">
+          <div className="flex items-center justify-between rounded-2xl border border-[#D4C5A0] bg-white px-5 py-5 shadow-sm">
             <span className="text-base font-semibold text-gray-800">پشتیبانی سریع</span>
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500 text-white">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-6 w-6">
@@ -22,7 +22,7 @@ export default function Footer() {
             </span>
           </div>
 
-          <div className="flex items-center justify-between rounded-2xl border border-[#E8DFC8] bg-white px-5 py-5 shadow-sm">
+          <div className="flex items-center justify-between rounded-2xl border border-[#D4C5A0] bg-white px-5 py-5 shadow-sm">
             <span className="text-base font-semibold text-gray-800">ضمانت اصالت</span>
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500 text-white">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-6 w-6">
@@ -31,7 +31,7 @@ export default function Footer() {
             </span>
           </div>
 
-          <div className="flex items-center justify-between rounded-2xl border border-[#E8DFC8] bg-white px-5 py-5 shadow-sm">
+          <div className="flex items-center justify-between rounded-2xl border border-[#D4C5A0] bg-white px-5 py-5 shadow-sm">
             <span className="text-base font-semibold text-gray-800">ارسال سریع</span>
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500 text-white">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-6 w-6">
@@ -97,20 +97,20 @@ export default function Footer() {
               </p>
 
               <div className="mt-3 flex items-center gap-3">
-                <a href="https://youtube.com/@kawcamp" target="_blank" rel="noopener noreferrer" className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#E8DFC8] bg-white shadow-sm transition hover:shadow-md" aria-label="یوتیوب">
+                <a href="https://youtube.com/@kawcamp" target="_blank" rel="noopener noreferrer" className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#D4C5A0] bg-white shadow-sm transition hover:shadow-md" aria-label="یوتیوب">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="h-8 w-8 text-red-600">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                   </svg>
                 </a>
 
-                <a href="#" aria-label="بله" className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#E8DFC8] bg-white shadow-sm transition hover:shadow-md">
+                <a href="#" aria-label="بله" className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#D4C5A0] bg-white shadow-sm transition hover:shadow-md">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="h-10 w-10">
                     <circle cx="24" cy="24" r="22" fill="#1E88E5" />
                     <path d="M34 14L14 22l6 2.5L22 34l4-6 8-14z" fill="#ffffff" />
                   </svg>
                 </a>
 
-                <a href="#" aria-label="روبیکا" className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#E8DFC8] bg-white shadow-sm transition hover:shadow-md">
+                <a href="#" aria-label="روبیکا" className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#D4C5A0] bg-white shadow-sm transition hover:shadow-md">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="h-10 w-10">
                     <path d="M24 4L42 14v20L24 44 6 34V14L24 4z" fill="#E53935" />
                     <path d="M24 4L42 14L24 24L6 14L24 4z" fill="#FFB300" />
@@ -251,7 +251,7 @@ export default function Footer() {
       </div>
 
       {/* کپی رایت */}
-      <div className="mt-8 border-t border-[#E8DFC8] bg-white py-5">
+      <div className="mt-8 border-t border-[#D4C5A0] bg-white py-5">
         <div className="mx-auto max-w-[1600px] px-6 text-center text-base font-semibold text-gray-600">
           © ۱۴۰۴ کو کمپ — تمامی حقوق محفوظ است.
         </div>

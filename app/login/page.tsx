@@ -22,7 +22,7 @@ export default function LoginPage() {
 
         <div className="mx-auto max-w-md">
           {/* کارت اصلی */}
-          <div className="rounded-2xl border border-[#E8DFC8] bg-white p-8 shadow-sm">
+          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-8 shadow-sm">
             {/* لوگو */}
             <div className="mb-6 text-center">
               <h1 className="text-2xl font-bold text-gray-900">
@@ -36,7 +36,7 @@ export default function LoginPage() {
             </div>
 
             {/* تب‌ها */}
-            <div className="mb-6 flex rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/50 p-1">
+            <div className="mb-6 flex rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/50 p-1">
               <button
                 type="button"
                 onClick={() => {
@@ -80,7 +80,7 @@ export default function LoginPage() {
                   <input
                     type="text"
                     placeholder="مثلاً علی محمدی"
-                    className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500"
+                    className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500"
                   />
                 </div>
               )}
@@ -94,7 +94,7 @@ export default function LoginPage() {
                   type="tel"
                   dir="ltr"
                   placeholder="09123456789"
-                  className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-3 text-right text-sm outline-none transition focus:border-amber-500"
+                  className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-3 text-right text-sm outline-none transition focus:border-amber-500"
                 />
               </div>
 
@@ -118,7 +118,7 @@ export default function LoginPage() {
                   <input
                     type="password"
                     placeholder="••••••••"
-                    className="w-full rounded-lg border border-[#E8DFC8] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500"
+                    className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500"
                   />
                 </div>
               )}
@@ -170,16 +170,16 @@ export default function LoginPage() {
 
             {/* جداکننده */}
             <div className="my-6 flex items-center gap-3">
-              <div className="flex-1 border-t border-[#E8DFC8]"></div>
+              <div className="flex-1 border-t border-[#D4C5A0]"></div>
               <span className="text-xs text-gray-500">یا</span>
-              <div className="flex-1 border-t border-[#E8DFC8]"></div>
+              <div className="flex-1 border-t border-[#D4C5A0]"></div>
             </div>
 
             {/* دکمه‌های شبکه اجتماعی */}
             <div className="space-y-2">
               <button
                 type="button"
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#E8DFC8] bg-white py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#D4C5A0] bg-white py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -237,19 +237,19 @@ export default function LoginPage() {
 
           {/* مزیت‌ها */}
           <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-lg border border-[#E8DFC8] bg-white p-3">
+            <div className="rounded-lg border border-[#D4C5A0] bg-white p-3">
               <span className="text-2xl">🎁</span>
               <p className="mt-2 text-xs font-semibold text-gray-700">
                 تخفیف ویژه اعضا
               </p>
             </div>
-            <div className="rounded-lg border border-[#E8DFC8] bg-white p-3">
+            <div className="rounded-lg border border-[#D4C5A0] bg-white p-3">
               <span className="text-2xl">🚚</span>
               <p className="mt-2 text-xs font-semibold text-gray-700">
                 ارسال سریع
               </p>
             </div>
-            <div className="rounded-lg border border-[#E8DFC8] bg-white p-3">
+            <div className="rounded-lg border border-[#D4C5A0] bg-white p-3">
               <span className="text-2xl">💬</span>
               <p className="mt-2 text-xs font-semibold text-gray-700">
                 پشتیبانی ۲۴/۷

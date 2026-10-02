@@ -105,7 +105,7 @@ export default function FaqPage() {
         </nav>
 
         {/* هدر صفحه */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center md:p-12">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
           <span className="inline-block rounded-full bg-amber-50 px-5 py-2 text-sm font-semibold text-amber-600">
             سوالات متداول
           </span>
@@ -123,7 +123,7 @@ export default function FaqPage() {
           {faqs.map((group, gi) => (
             <div
               key={gi}
-              className="overflow-hidden rounded-2xl border border-[#E8DFC8] bg-white"
+              className="overflow-hidden rounded-2xl border border-[#D4C5A0] bg-white"
             >
               {/* عنوان دسته */}
               <div className="flex items-center gap-3 border-b border-[#EDE4CE] bg-[#F7F1E3]/50 px-6 py-4">

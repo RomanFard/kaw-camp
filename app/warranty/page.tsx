@@ -71,7 +71,7 @@ export default function WarrantyPage() {
         </nav>
 
         {/* هدر صفحه */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-8 text-center md:p-12">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
           <span className="inline-block rounded-full bg-amber-50 px-5 py-2 text-sm font-semibold text-amber-600">
             گارانتی و خدمات پس از فروش
           </span>
@@ -94,7 +94,7 @@ export default function WarrantyPage() {
             {warrantyTypes.map((w, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-[#E8DFC8] bg-white p-6 transition hover:shadow-md"
+                className="rounded-2xl border border-[#D4C5A0] bg-white p-6 transition hover:shadow-md"
               >
                 <div className="flex items-center gap-3">
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-3xl">
@@ -118,7 +118,7 @@ export default function WarrantyPage() {
         </div>
 
         {/* مراحل استفاده از گارانتی */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-6 md:p-8">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-6 md:p-8">
           <h2 className="mb-6 text-lg font-bold text-gray-800">
             مراحل استفاده از گارانتی
           </h2>
@@ -148,7 +148,7 @@ export default function WarrantyPage() {
         </div>
 
         {/* مواردی که گارانتی را باطل می‌کند */}
-        <div className="mb-8 rounded-2xl border border-[#E8DFC8] bg-white p-6 md:p-8">
+        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-6 md:p-8">
           <h2 className="mb-5 flex items-center gap-3 text-lg font-bold text-gray-800">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-xl">
               ❌

@@ -121,7 +121,7 @@ export default function HeroSlider() {
         </div>
       </div>
 
-      <div className="mt-4 w-full border-b border-[#E8DFC8] bg-white">
+      <div className="mt-4 w-full border-b border-[#D4C5A0] bg-white">
         <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-3 px-6 py-4 text-center">
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 md:text-base">
             <span className="text-amber-500">◆</span>

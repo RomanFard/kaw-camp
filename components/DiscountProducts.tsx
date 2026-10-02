@@ -49,7 +49,7 @@ export default function DiscountProducts() {
             <a
               key={product.id}
               href={`/product/${product.id}`}
-              className="group relative flex flex-col overflow-hidden rounded-xl border border-[#E8DFC8] bg-white transition hover:border-amber-500 hover:shadow-lg"
+              className="group relative flex flex-col overflow-hidden rounded-xl border border-[#D4C5A0] bg-white transition hover:border-amber-500 hover:shadow-lg"
             >
               {/* تصویر */}
               <div className="relative aspect-square overflow-hidden bg-[#F7F1E3]">

@@ -2,13 +2,15 @@
 
 import { usePathname } from "next/navigation";
 import { useCart } from "@/components/context/CartContext";
+import { useState } from "react";
+import MobileMenuDrawer from "./MobileMenuDrawer";
 
 const navItems = [
-  { label: "خانه", href: "/", icon: "home" },
-  { label: "دسته‌بندی", href: "/products", icon: "grid" },
-  { label: "سبد خرید", href: "/cart", icon: "cart" },
-  { label: "اکسپلور", href: "/explore", icon: "compass" },
-  { label: "پشتیبانی", href: "/contact", icon: "chat" },
+  { label: "خانه", href: "/", icon: "home", action: "link" },
+  { label: "دسته‌بندی", href: "#", icon: "grid", action: "drawer" },
+  { label: "سبد خرید", href: "/cart", icon: "cart", action: "link" },
+  { label: "اکسپلور", href: "/explore", icon: "compass", action: "link" },
+  { label: "پشتیبانی", href: "/contact", icon: "chat", action: "link" },
 ];
 
 function Icon({ name, active }: { name: string; active: boolean }) {
@@ -112,58 +114,96 @@ function Icon({ name, active }: { name: string; active: boolean }) {
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const { totalItems } = useCart();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  
+  if (pathname === "/checkout") return null;
 
   return (
-    <nav
-      dir="rtl"
-      className="fixed bottom-0 left-0 right-0 z-[150] border-t border-[#E8DFC8] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
-    >
-      <ul className="mx-auto flex max-w-[600px] items-stretch justify-between px-1">
-        {navItems.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+    <>
+      <nav
+        dir="rtl"
+        className="fixed bottom-0 left-0 right-0 z-[150] border-t border-[#D4C5A0] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
+      >
+        <ul className="mx-auto flex max-w-[600px] items-stretch justify-between px-1">
+          {navItems.map((item) => {
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
 
-          const showBadge = item.icon === "cart" && totalItems > 0;
+            const showBadge = item.icon === "cart" && totalItems > 0;
 
-          return (
-            <li key={item.label} className="flex-1">
-              <a
-                href={item.href}
-                className={
-                  "relative flex flex-col items-center gap-1.5 px-1 py-3 transition " +
-                  (isActive
-                    ? "text-amber-600"
-                    : "text-gray-500 hover:text-amber-600")
-                }
-              >
-                {/* Badge فقط برای سبد خرید */}
-                {showBadge && (
-                  <span className="absolute right-1/2 top-2 z-10 flex h-5 min-w-[20px] translate-x-[15px] items-center justify-center rounded-full bg-amber-500 px-1 text-[11px] font-bold text-white shadow-md">
-                    {totalItems}
-                  </span>
-                )}
+            // اگه action === drawer بود، دکمه نشون بده
+            if (item.action === "drawer") {
+              return (
+                <li key={item.label} className="flex-1">
+                  <button
+                    type="button"
+                    onClick={() => setDrawerOpen(true)}
+                    className={
+                      "flex w-full flex-col items-center gap-1.5 px-1 py-3 transition " +
+                      (isActive
+                        ? "text-amber-600"
+                        : "text-gray-500 hover:text-amber-600")
+                    }
+                  >
+                    <Icon name={item.icon} active={isActive} />
+                    <span
+                      className={
+                        "text-xs leading-tight " +
+                        (isActive ? "font-bold" : "font-semibold")
+                      }
+                    >
+                      {item.label}
+                    </span>
+                  </button>
+                </li>
+              );
+            }
 
-                <Icon name={item.icon} active={isActive} />
-
-                <span
+            // بقیه آیتم‌ها لینک هستن
+            return (
+              <li key={item.label} className="flex-1">
+                <a
+                  href={item.href}
                   className={
-                    "text-xs leading-tight " +
-                    (isActive ? "font-bold" : "font-semibold")
+                    "relative flex flex-col items-center gap-1.5 px-1 py-3 transition " +
+                    (isActive
+                      ? "text-amber-600"
+                      : "text-gray-500 hover:text-amber-600")
                   }
                 >
-                  {item.label}
-                </span>
-              </a>
-            </li>
-          );
-        })}
-      </ul>
+                  {/* Badge فقط برای سبد خرید */}
+                  {showBadge && (
+                    <span className="absolute right-1/2 top-2 z-10 flex h-5 min-w-[20px] translate-x-[15px] items-center justify-center rounded-full bg-amber-500 px-1 text-[11px] font-bold text-white shadow-md">
+                      {totalItems}
+                    </span>
+                  )}
 
-      <div className="h-1.5"></div>
-    </nav>
+                  <Icon name={item.icon} active={isActive} />
+
+                  <span
+                    className={
+                      "text-xs leading-tight " +
+                      (isActive ? "font-bold" : "font-semibold")
+                    }
+                  >
+                    {item.label}
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="h-1.5"></div>
+      </nav>
+
+      {/* دراور منوی موبایل */}
+      <MobileMenuDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
+    </>
   );
 }
