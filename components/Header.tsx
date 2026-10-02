@@ -24,12 +24,7 @@ export default function Header() {
   return (
     <>
       <header dir="rtl" className="w-full bg-white text-gray-900">
-        {/* نوار بالایی نارنجی */}
-        <div className="w-full bg-amber-500 py-2 text-[11px] font-semibold text-white md:py-2.5 md:text-base">
-          <div className="mx-auto max-w-[1600px] px-4 text-center md:px-6 md:text-right">
-            <span>کردستان - بانه - کوچه پاساژ نور - پاساژ ارغوانی - بلوک ۲</span>
-          </div>
-        </div>
+
 
         {/* نوار اصلی */}
         <div className="border-b border-[#E8DFC8]">
