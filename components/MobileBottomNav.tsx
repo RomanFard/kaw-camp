@@ -120,10 +120,10 @@ export default function MobileBottomNav() {
 
   return (
     <>
-<nav
-  dir="rtl"
-  className="pb-safe fixed bottom-0 left-0 right-0 z-[150] border-t border-[#E8DFC8] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
->
+      <nav
+        dir="rtl"
+        className="pb-safe fixed bottom-0 left-0 right-0 z-[150] border-t border-[#E8DFC8] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
+      >
         <ul className="mx-auto flex max-w-[600px] items-stretch justify-between px-1">
           {navItems.map((item) => {
             const isActive =
@@ -166,6 +166,9 @@ export default function MobileBottomNav() {
               <li key={item.label} className="flex-1">
                 <a
                   href={item.href}
+                  {...(item.icon === "cart"
+                    ? { "data-cart-icon-mobile": true }
+                    : {})}
                   className={
                     "relative flex flex-col items-center gap-1.5 px-1 py-3 transition " +
                     (isActive
@@ -195,8 +198,7 @@ export default function MobileBottomNav() {
             );
           })}
         </ul>
-
-    </nav>
+      </nav>
 
       {/* دراور منوی موبایل */}
       <MobileMenuDrawer

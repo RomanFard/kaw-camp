@@ -28,13 +28,13 @@ export default function MobileMenuDrawer({
       />
 
       {/* Drawer - تمام صفحه */}
-      <aside
-        className={
-          "fixed inset-0 z-[210] flex h-screen w-screen flex-col bg-white transition-transform duration-300 md:hidden " +
-          (isOpen ? "translate-x-0" : "translate-x-full")
-        }
-        dir="rtl"
-      >
+<aside
+  className={
+    "fixed right-0 top-0 z-[210] flex h-screen w-full max-w-[400px] flex-col bg-white shadow-2xl transition-transform duration-300 " +
+    (isOpen ? "translate-x-0" : "translate-x-full")
+  }
+  dir="rtl"
+>
 {/* هدر بالا */}
 <div className="flex flex-shrink-0 items-center justify-between border-b border-[#EDE4CE] bg-white px-3 py-2.5">
   <span className="w-8"></span>

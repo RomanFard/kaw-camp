@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import MegaMenu from "./MegaMenu";
-import CategoriesMenu from "./CategoriesMenu";
 import CartDropdown from "./CartDropdown";
 import SearchPanel from "./SearchPanel";
 import MobileMenuDrawer from "./MobileMenuDrawer";
+import RightSidebar from "./RightSidebar";
 
 const menuItems = [
   { label: "صفحه اصلی", href: "/" },
@@ -20,6 +20,15 @@ const menuItems = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);
+  const [megaActiveKey, setMegaActiveKey] = useState("tent");
+
+  function openMegaMenu(categoryKey?: string) {
+    if (categoryKey) {
+      setMegaActiveKey(categoryKey);
+    }
+    setMegaOpen(true);
+  }
 
   return (
     <>
@@ -32,53 +41,54 @@ export default function Header() {
         </div>
 
         {/* نوار اصلی */}
-        <div className="border-b border-[#D4C5A0]">
+        <div className="border-b border-[#E8DFC8]">
           <div className="mx-auto max-w-[1600px] px-4 md:px-6">
-{/* ═══ موبایل ═══ */}
-<div className="py-3 md:hidden">
-  <div className="flex items-center gap-2">
-    {/* لوگو (راست) */}
-    <a href="/" className="flex-shrink-0">
-      <Image
-        src="/images/logo.png"
-        alt="کو کمپ"
-        width={60}
-        height={60}
-        className="h-9 w-auto"
-      />
-    </a>
+            {/* ═══ موبایل ═══ */}
+            <div className="py-3 md:hidden">
+              <div className="flex items-center gap-2">
+                {/* لوگو (راست) */}
+                <a href="/" className="flex-shrink-0">
+                  <Image
+                    src="/images/logo.png"
+                    alt="کو کمپ"
+                    width={60}
+                    height={60}
+                    className="h-9 w-auto"
+                  />
+                </a>
 
-    {/* نوار جستجو (پهن، وسط) */}
-    <div className="flex-1">
-      <SearchButton />
-    </div>
+                {/* نوار جستجو */}
+                <div className="flex-1">
+                  <SearchButton />
+                </div>
 
-    {/* دکمه پروفایل (چپ) */}
-    <a
-      href="/login"
-      aria-label="حساب کاربری"
-      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={2}
-        stroke="currentColor"
-        className="h-5 w-5"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-        />
-      </svg>
-    </a>
-  </div>
-</div>
+                {/* دکمه پروفایل */}
+                <a
+                  href="/login"
+                  aria-label="حساب کاربری"
+                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
 
             {/* ═══ دسکتاپ ═══ */}
             <div className="hidden grid-cols-3 items-center gap-4 py-4 md:grid">
+              {/* لوگو */}
               <a href="/" className="flex items-center justify-start">
                 <Image
                   src="/images/logo.png"
@@ -90,12 +100,14 @@ export default function Header() {
                 />
               </a>
 
+              {/* متن وسط */}
               <div className="pt-16 text-center">
                 <h1 className="text-lg font-semibold text-gray-900">
                   فروشگاه لوازم کمپینگ و کوهنوردی
                 </h1>
               </div>
 
+              {/* آیکون‌ها */}
               <div className="flex items-center justify-end gap-7 pt-16">
                 <a
                   href="/login"
@@ -133,30 +145,63 @@ export default function Header() {
           </div>
         </div>
 
-{/* منوی دسکتاپ */}
-<nav className="hidden border-b border-[#D4C5A0] bg-[#F7F1E3] md:block">
-  <div className="mx-auto flex max-w-[1600px] items-center gap-10 px-6">
-    <MegaMenu />
+        {/* منوی دسکتاپ */}
+        <nav className="hidden border-b border-[#E8DFC8] bg-[#F7F1E3] md:block">
+          <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-6">
+            {/* دکمه دسته‌بندی (سمت راست) */}
+            <button
+              type="button"
+              onClick={() => openMegaMenu()}
+              className="flex items-center gap-3 rounded-lg bg-white px-5 py-3 text-sm font-bold text-gray-800 shadow-sm transition hover:bg-amber-50 hover:text-amber-600 md:text-base"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+                />
+              </svg>
+              <span>دسته‌بندی محصولات</span>
+            </button>
 
-    <ul className="flex flex-wrap items-center gap-x-10 gap-y-2 py-5 text-lg font-semibold">
-      {menuItems.map((item) => (
-        <li key={item.label}>
-          <a
-            href={item.href}
-            className={
-              item.href === "/"
-                ? "text-amber-600"
-                : "hover:text-amber-600"
-            }
-          >
-            {item.label}
-          </a>
-        </li>
-      ))}
-    </ul>
-  </div>
-</nav>
+            {/* منوی میانی */}
+            <ul className="flex flex-1 flex-wrap items-center justify-center gap-x-10 gap-y-2 py-5 text-lg font-semibold">
+              {menuItems.map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className={
+                      item.href === "/"
+                        ? "text-amber-600"
+                        : "hover:text-amber-600"
+                    }
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
       </header>
+
+      {/* نوار کناری راست (دسکتاپ) */}
+      <RightSidebar onOpenMegaMenu={openMegaMenu} />
+
+      {/* مگا منو (دسکتاپ) */}
+      <MegaMenu
+        isOpen={megaOpen}
+        onClose={() => setMegaOpen(false)}
+        activeKey={megaActiveKey}
+        onActiveKeyChange={setMegaActiveKey}
+      />
 
       {/* دراور موبایل */}
       <MobileMenuDrawer
@@ -176,9 +221,8 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-2 rounded-full border border-[#D4C5A0] bg-[#F7F1E3]/40 px-4 py-2.5 text-sm text-gray-400 transition hover:border-amber-500"
+        className="flex w-full items-center gap-2 rounded-full border border-[#E8DFC8] bg-[#F7F1E3]/40 px-4 py-2.5 text-sm text-gray-400 transition hover:border-amber-500"
       >
-        {/* آیکون ذره‌بین */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -193,8 +237,6 @@ function SearchButton() {
             d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
           />
         </svg>
-
-        {/* متن */}
         <span className="flex-1 text-right text-xs md:text-sm">
           جستجو در کو کمپ...
         </span>

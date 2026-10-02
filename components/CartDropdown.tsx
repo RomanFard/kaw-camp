@@ -29,11 +29,12 @@ export default function CartDropdown() {
   return (
     <>
       {/* دکمه سبد */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="relative flex items-center gap-2 text-gray-700 transition hover:text-amber-600"
-      >
+<button
+  type="button"
+  onClick={() => setIsOpen(true)}
+  data-cart-icon
+  className="relative flex items-center gap-2 text-gray-700 transition hover:text-amber-600"
+>
         <span className="relative">
           <svg
             xmlns="http://www.w3.org/2000/svg"

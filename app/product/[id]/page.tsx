@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductPageClient from "@/components/ProductPageClient";
-import ProductTabs from "@/components/ProductTabs";
 import { getProductById, categories } from "@/data/products";
 
 export default async function ProductPage({
@@ -25,7 +24,7 @@ export default async function ProductPage({
     <main className="min-h-screen overflow-x-hidden bg-[#F7F1E3]">
       <Header />
 
-      <div className="mx-auto max-w-[1600px] px-4 py-4 md:px-6 md:py-5">
+      <div className="mx-auto max-w-[1600px] px-4 py-4 md:px-6 md:py-6">
         {/* مسیر ناوبری */}
         <nav className="mb-4 text-xs text-gray-500 md:mb-5 md:text-sm">
           <a href="/" className="hover:text-amber-600">خانه</a>
@@ -38,15 +37,12 @@ export default async function ProductPage({
           >
             {categoryLabel}
           </a>
+          <span className="mx-2">/</span>
+          <span className="text-gray-800">{product.name}</span>
         </nav>
 
-        {/* بخش اصلی: گالری + سایدبار */}
+        {/* محتوای محصول */}
         <ProductPageClient product={product} />
-
-        {/* بخش تب‌ها */}
-        <div className="mt-4 md:mt-6">
-          <ProductTabs product={product} />
-        </div>
       </div>
 
       <Footer />

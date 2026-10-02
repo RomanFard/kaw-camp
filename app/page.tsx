@@ -1,3 +1,4 @@
+import ProductsSort from "@/components/ProductsSort";
 import Header from "@/components/Header";
 import HeroSlider from "@/components/HeroSlider";
 import BrandCarousel from "@/components/BrandCarousel";
