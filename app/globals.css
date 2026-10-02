@@ -29,3 +29,14 @@
   background: #f59e0b;
   border-radius: 4px;
 }
+/* برای گوشی‌های با نوار پایین (iPhone Home Indicator) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* تنظیم padding بدنه صفحه */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));
+  }
+}

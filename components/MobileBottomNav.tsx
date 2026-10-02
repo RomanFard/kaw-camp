@@ -120,10 +120,10 @@ export default function MobileBottomNav() {
 
   return (
     <>
-      <nav
-        dir="rtl"
-        className="fixed bottom-0 left-0 right-0 z-[150] border-t border-[#D4C5A0] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
-      >
+<nav
+  dir="rtl"
+  className="pb-safe fixed bottom-0 left-0 right-0 z-[150] border-t border-[#E8DFC8] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
+>
         <ul className="mx-auto flex max-w-[600px] items-stretch justify-between px-1">
           {navItems.map((item) => {
             const isActive =
@@ -196,8 +196,7 @@ export default function MobileBottomNav() {
           })}
         </ul>
 
-        <div className="h-1.5"></div>
-      </nav>
+    </nav>
 
       {/* دراور منوی موبایل */}
       <MobileMenuDrawer
