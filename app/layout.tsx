@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { CartProvider } from "@/components/context/CartContext";
+import { WishlistProvider } from "@/components/context/WishlistContext";
 import MobileBottomNav from "@/components/MobileBottomNav";
 
 export const metadata: Metadata = {
@@ -22,10 +24,12 @@ export default function RootLayout({
         />
       </head>
       <body className="font-[IranYekan] bg-gray-50">
-        <CartProvider>
-          {children}
-          <MobileBottomNav />
-        </CartProvider>
+<CartProvider>
+  <WishlistProvider>
+    {children}
+    <MobileBottomNav />
+  </WishlistProvider>
+</CartProvider>
       </body>
     </html>
   );

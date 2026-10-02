@@ -9,7 +9,7 @@ const navItems = [
   { label: "خانه", href: "/", icon: "home", action: "link" },
   { label: "دسته‌بندی", href: "#", icon: "grid", action: "drawer" },
   { label: "سبد خرید", href: "/cart", icon: "cart", action: "link" },
-  { label: "اکسپلور", href: "/explore", icon: "compass", action: "link" },
+  { label: "آفرود و تور", href: "/explore", icon: "compass", action: "link" },
   { label: "پشتیبانی", href: "/contact", icon: "chat", action: "link" },
 ];
 
@@ -133,7 +133,6 @@ export default function MobileBottomNav() {
 
             const showBadge = item.icon === "cart" && totalItems > 0;
 
-            // اگه action === drawer بود، دکمه نشون بده
             if (item.action === "drawer") {
               return (
                 <li key={item.label} className="flex-1">
@@ -161,7 +160,6 @@ export default function MobileBottomNav() {
               );
             }
 
-            // بقیه آیتم‌ها لینک هستن
             return (
               <li key={item.label} className="flex-1">
                 <a
@@ -176,7 +174,6 @@ export default function MobileBottomNav() {
                       : "text-gray-500 hover:text-amber-600")
                   }
                 >
-                  {/* Badge فقط برای سبد خرید */}
                   {showBadge && (
                     <span className="absolute right-1/2 top-2 z-10 flex h-5 min-w-[20px] translate-x-[15px] items-center justify-center rounded-full bg-amber-500 px-1 text-[11px] font-bold text-white shadow-md">
                       {totalItems}
@@ -187,7 +184,7 @@ export default function MobileBottomNav() {
 
                   <span
                     className={
-                      "text-xs leading-tight " +
+                      "whitespace-nowrap text-[10px] leading-tight " +
                       (isActive ? "font-bold" : "font-semibold")
                     }
                   >
@@ -200,7 +197,6 @@ export default function MobileBottomNav() {
         </ul>
       </nav>
 
-      {/* دراور منوی موبایل */}
       <MobileMenuDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}

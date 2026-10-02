@@ -6,11 +6,12 @@ import CartDropdown from "./CartDropdown";
 import SearchPanel from "./SearchPanel";
 import MobileMenuDrawer from "./MobileMenuDrawer";
 import RightSidebar from "./RightSidebar";
+import { useWishlist } from "@/components/context/WishlistContext";
 
 const menuItems = [
   { label: "صفحه اصلی", href: "/" },
   { label: "تمامی محصولات", href: "/products" },
-  { label: "اکسپلور", href: "/explore" },
+  { label: "آفرود و تور", href: "/explore" },
   { label: "قوانین سایت", href: "/rules" },
   { label: "مقالات", href: "/blog" },
   { label: "درباره ما", href: "/about" },
@@ -20,19 +21,18 @@ const menuItems = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { totalItems: wishlistCount } = useWishlist();
 
   return (
     <>
       <header dir="rtl" className="w-full bg-white text-gray-900">
-
-
         {/* نوار اصلی */}
         <div className="border-b border-[#E8DFC8]">
-          <div className="mx-auto max-w-[1600px] px-4 md:px-6">
+          <div className="mx-auto max-w-[1600px] px-3 md:px-6">
             {/* ═══ موبایل ═══ */}
-            <div className="py-3 md:hidden">
-              <div className="flex items-center gap-2">
-                {/* لوگو */}
+            <div className="py-2.5 md:hidden">
+              <div className="flex items-center gap-1.5">
+                {/* لوگو (راست) */}
                 <a href="/" className="flex-shrink-0">
                   <Image
                     src="/images/logo.png"
@@ -43,16 +43,16 @@ export default function Header() {
                   />
                 </a>
 
-                {/* نوار جستجو */}
-                <div className="flex-1">
+                {/* نوار جستجو (وسط) */}
+                <div className="min-w-0 flex-1">
                   <SearchButton />
                 </div>
 
-                {/* دکمه پروفایل */}
+                {/* پروفایل */}
                 <a
                   href="/login"
                   aria-label="حساب کاربری"
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
+                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -69,12 +69,40 @@ export default function Header() {
                     />
                   </svg>
                 </a>
+
+                {/* قلب (چپ‌ترین) */}
+                <a
+                  href="/wishlist"
+                  aria-label="علاقه‌مندی"
+                  data-wishlist-icon-mobile
+                  className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                    />
+                  </svg>
+
+                  {wishlistCount > 0 && (
+                    <span className="absolute -left-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </a>
               </div>
             </div>
 
             {/* ═══ دسکتاپ ═══ */}
             <div className="hidden grid-cols-3 items-center gap-4 py-4 md:grid">
-              {/* لوگو */}
               <a href="/" className="flex items-center justify-start">
                 <Image
                   src="/images/logo.png"
@@ -86,14 +114,12 @@ export default function Header() {
                 />
               </a>
 
-              {/* متن وسط */}
               <div className="pt-16 text-center">
                 <h1 className="text-lg font-semibold text-gray-900">
                   فروشگاه لوازم کمپینگ و کوهنوردی
                 </h1>
               </div>
 
-              {/* آیکون‌ها */}
               <div className="flex items-center justify-end gap-7 pt-16">
                 <a
                   href="/login"
@@ -107,7 +133,8 @@ export default function Header() {
                 <a
                   href="/wishlist"
                   aria-label="علاقه‌مندی"
-                  className="text-gray-700 transition hover:text-amber-600"
+                  data-wishlist-icon
+                  className="relative text-gray-700 transition hover:text-amber-600"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -123,6 +150,12 @@ export default function Header() {
                       d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                     />
                   </svg>
+
+                  {wishlistCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow">
+                      {wishlistCount}
+                    </span>
+                  )}
                 </a>
 
                 <CartDropdown />
@@ -134,7 +167,6 @@ export default function Header() {
         {/* منوی دسکتاپ */}
         <nav className="hidden border-b border-[#E8DFC8] bg-[#F7F1E3] md:block">
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-6">
-            {/* دکمه باز کردن منوی کناری (راست) */}
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
@@ -158,7 +190,6 @@ export default function Header() {
               <span>دسته‌بندی محصولات</span>
             </button>
 
-            {/* منوی میانی */}
             <ul className="flex flex-1 flex-wrap items-center justify-center gap-x-8 gap-y-2 py-5 text-base font-semibold lg:gap-x-10 lg:text-lg">
               {menuItems.map((item) => (
                 <li key={item.label}>
@@ -176,19 +207,16 @@ export default function Header() {
               ))}
             </ul>
 
-            {/* فضای خالی برای تعادل */}
             <div className="hidden w-[180px] lg:block"></div>
           </div>
         </nav>
       </header>
 
-      {/* نوار کناری راست (دسکتاپ) */}
       <RightSidebar
         forceOpen={sidebarOpen}
         onForceClose={() => setSidebarOpen(false)}
       />
 
-      {/* دراور موبایل */}
       <MobileMenuDrawer
         isOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
@@ -197,7 +225,6 @@ export default function Header() {
   );
 }
 
-/* دکمه جستجوی موبایل */
 function SearchButton() {
   const [open, setOpen] = useState(false);
 
@@ -206,7 +233,7 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-2 rounded-full border border-[#E8DFC8] bg-[#F7F1E3]/40 px-4 py-2.5 text-sm text-gray-400 transition hover:border-amber-500"
+        className="flex w-full items-center gap-1.5 rounded-full border border-[#E8DFC8] bg-[#F7F1E3]/40 px-3 py-2 text-xs text-gray-400 transition hover:border-amber-500"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -214,7 +241,7 @@ function SearchButton() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-5 w-5 flex-shrink-0 text-amber-500"
+          className="h-4 w-4 flex-shrink-0 text-amber-500"
         >
           <path
             strokeLinecap="round"
@@ -222,8 +249,8 @@ function SearchButton() {
             d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
           />
         </svg>
-        <span className="flex-1 text-right text-xs md:text-sm">
-          جستجو در کو کمپ...
+        <span className="flex-1 truncate text-right text-xs">
+          جستجو...
         </span>
       </button>
 
