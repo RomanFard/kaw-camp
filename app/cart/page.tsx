@@ -20,6 +20,7 @@ export default function CartPage() {
     applyCode,
     removeCode,
   } = useCart();
+  // موقت — بعداً حذف کن
 
   const [codeInput, setCodeInput] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
