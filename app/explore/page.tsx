@@ -1,23 +1,31 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WeatherCard from "@/components/WeatherCard";
 import HeroWeather from "@/components/HeroWeather";
-import CampingMap from "@/components/CampingMap";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { tours, tourTypeLabels, type Tour, type TourType } from "@/data/tours";
 import LocationSelector from "@/components/LocationSelector";
 
-// نقشه باید فقط client-side لود بشه
+// ═══ نقشه‌ها باید فقط client-side لود بشن ═══
 const RouteMap = dynamic(() => import("@/components/RouteMap"), {
   ssr: false,
   loading: () => (
     <div className="flex h-[400px] items-center justify-center rounded-2xl border border-[#E8DFC8] bg-white text-sm text-gray-500">
       در حال بارگذاری نقشه...
+    </div>
+  ),
+});
+
+const CampingMap = dynamic(() => import("@/components/CampingMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="mx-auto max-w-6xl px-4 pb-16">
+      <div className="h-[500px] animate-pulse rounded-2xl bg-gray-100" />
     </div>
   ),
 });
@@ -133,7 +141,6 @@ function WeatherRouteSection({ tours }: { tours: Tour[] }) {
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [tourCoords, setTourCoords] = useState<{ lat: number; lng: number } | null>(null);
 
-  // ✅ استفاده مستقیم از مختصات ذخیره‌شده در دیتای تور
   useEffect(() => {
     if (!selectedTour) {
       setTourCoords(null);
@@ -143,18 +150,16 @@ function WeatherRouteSection({ tours }: { tours: Tour[] }) {
   }, [selectedTour]);
 
   return (
-<section className="mx-auto max-w-6xl px-4 pb-16">
-  <h2 className="mb-6 text-xl font-extrabold text-gray-900">
-    🌤️ آب‌وهوای زنده و مسیر سفر
-  </h2>
+    <section className="mx-auto max-w-6xl px-4 pb-16">
+      <h2 className="mb-6 text-xl font-extrabold text-gray-900">
+        🌤️ آب‌وهوای زنده و مسیر سفر
+      </h2>
 
-  {/* 👇 انتخاب موقعیت */}
-  <div className="mb-6">
-    <LocationSelector />
-  </div>
+      <div className="mb-6">
+        <LocationSelector />
+      </div>
 
-  {/* انتخاب تور */}
-  <div className="mb-6">
+      <div className="mb-6">
         <label className="mb-2 block text-sm font-bold text-gray-700">
           تور موردنظر را انتخاب کنید:
         </label>
@@ -181,7 +186,6 @@ function WeatherRouteSection({ tours }: { tours: Tour[] }) {
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* ستون آب‌وهوا */}
           <div className="flex flex-col gap-4">
             {userLoading && (
               <div className="animate-pulse rounded-2xl border border-[#E8DFC8] bg-white p-4">
@@ -217,7 +221,6 @@ function WeatherRouteSection({ tours }: { tours: Tour[] }) {
             )}
           </div>
 
-          {/* ستون نقشه */}
           <div>
             {userLocation && tourCoords ? (
               <RouteMap
@@ -247,9 +250,10 @@ function WeatherRouteSection({ tours }: { tours: Tour[] }) {
 }
 
 /* ============================================================
-   صفحه اصلی
+   محتوای صفحه — از useSearchParams استفاده می‌کنه
+   پس باید داخل <Suspense> قرار بگیره
    ============================================================ */
-export default function ExplorePage() {
+function ExploreContent() {
   const searchParams = useSearchParams();
   const [filter, setFilter] = useState<Filter>("all");
   const [selectedTourId, setSelectedTourId] = useState<string>(
@@ -263,7 +267,6 @@ export default function ExplorePage() {
     people: "1",
   });
 
-  // خواندن فیلتر از URL
   useEffect(() => {
     const t = searchParams.get("type") as TourType | null;
     if (t && ["off-road", "hiking", "camping"].includes(t)) setFilter(t);
@@ -294,8 +297,6 @@ export default function ExplorePage() {
       {/* ==================== Hero ==================== */}
       <section className="bg-gradient-to-l from-[#F59E0B] to-[#D97706] text-white">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-16 text-center md:py-24">
-          
-          {/* 🌤️ نوار آب‌وهوای لایو */}
           <HeroWeather />
 
           <span className="rounded-full bg-white/20 px-4 py-1 text-sm font-bold">
@@ -431,13 +432,33 @@ export default function ExplorePage() {
         </div>
       </section>
 
-{/* ===== بخش آب‌وهوا و نقشه ===== */}
-<WeatherRouteSection tours={tours} />
+      {/* ===== بخش آب‌وهوا و نقشه ===== */}
+      <WeatherRouteSection tours={tours} />
 
-{/* ===== نقشه کمپینگ ایران ===== */}
-<CampingMap />
+      {/* ===== نقشه کمپینگ ایران ===== */}
+      <CampingMap />
 
-<Footer />
+      <Footer />
     </main>
+  );
+}
+
+/* ============================================================
+   export پیش‌فرض با Suspense boundary
+   ============================================================ */
+export default function ExplorePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#F7F1E3]">
+          <Header />
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <div className="text-sm text-gray-500">در حال بارگذاری...</div>
+          </div>
+        </main>
+      }
+    >
+      <ExploreContent />
+    </Suspense>
   );
 }
