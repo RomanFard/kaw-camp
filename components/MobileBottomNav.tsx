@@ -2,19 +2,16 @@
 
 import { usePathname } from "next/navigation";
 import { useCart } from "@/components/context/CartContext";
-import { useState } from "react";
-import MobileMenuDrawer from "./MobileMenuDrawer";
 
 const navItems = [
-  { label: "خانه", href: "/", icon: "home", action: "link" },
-  { label: "دسته‌بندی", href: "#", icon: "grid", action: "drawer" },
-  { label: "سبد خرید", href: "/cart", icon: "cart", action: "link" },
-  { label: "آفرود و تور", href: "/explore", icon: "compass", action: "link" },
-  { label: "پشتیبانی", href: "/contact", icon: "chat", action: "link" },
+  { label: "خانه", href: "/", icon: "home" },
+  { label: "سبد خرید", href: "/cart", icon: "cart" },
+  { label: "آفرود و تور", href: "/explore", icon: "compass" },
+  { label: "تماس با ما", href: "/contact", icon: "chat" },
 ];
 
 function Icon({ name, active }: { name: string; active: boolean }) {
-  const cls = "h-7 w-7";
+  const cls = "h-6 w-6";
 
   if (name === "home") {
     return (
@@ -30,24 +27,6 @@ function Icon({ name, active }: { name: string; active: boolean }) {
           strokeLinecap="round"
           strokeLinejoin="round"
           d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-        />
-      </svg>
-    );
-  }
-  if (name === "grid") {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.8}
-        stroke="currentColor"
-        className={cls}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
         />
       </svg>
     );
@@ -93,6 +72,7 @@ function Icon({ name, active }: { name: string; active: boolean }) {
       </svg>
     );
   }
+  // chat
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -114,93 +94,58 @@ function Icon({ name, active }: { name: string; active: boolean }) {
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const { totalItems } = useCart();
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   if (pathname === "/checkout") return null;
 
   return (
-    <>
-      <nav
-        dir="rtl"
-        className="pb-safe fixed bottom-0 left-0 right-0 z-[150] border-t border-[#E8DFC8] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
-      >
-        <ul className="mx-auto flex max-w-[600px] items-stretch justify-between px-1">
-          {navItems.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(item.href);
+    <nav
+      dir="rtl"
+      className="pb-safe fixed bottom-0 left-0 right-0 z-[150] border-t border-[#E8DFC8] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
+    >
+      <ul className="mx-auto flex max-w-[600px] items-stretch justify-between px-1">
+        {navItems.map((item) => {
+          const isActive =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
 
-            const showBadge = item.icon === "cart" && totalItems > 0;
+          const showBadge = item.icon === "cart" && totalItems > 0;
 
-            if (item.action === "drawer") {
-              return (
-                <li key={item.label} className="flex-1">
-                  <button
-                    type="button"
-                    onClick={() => setDrawerOpen(true)}
-                    className={
-                      "flex w-full flex-col items-center gap-1.5 px-1 py-3 transition " +
-                      (isActive
-                        ? "text-amber-600"
-                        : "text-gray-500 hover:text-amber-600")
-                    }
-                  >
-                    <Icon name={item.icon} active={isActive} />
-                    <span
-                      className={
-                        "text-xs leading-tight " +
-                        (isActive ? "font-bold" : "font-semibold")
-                      }
-                    >
-                      {item.label}
-                    </span>
-                  </button>
-                </li>
-              );
-            }
+          return (
+            <li key={item.label} className="flex-1">
+              <a
+                href={item.href}
+                {...(item.icon === "cart"
+                  ? { "data-cart-icon-mobile": true }
+                  : {})}
+                className={
+                  "relative flex flex-col items-center gap-1 px-1 py-2 transition " +
+                  (isActive
+                    ? "text-amber-600"
+                    : "text-gray-500 hover:text-amber-600")
+                }
+              >
+                {showBadge && (
+                  <span className="absolute right-1/2 top-1 z-10 flex h-4 min-w-[16px] translate-x-[13px] items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-white shadow-md">
+                    {totalItems}
+                  </span>
+                )}
 
-            return (
-              <li key={item.label} className="flex-1">
-                <a
-                  href={item.href}
-                  {...(item.icon === "cart"
-                    ? { "data-cart-icon-mobile": true }
-                    : {})}
+                <Icon name={item.icon} active={isActive} />
+
+                <span
                   className={
-                    "relative flex flex-col items-center gap-1.5 px-1 py-3 transition " +
-                    (isActive
-                      ? "text-amber-600"
-                      : "text-gray-500 hover:text-amber-600")
+                    "whitespace-nowrap text-[9px] leading-tight " +
+                    (isActive ? "font-bold" : "font-semibold")
                   }
                 >
-                  {showBadge && (
-                    <span className="absolute right-1/2 top-2 z-10 flex h-5 min-w-[20px] translate-x-[15px] items-center justify-center rounded-full bg-amber-500 px-1 text-[11px] font-bold text-white shadow-md">
-                      {totalItems}
-                    </span>
-                  )}
-
-                  <Icon name={item.icon} active={isActive} />
-
-                  <span
-                    className={
-                      "whitespace-nowrap text-[10px] leading-tight " +
-                      (isActive ? "font-bold" : "font-semibold")
-                    }
-                  >
-                    {item.label}
-                  </span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
-      <MobileMenuDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      />
-    </>
+                  {item.label}
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }

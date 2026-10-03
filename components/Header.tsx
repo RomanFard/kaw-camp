@@ -25,84 +25,109 @@ export default function Header() {
 
   return (
     <>
-      <header dir="rtl" className="w-full bg-white text-gray-900">
-        {/* نوار اصلی */}
-        <div className="border-b border-[#E8DFC8]">
-          <div className="mx-auto max-w-[1600px] px-3 md:px-6">
-            {/* ═══ موبایل ═══ */}
-            <div className="py-2.5 md:hidden">
-              <div className="flex items-center gap-1.5">
-                {/* لوگو (راست) */}
-                <a href="/" className="flex-shrink-0">
-                  <Image
-                    src="/images/logo.png"
-                    alt="کو کمپ"
-                    width={60}
-                    height={60}
-                    className="h-9 w-auto"
+<header dir="rtl" className="w-full bg-white text-gray-900">
+
+        {/* ═══ موبایل ═══ */}
+       <div className="fixed top-0 left-0 right-0 z-[100] border-b border-[#E8DFC8] bg-white md:hidden">
+          <div className="px-3 py-2.5">
+            <div className="flex items-center gap-1.5">
+              {/* ۱. دسته‌بندی */}
+              <button
+                type="button"
+                onClick={() => setMobileOpen(true)}
+                aria-label="دسته‌بندی محصولات"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.2}
+                  stroke="currentColor"
+                  className="h-5 w-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
                   />
-                </a>
+                </svg>
+              </button>
 
-                {/* نوار جستجو (وسط) */}
-                <div className="min-w-0 flex-1">
-                  <SearchButton />
-                </div>
+              {/* ۲. لوگو */}
+              <a href="/" className="flex-shrink-0">
+                <Image
+                  src="/images/logo.png"
+                  alt="کو کمپ"
+                  width={60}
+                  height={60}
+                  className="h-8 w-auto"
+                />
+              </a>
 
-                {/* پروفایل */}
-                <a
-                  href="/login"
-                  aria-label="حساب کاربری"
-                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="h-5 w-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                    />
-                  </svg>
-                </a>
-
-                {/* قلب (چپ‌ترین) */}
-                <a
-                  href="/wishlist"
-                  aria-label="علاقه‌مندی"
-                  data-wishlist-icon-mobile
-                  className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="h-5 w-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-                    />
-                  </svg>
-
-                  {wishlistCount > 0 && (
-                    <span className="absolute -left-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </a>
+              {/* ۳. جستجو */}
+              <div className="min-w-0 flex-1">
+                <SearchButton />
               </div>
-            </div>
 
-            {/* ═══ دسکتاپ ═══ */}
-            <div className="hidden grid-cols-3 items-center gap-4 py-4 md:grid">
+              {/* ۴. ثبت‌نام */}
+              <a
+                href="/login"
+                aria-label="حساب کاربری"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="h-5 w-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                  />
+                </svg>
+              </a>
+
+              {/* ۵. علاقه‌مندی */}
+              <a
+                href="/wishlist"
+                aria-label="علاقه‌مندی"
+                data-wishlist-icon-mobile
+                className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#F7F1E3] text-gray-700 transition hover:bg-amber-100"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="h-5 w-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                  />
+                </svg>
+
+                {wishlistCount > 0 && (
+                  <span className="absolute -left-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow">
+                    {wishlistCount}
+                  </span>
+                )}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ═══ دسکتاپ ═══ */}
+        <div className="hidden border-b border-[#E8DFC8] md:block">
+          <div className="mx-auto max-w-[1600px] px-6">
+            <div className="grid grid-cols-3 items-center gap-4 py-4">
               <a href="/" className="flex items-center justify-start">
                 <Image
                   src="/images/logo.png"
