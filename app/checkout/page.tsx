@@ -7,7 +7,17 @@ import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 
 export default function CheckoutPage() {
-  const { items, totalPrice, totalItems } = useCart();
+  const {
+    items,
+    totalPrice,
+    totalItems,
+    appliedCode,
+    discountAmount,
+    totalAfterDiscount,
+    applyCode,
+    removeCode,
+  } = useCart();
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -22,11 +32,43 @@ export default function CheckoutPage() {
   const [shipping, setShipping] = useState("post");
   const [payment, setPayment] = useState("online");
 
+  // ─── کد تخفیف ───
+  const [codeInput, setCodeInput] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [codeSuccess, setCodeSuccess] = useState("");
+
   const shippingCost = shipping === "post" ? 80000 : 0;
-  const finalPrice = totalPrice + shippingCost;
+  const finalPrice = totalAfterDiscount + shippingCost;
+
+  // کد اعمال شده ولی شرطش برقرار نیست؟
+  const codeInvalid =
+    appliedCode !== null &&
+    discountAmount === 0 &&
+    appliedCode.minPurchase !== undefined &&
+    totalPrice < appliedCode.minPurchase;
 
   function updateField(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleApplyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setCodeError("");
+    setCodeSuccess("");
+
+    const result = applyCode(codeInput);
+    if (result.success) {
+      setCodeSuccess("کد تخفیف با موفقیت اعمال شد 🎉");
+      setCodeInput("");
+    } else {
+      setCodeError(result.error);
+    }
+  }
+
+  function handleRemoveCode() {
+    removeCode();
+    setCodeError("");
+    setCodeSuccess("");
   }
 
   return (
@@ -338,6 +380,90 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* ─── کد تخفیف ─── */}
+              <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
+                <h2 className="mb-3 text-sm font-bold text-gray-800">
+                  🎟️ کد تخفیف
+                </h2>
+
+                {appliedCode ? (
+                  <div
+                    className={`rounded-lg border p-3 ${
+                      codeInvalid
+                        ? "border-amber-300 bg-amber-50"
+                        : "border-green-300 bg-green-50"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🎟️</span>
+                          <span
+                            className={`font-bold ${
+                              codeInvalid ? "text-amber-800" : "text-green-800"
+                            }`}
+                          >
+                            {appliedCode.code}
+                          </span>
+                        </div>
+                        <p
+                          className={`mt-1 text-xs ${
+                            codeInvalid ? "text-amber-700" : "text-green-700"
+                          }`}
+                        >
+                          {codeInvalid
+                            ? `شرط این کد برقرار نیست (حداقل خرید ${appliedCode.minPurchase?.toLocaleString(
+                                "fa-IR"
+                              )} تومان)`
+                            : appliedCode.description}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveCode}
+                        aria-label="حذف کد"
+                        className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-white hover:text-red-500"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleApplyCode}>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={codeInput}
+                        onChange={(e) => {
+                          setCodeInput(e.target.value);
+                          setCodeError("");
+                          setCodeSuccess("");
+                        }}
+                        placeholder="مثلاً KAW10"
+                        className="min-w-0 flex-1 rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-sm outline-none transition focus:border-amber-500"
+                        dir="ltr"
+                      />
+                      <button
+                        type="submit"
+                        className="shrink-0 rounded-lg bg-[#1E40AF] px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-900"
+                      >
+                        اعمال
+                      </button>
+                    </div>
+                    {codeError && (
+                      <p className="mt-2 text-xs font-bold text-red-600">
+                        ⚠️ {codeError}
+                      </p>
+                    )}
+                    {codeSuccess && (
+                      <p className="mt-2 text-xs font-bold text-green-600">
+                        {codeSuccess}
+                      </p>
+                    )}
+                  </form>
+                )}
+              </div>
+
               {/* جمع کل */}
               <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
                 <div className="space-y-3 border-b border-[#EDE4CE] pb-4 text-sm">
@@ -347,6 +473,16 @@ export default function CheckoutPage() {
                       {formatPrice(totalPrice)}
                     </span>
                   </div>
+
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-green-700">
+                      <span>تخفیف ({appliedCode?.code})</span>
+                      <span className="font-bold">
+                        − {formatPrice(discountAmount)}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between text-gray-600">
                     <span>هزینه ارسال</span>
                     <span
@@ -378,7 +514,11 @@ export default function CheckoutPage() {
                 </button>
 
                 <p className="mt-3 text-center text-xs text-gray-500">
-                  با ثبت سفارش، <a href="/rules" className="text-amber-600 hover:underline">قوانین و مقررات</a> را می‌پذیرید.
+                  با ثبت سفارش،{" "}
+                  <a href="/rules" className="text-amber-600 hover:underline">
+                    قوانین و مقررات
+                  </a>{" "}
+                  را می‌پذیرید.
                 </p>
               </div>
             </aside>
