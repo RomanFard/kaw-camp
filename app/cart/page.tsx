@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
+import { useToast } from "@/components/context/ToastContext";
 
 export default function CartPage() {
   const {
@@ -20,7 +21,8 @@ export default function CartPage() {
     applyCode,
     removeCode,
   } = useCart();
-  // موقت — بعداً حذف کن
+
+  const toast = useToast();
 
   const [codeInput, setCodeInput] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -37,24 +39,36 @@ export default function CartPage() {
     appliedCode.minPurchase !== undefined &&
     totalPrice < appliedCode.minPurchase;
 
-async function handleApplyCode(e: React.FormEvent) {
-  e.preventDefault();
-  setErrorMsg("");
-  setSuccessMsg("");
+  async function handleApplyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
 
-  const result = await applyCode(codeInput);
-  if (result.success) {
-      setSuccessMsg("کد تخفیف با موفقیت اعمال شد 🎉");
+    const result = await applyCode(codeInput);
+    if (result.success) {
+      toast.success("کد تخفیف با موفقیت اعمال شد 🎉");
       setCodeInput("");
     } else {
-      setErrorMsg(result.error);
+      toast.error(result.error);
     }
   }
 
   function handleRemoveCode() {
     removeCode();
+    toast.info("کد تخفیف حذف شد");
     setErrorMsg("");
     setSuccessMsg("");
+  }
+
+  function handleClearCart() {
+    if (!confirm("آیا از پاک کردن کل سبد خرید مطمئنی؟")) return;
+    clearCart();
+    toast.info("سبد خرید پاک شد");
+  }
+
+  function handleRemoveItem(id: string, name: string) {
+    removeItem(id);
+    toast.info(`«${name}» از سبد حذف شد`);
   }
 
   return (
@@ -155,7 +169,7 @@ async function handleApplyCode(e: React.FormEvent) {
                         </div>
                         <button
                           type="button"
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => handleRemoveItem(item.id, item.name)}
                           aria-label="حذف"
                           className="text-gray-400 transition hover:text-red-500"
                         >
@@ -182,7 +196,7 @@ async function handleApplyCode(e: React.FormEvent) {
 
               <button
                 type="button"
-                onClick={clearCart}
+                onClick={handleClearCart}
                 className="mt-3 text-sm text-red-500 hover:underline"
               >
                 پاک کردن کل سبد
@@ -264,16 +278,6 @@ async function handleApplyCode(e: React.FormEvent) {
                         اعمال
                       </button>
                     </div>
-                    {errorMsg && (
-                      <p className="mt-2 text-xs font-bold text-red-600">
-                        ⚠️ {errorMsg}
-                      </p>
-                    )}
-                    {successMsg && (
-                      <p className="mt-2 text-xs font-bold text-green-600">
-                        {successMsg}
-                      </p>
-                    )}
                   </form>
                 )}
               </div>
@@ -300,7 +304,9 @@ async function handleApplyCode(e: React.FormEvent) {
                   <span>هزینه ارسال</span>
                   <span
                     className={
-                      shipping === 0 ? "font-bold text-green-600" : "font-bold text-gray-800"
+                      shipping === 0
+                        ? "font-bold text-green-600"
+                        : "font-bold text-gray-800"
                     }
                   >
                     {shipping === 0 ? "رایگان" : formatPrice(shipping)}
@@ -309,13 +315,16 @@ async function handleApplyCode(e: React.FormEvent) {
 
                 {shipping > 0 && (
                   <div className="rounded-lg bg-amber-50 p-2.5 text-xs text-amber-700">
-                    🎁 با {formatPrice(2_000_000 - totalPrice)} خرید بیشتر، ارسال رایگان می‌شود
+                    🎁 با {formatPrice(2_000_000 - totalPrice)} خرید بیشتر، ارسال
+                    رایگان می‌شود
                   </div>
                 )}
               </div>
 
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-base font-bold text-gray-800">مبلغ قابل پرداخت</span>
+                <span className="text-base font-bold text-gray-800">
+                  مبلغ قابل پرداخت
+                </span>
                 <span className="text-lg font-black text-gray-900">
                   {formatPrice(grandTotal)}
                 </span>

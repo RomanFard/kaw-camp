@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useToast } from "@/components/context/ToastContext";
 
 // ─── تایپ ───
 type DiscountCode = {
@@ -45,6 +46,7 @@ const EMPTY_FORM: FormData = {
 
 export default function DiscountsPage() {
   const supabase = createClient();
+  const toast = useToast();
 
   const [codes, setCodes] = useState<DiscountCode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +130,7 @@ export default function DiscountsPage() {
       return;
     }
     if (form.type === "percent" && numValue > 100) {
-      setFormError("درصد تخفیف نمیتواند بیشتر از ۱۰۰ باشد");
+      setFormError("درصد تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد");
       return;
     }
 
@@ -170,12 +172,13 @@ export default function DiscountsPage() {
 
     setSaving(false);
     setModalOpen(false);
+    toast.success(editingId ? "کد با موفقیت ویرایش شد" : "کد جدید اضافه شد");
     loadCodes();
   }
 
   // ─── حذف ───
   async function handleDelete(id: string, code: string) {
-    if (!confirm(`آیا مطمئنی میخوای کد "${code}" رو حذف کنی؟`)) return;
+    if (!confirm(`آیا مطمئنی می‌خوای کد "${code}" رو حذف کنی؟`)) return;
 
     const { error } = await supabase
       .from("discount_codes")
@@ -183,9 +186,10 @@ export default function DiscountsPage() {
       .eq("id", id);
 
     if (error) {
-      alert("خطا در حذف: " + error.message);
+      toast.error("خطا در حذف: " + error.message);
       return;
     }
+    toast.success(`کد «${code}» حذف شد`);
     loadCodes();
   }
 
@@ -197,12 +201,13 @@ export default function DiscountsPage() {
       .eq("id", id);
 
     if (error) {
-      alert("خطا: " + error.message);
+      toast.error("خطا: " + error.message);
       return;
     }
     setCodes((prev) =>
       prev.map((c) => (c.id === id ? { ...c, is_active: !current } : c))
     );
+    toast.success(current ? "کد غیرفعال شد" : "کد فعال شد");
   }
 
   return (
@@ -541,7 +546,11 @@ export default function DiscountsPage() {
                   disabled={saving}
                   className="flex-1 rounded-lg bg-[#F59E0B] py-3 text-sm font-bold text-white transition hover:bg-[#D97706] disabled:opacity-50"
                 >
-                  {saving ? "در حال ذخیره..." : editingId ? "ذخیره تغییرات" : "افزودن کد"}
+                  {saving
+                    ? "در حال ذخیره..."
+                    : editingId
+                    ? "ذخیره تغییرات"
+                    : "افزودن کد"}
                 </button>
                 <button
                   type="button"

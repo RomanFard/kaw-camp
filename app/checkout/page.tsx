@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { useToast } from "@/components/context/ToastContext";
 
 export default function CheckoutPage() {
   const {
@@ -21,6 +22,7 @@ export default function CheckoutPage() {
   } = useCart();
 
   const supabase = createClient();
+  const toast = useToast();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -66,15 +68,16 @@ export default function CheckoutPage() {
 
     const result = await applyCode(codeInput);
     if (result.success) {
-      setCodeSuccess("کد تخفیف با موفقیت اعمال شد 🎉");
+      toast.success("کد تخفیف با موفقیت اعمال شد 🎉");
       setCodeInput("");
     } else {
-      setCodeError(result.error);
+      toast.error(result.error);
     }
   }
 
   function handleRemoveCode() {
     removeCode();
+    toast.info("کد تخفیف حذف شد");
     setCodeError("");
     setCodeSuccess("");
   }
@@ -85,16 +88,16 @@ export default function CheckoutPage() {
 
     // اعتبارسنجی
     if (!form.firstName.trim() || !form.lastName.trim()) {
-      setSubmitError("نام و نام خانوادگی الزامی است");
+      toast.error("نام و نام خانوادگی الزامی است");
       return;
     }
     if (!form.phone.trim()) {
-      setSubmitError("شماره تماس الزامی است");
+      toast.error("شماره تماس الزامی است");
       return;
     }
     if (shipping === "post") {
       if (!form.province.trim() || !form.city.trim() || !form.address.trim()) {
-        setSubmitError("برای ارسال پستی، استان، شهر و آدرس الزامی است");
+        toast.error("برای ارسال پستی، استان، شهر و آدرس الزامی است");
         return;
       }
     }
@@ -116,7 +119,7 @@ export default function CheckoutPage() {
     );
 
     if (numError || !numData) {
-      setSubmitError("خطا در تولید شماره پیگیری. لطفاً دوباره تلاش کنید.");
+      toast.error("خطا در تولید شماره پیگیری. لطفاً دوباره تلاش کنید.");
       setSubmitting(false);
       return;
     }
@@ -146,12 +149,13 @@ export default function CheckoutPage() {
 
     if (insertError) {
       console.error(insertError);
-      setSubmitError("خطا در ثبت سفارش: " + insertError.message);
+      toast.error("خطا در ثبت سفارش: " + insertError.message);
       setSubmitting(false);
       return;
     }
 
     // موفقیت
+    toast.success(`سفارش ${numData} با موفقیت ثبت شد!`);
     setOrderNumber(numData);
     clearCart();
     setSubmitting(false);
@@ -585,16 +589,6 @@ export default function CheckoutPage() {
                         اعمال
                       </button>
                     </div>
-                    {codeError && (
-                      <p className="mt-2 text-xs font-bold text-red-600">
-                        ⚠️ {codeError}
-                      </p>
-                    )}
-                    {codeSuccess && (
-                      <p className="mt-2 text-xs font-bold text-green-600">
-                        {codeSuccess}
-                      </p>
-                    )}
                   </form>
                 )}
               </div>
@@ -640,12 +634,6 @@ export default function CheckoutPage() {
                     {formatPrice(finalPrice)}
                   </span>
                 </div>
-
-                {submitError && (
-                  <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-700">
-                    ⚠️ {submitError}
-                  </div>
-                )}
 
                 <button
                   type="button"

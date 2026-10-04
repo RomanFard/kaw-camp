@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
+import { useToast } from "@/components/context/ToastContext";
 
 type OrderItem = {
   id: string;
@@ -67,6 +68,7 @@ export default function OrderDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const supabase = createClient();
+  const toast = useToast();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,9 +110,10 @@ export default function OrderDetailPage() {
       .eq("id", order.id);
 
     if (error) {
-      alert("خطا: " + error.message);
+      toast.error("خطا: " + error.message);
     } else {
       setOrder({ ...order, status: newStatus });
+      toast.success("وضعیت سفارش بروزرسانی شد");
     }
     setUpdatingStatus(false);
   }
@@ -130,10 +133,13 @@ export default function OrderDetailPage() {
       .eq("id", order.id);
 
     if (error) {
-      alert("خطا: " + error.message);
+      toast.error("خطا: " + error.message);
       return;
     }
-    window.location.href = "/admin/orders";
+    toast.success(`سفارش «${order.order_number}» حذف شد`);
+    setTimeout(() => {
+      window.location.href = "/admin/orders";
+    }, 500);
   }
 
   function formatDate(iso: string) {
@@ -223,9 +229,7 @@ export default function OrderDetailPage() {
         <div className="mb-6 rounded-2xl border border-[#D4C5A0] bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-bold text-gray-500">
-                وضعیت سفارش
-              </p>
+              <p className="text-xs font-bold text-gray-500">وضعیت سفارش</p>
               <div className="mt-2 flex items-center gap-2">
                 <span
                   className={`rounded-lg border px-3 py-1 text-sm font-bold ${
@@ -235,15 +239,15 @@ export default function OrderDetailPage() {
                   {STATUS_LABELS[order.status]}
                 </span>
                 {updatingStatus && (
-                  <span className="text-xs text-gray-400">در حال بروزرسانی...</span>
+                  <span className="text-xs text-gray-400">
+                    در حال بروزرسانی...
+                  </span>
                 )}
               </div>
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-bold text-gray-500">
-                تغییر سریع
-              </p>
+              <p className="mb-2 text-xs font-bold text-gray-500">تغییر سریع</p>
               <div className="flex flex-wrap gap-2">
                 {(Object.keys(STATUS_LABELS) as Order["status"][]).map(
                   (status) => (
@@ -390,9 +394,7 @@ export default function OrderDetailPage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-gray-900">
-                    {item.name}
-                  </p>
+                  <p className="text-sm font-bold text-gray-900">{item.name}</p>
                   <p className="mt-1 text-xs text-gray-500">
                     {item.quantity.toLocaleString("fa-IR")} ×{" "}
                     {formatPrice(item.price)}
