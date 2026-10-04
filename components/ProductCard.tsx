@@ -29,10 +29,7 @@ export default function ProductCard({ product }: { product: Product }) {
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
 
-  const image =
-    product.image && product.image.startsWith("/")
-      ? product.image
-      : getProductImage(product.category, product.id);
+  const image = product.image || getProductImage(product.category, product.id);
 
   const colors = product.colors || [];
 

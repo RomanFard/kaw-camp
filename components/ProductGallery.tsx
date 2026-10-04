@@ -18,15 +18,13 @@ export default function ProductGallery({
 }) {
   const [localIndex, setLocalIndex] = useState(activeImageIndex);
 
-  // اگه عکس لوکال داره، ازش استفاده کن
-  const localImages = (images || []).filter(
-    (img) => img && img.startsWith("/")
-  );
+  // ✅ هر URL معتبری (لوکال یا https) قبوله
+  const validImages = (images || []).filter((img) => img && img.trim());
 
-  // اگه عکس لوکال نیست، از عکس‌های دسته‌بندی استفاده کن
+  // اگه عکسی نداشت، از عکس‌های دسته‌بندی استفاده کن
   const finalImages =
-    localImages.length > 0
-      ? localImages
+    validImages.length > 0
+      ? validImages
       : productCategory
       ? getProductImages(productCategory, productName)
       : [];

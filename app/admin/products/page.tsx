@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
 import { useToast } from "@/components/context/ToastContext";
+import ImageUploader from "@/components/admin/ImageUploader";
 import {
   getAllProducts,
   createProduct,
@@ -623,29 +624,11 @@ export default function ProductsAdminPage() {
               </div>
 
               {/* عکس اصلی */}
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                  آدرس تصویر اصلی *
-                </label>
-                <input
-                  type="text"
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  dir="ltr"
-                  placeholder="/images/products/... یا https://..."
-                  className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 font-mono text-left text-xs outline-none focus:border-amber-500"
-                />
-                {form.image && (
-                  <div className="mt-2 h-20 w-20 overflow-hidden rounded-lg border border-[#EDE4CE] bg-gray-50">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={form.image}
-                      alt="preview"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                )}
-              </div>
+              <ImageUploader
+                value={form.image}
+                onChange={(url) => setForm({ ...form, image: url })}
+                label="آدرس تصویر اصلی *"
+              />
 
               {/* گالری */}
               <div>
