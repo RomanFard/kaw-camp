@@ -1,320 +1,315 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { formatPrice } from "@/lib/utils";
-import { useToast } from "@/components/context/ToastContext";
+import { products } from "@/data/products";
+import AnalyticsSection from "@/components/admin/AnalyticsSection";
 
-// ─── تایپ ───
-type OrderItem = {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image?: string;
-};
-
-type Order = {
-  id: string;
-  order_number: string;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  province: string | null;
-  city: string | null;
-  items: OrderItem[];
-  subtotal: number;
-  discount_amount: number;
-  shipping_cost: number;
+type DiscountStats = {
   total: number;
-  status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
-  created_at: string;
+  active: number;
+  recent: {
+    id: string;
+    code: string;
+    type: "percent" | "fixed";
+    value: number;
+    is_active: boolean;
+    used_count: number;
+  }[];
 };
 
-type StatusKey = Order["status"] | "all";
-
-const STATUS_LABELS: Record<Order["status"], string> = {
-  pending: "در انتظار تأیید",
-  confirmed: "تأیید شده",
-  shipped: "ارسال شده",
-  delivered: "تحویل داده شده",
-  cancelled: "لغو شده",
-};
-
-const STATUS_COLORS: Record<Order["status"], string> = {
-  pending: "bg-amber-100 text-amber-700 border-amber-300",
-  confirmed: "bg-blue-100 text-blue-700 border-blue-300",
-  shipped: "bg-purple-100 text-purple-700 border-purple-300",
-  delivered: "bg-green-100 text-green-700 border-green-300",
-  cancelled: "bg-red-100 text-red-700 border-red-300",
-};
-
-export default function OrdersPage() {
+export default function AdminPage() {
+  const router = useRouter();
   const supabase = createClient();
-  const toast = useToast();
 
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [stats, setStats] = useState<DiscountStats>({
+    total: 0,
+    active: 0,
+    recent: [],
+  });
+  const [orderCount, setOrderCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusKey>("all");
-
-  // ─── لود ───
-  async function loadOrders() {
-    setLoading(true);
-    setError("");
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      setError("خطا در بارگذاری سفارشات: " + error.message);
-    } else {
-      setOrders((data ?? []) as Order[]);
-    }
-    setLoading(false);
-  }
 
   useEffect(() => {
-    loadOrders();
+    async function loadStats() {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("discount_codes")
+        .select("id, code, type, value, is_active, used_count")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error loading stats:", error);
+      } else {
+        const all = data ?? [];
+        setStats({
+          total: all.length,
+          active: all.filter((c) => c.is_active).length,
+          recent: all.slice(0, 5),
+        });
+      }
+
+      const { data: orders } = await supabase.from("orders").select("status");
+
+      if (orders) {
+        setOrderCount(orders.length);
+        setPendingCount(orders.filter((o) => o.status === "pending").length);
+      }
+
+      setLoading(false);
+    }
+
+    loadStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── شمارش هر وضعیت ───
-  const counts = {
-    all: orders.length,
-    pending: orders.filter((o) => o.status === "pending").length,
-    confirmed: orders.filter((o) => o.status === "confirmed").length,
-    shipped: orders.filter((o) => o.status === "shipped").length,
-    delivered: orders.filter((o) => o.status === "delivered").length,
-    cancelled: orders.filter((o) => o.status === "cancelled").length,
-  };
-
-  // ─── فیلتر ───
-  const filtered = orders.filter((o) => {
-    if (statusFilter !== "all" && o.status !== statusFilter) return false;
-    if (!search.trim()) return true;
-    const q = search.trim().toLowerCase();
-    return (
-      o.order_number.toLowerCase().includes(q) ||
-      o.phone.includes(q) ||
-      `${o.first_name} ${o.last_name}`.toLowerCase().includes(q)
-    );
-  });
-
-  // ─── تغییر سریع وضعیت ───
-  async function handleStatusChange(id: string, newStatus: Order["status"]) {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: newStatus })
-      .eq("id", id);
-
-    if (error) {
-      toast.error("خطا: " + error.message);
-      return;
-    }
-    setOrders((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, status: newStatus } : o))
-    );
-    toast.success("وضعیت سفارش بروزرسانی شد");
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push("/admin/login");
+    router.refresh();
   }
 
-  // ─── حذف ───
-  async function handleDelete(id: string, num: string) {
-    if (!confirm(`آیا از حذف سفارش "${num}" مطمئنی؟`)) return;
+  const statCards = [
+    {
+      title: "محصولات",
+      value: products.length.toLocaleString("fa-IR"),
+      icon: "📦",
+      color: "from-blue-400 to-blue-600",
+      href: "/products",
+      note: "فعال در فروشگاه",
+    },
+    {
+      title: "کدهای تخفیف",
+      value: stats.total.toLocaleString("fa-IR"),
+      icon: "🎟️",
+      color: "from-amber-400 to-amber-600",
+      href: "/admin/discounts",
+      note: `${stats.active.toLocaleString("fa-IR")} کد فعال`,
+    },
+    {
+      title: "سفارشات",
+      value: orderCount.toLocaleString("fa-IR"),
+      icon: "🛒",
+      color: "from-green-400 to-green-600",
+      href: "/admin/orders",
+      note: `${pendingCount.toLocaleString("fa-IR")} در انتظار تأیید`,
+    },
+    {
+      title: "کاربران",
+      value: "—",
+      icon: "👥",
+      color: "from-gray-300 to-gray-400",
+      href: "#",
+      note: "به‌زودی فعال می‌شود",
+      disabled: true,
+    },
+  ];
 
-    const { error } = await supabase.from("orders").delete().eq("id", id);
-
-    if (error) {
-      toast.error("خطا: " + error.message);
-      return;
-    }
-    toast.success(`سفارش «${num}» حذف شد`);
-    loadOrders();
-  }
-
-  // ─── تاریخ ───
-  function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString("fa-IR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-  }
+  const quickLinks = [
+    {
+      title: "کدهای تخفیف",
+      icon: "🎟️",
+      href: "/admin/discounts",
+      description: "افزودن، ویرایش و مدیریت کدها",
+      active: true,
+    },
+    {
+      title: "محصولات",
+      icon: "📦",
+      href: "#",
+      description: "به‌زودی...",
+      active: false,
+    },
+    {
+      title: "سفارشات",
+      icon: "🛒",
+      href: "/admin/orders",
+      description: "مدیریت و پیگیری سفارشات",
+      active: true,
+    },
+    {
+      title: "مقالات",
+      icon: "📝",
+      href: "#",
+      description: "به‌زودی...",
+      active: false,
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-[#F7F1E3]">
       <div className="mx-auto max-w-6xl px-6 py-8">
         {/* Header */}
-        <div className="mb-6">
-          <a
-            href="/admin"
-            className="text-sm text-gray-500 hover:text-amber-600"
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-black text-gray-900">
+              🎛️ پنل مدیریت KAW CAMP
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">نمای کلی فروشگاه</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-bold text-red-700 transition hover:bg-red-100"
           >
-            ← بازگشت به داشبورد
-          </a>
-          <h1 className="mt-2 text-3xl font-black text-gray-900">
-            🛒 مدیریت سفارشات
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {orders.length.toLocaleString("fa-IR")} سفارش ثبت شده
-          </p>
+            🚪 خروج
+          </button>
         </div>
 
-        {/* کارت‌های آماری وضعیت */}
-        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-6">
-          {(
-            [
-              "all",
-              "pending",
-              "confirmed",
-              "shipped",
-              "delivered",
-              "cancelled",
-            ] as StatusKey[]
-          ).map((key) => {
-            const isActive = statusFilter === key;
-            const label =
-              key === "all" ? "همه" : STATUS_LABELS[key as Order["status"]];
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setStatusFilter(key)}
-                className={`rounded-xl border p-3 text-center transition ${
-                  isActive
-                    ? "border-amber-500 bg-amber-50 shadow-sm"
-                    : "border-[#D4C5A0] bg-white hover:border-amber-400"
+        {/* کارت‌های آماری */}
+        <div className="mb-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {statCards.map((card) => {
+            const isDisabled = card.disabled;
+            const content = (
+              <div
+                className={`group relative overflow-hidden rounded-2xl border border-[#D4C5A0] bg-white p-5 transition ${
+                  isDisabled
+                    ? "cursor-not-allowed opacity-60"
+                    : "hover:-translate-y-1 hover:border-amber-500 hover:shadow-lg"
                 }`}
               >
-                <div className="text-2xl font-black text-gray-900">
-                  {counts[key].toLocaleString("fa-IR")}
+                <div className="flex items-start justify-between">
+                  <div
+                    className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${card.color} text-2xl shadow-sm`}
+                  >
+                    {card.icon}
+                  </div>
                 </div>
-                <div className="mt-1 text-[11px] font-bold text-gray-600">
-                  {label}
+                <div className="mt-4">
+                  <p className="text-xs font-bold text-gray-500">
+                    {card.title}
+                  </p>
+                  <p className="mt-1 text-3xl font-black text-gray-900">
+                    {loading && !isDisabled ? "..." : card.value}
+                  </p>
+                  <p className="mt-1 text-[11px] text-gray-400">{card.note}</p>
                 </div>
-              </button>
+              </div>
+            );
+
+            return isDisabled ? (
+              <div key={card.title}>{content}</div>
+            ) : (
+              <a key={card.title} href={card.href}>
+                {content}
+              </a>
             );
           })}
         </div>
 
-        {/* جستجو */}
-        <div className="mb-4">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="🔍 جستجو در شماره پیگیری، نام یا تلفن..."
-            className="w-full max-w-md rounded-lg border border-[#D4C5A0] bg-white px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-          />
+        {/* ─── بخش تحلیل پیشرفته ─── */}
+        <div className="mb-8">
+          <AnalyticsSection />
         </div>
 
-        {/* خطا */}
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
-            ⚠️ {error}
+        {/* کدهای اخیر + دسترسی سریع */}
+        <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+          {/* کدهای تخفیف اخیر */}
+          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-black text-gray-900">
+                🎟️ آخرین کدهای تخفیف
+              </h2>
+              <a
+                href="/admin/discounts"
+                className="text-xs font-bold text-amber-600 hover:underline"
+              >
+                مشاهده همه →
+              </a>
+            </div>
+
+            {loading ? (
+              <div className="py-8 text-center text-sm text-gray-400">
+                در حال بارگذاری...
+              </div>
+            ) : stats.recent.length === 0 ? (
+              <div className="py-8 text-center text-sm text-gray-400">
+                هنوز کدی ثبت نشده
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {stats.recent.map((code) => (
+                  <div
+                    key={code.id}
+                    className="flex items-center justify-between rounded-lg border border-[#EDE4CE] bg-[#F7F1E3]/30 px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`flex h-2 w-2 rounded-full ${
+                          code.is_active ? "bg-green-500" : "bg-gray-300"
+                        }`}
+                      />
+                      <span className="font-mono font-bold text-gray-900">
+                        {code.code}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-gray-600">
+                      <span className="font-bold">
+                        {code.type === "percent"
+                          ? `${code.value.toLocaleString("fa-IR")}٪`
+                          : `${code.value.toLocaleString("fa-IR")} تومان`}
+                      </span>
+                      <span className="text-gray-400">
+                        {code.used_count.toLocaleString("fa-IR")} استفاده
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
 
-        {/* جدول */}
-        <div className="overflow-hidden rounded-2xl border border-[#D4C5A0] bg-white">
-          {loading ? (
-            <div className="p-12 text-center text-gray-500">
-              در حال بارگذاری...
+          {/* دسترسی سریع */}
+          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
+            <h2 className="mb-4 text-lg font-black text-gray-900">
+              🔗 دسترسی سریع
+            </h2>
+
+            <div className="space-y-2">
+              {quickLinks.map((link) => {
+                const content = (
+                  <div
+                    className={`flex items-start gap-3 rounded-lg border p-3 transition ${
+                      link.active
+                        ? "border-[#EDE4CE] bg-[#F7F1E3]/30 hover:border-amber-400 hover:bg-amber-50"
+                        : "cursor-not-allowed border-[#EDE4CE] bg-gray-50 opacity-60"
+                    }`}
+                  >
+                    <span className="text-2xl">{link.icon}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-gray-900">
+                        {link.title}
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-gray-500">
+                        {link.description}
+                      </p>
+                    </div>
+                    {link.active && (
+                      <span className="text-lg text-gray-300 group-hover:text-amber-600">
+                        →
+                      </span>
+                    )}
+                  </div>
+                );
+
+                return link.active ? (
+                  <a key={link.title} href={link.href} className="block">
+                    {content}
+                  </a>
+                ) : (
+                  <div key={link.title}>{content}</div>
+                );
+              })}
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              {search || statusFilter !== "all"
-                ? "سفارشی با این فیلتر پیدا نشد"
-                : "هنوز سفارشی ثبت نشده"}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-right text-sm">
-                <thead className="border-b border-[#EDE4CE] bg-[#F7F1E3]/50">
-                  <tr className="text-xs font-bold text-gray-600">
-                    <th className="px-4 py-3">شماره پیگیری</th>
-                    <th className="px-4 py-3">مشتری</th>
-                    <th className="px-4 py-3">تلفن</th>
-                    <th className="px-4 py-3">مبلغ</th>
-                    <th className="px-4 py-3">وضعیت</th>
-                    <th className="px-4 py-3">تاریخ</th>
-                    <th className="px-4 py-3 text-left">عملیات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((order) => (
-                    <tr
-                      key={order.id}
-                      className="border-b border-[#EDE4CE] last:border-0 transition hover:bg-[#F7F1E3]/30"
-                    >
-                      <td className="px-4 py-3">
-                        <span className="font-mono font-bold text-gray-900">
-                          {order.order_number}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {order.first_name} {order.last_name}
-                      </td>
-                      <td
-                        className="px-4 py-3 font-mono text-xs text-gray-600"
-                        dir="ltr"
-                      >
-                        {order.phone}
-                      </td>
-                      <td className="px-4 py-3 font-bold">
-                        {formatPrice(order.total)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <select
-                          value={order.status}
-                          onChange={(e) =>
-                            handleStatusChange(
-                              order.id,
-                              e.target.value as Order["status"]
-                            )
-                          }
-                          className={`cursor-pointer rounded-lg border px-2 py-1 text-xs font-bold outline-none ${
-                            STATUS_COLORS[order.status]
-                          }`}
-                        >
-                          {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                            <option key={k} value={k}>
-                              {v}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-gray-500">
-                        {formatDate(order.created_at)}
-                      </td>
-                      <td className="px-4 py-3 text-left">
-                        <div className="flex justify-end gap-2">
-                          <a
-                            href={`/admin/orders/${order.id}`}
-                            className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 transition hover:bg-blue-100"
-                          >
-                            👁 مشاهده
-                          </a>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleDelete(order.id, order.order_number)
-                            }
-                            className="rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          </div>
         </div>
+
+        <p className="mt-8 text-center text-xs text-gray-400">
+          KAW CAMP Admin Panel — v1.0
+        </p>
       </div>
     </main>
   );
