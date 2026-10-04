@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 export default function CheckoutPage() {
   const {
@@ -16,7 +17,10 @@ export default function CheckoutPage() {
     totalAfterDiscount,
     applyCode,
     removeCode,
+    clearCart,
   } = useCart();
+
+  const supabase = createClient();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -37,10 +41,14 @@ export default function CheckoutPage() {
   const [codeError, setCodeError] = useState("");
   const [codeSuccess, setCodeSuccess] = useState("");
 
+  // ─── ثبت سفارش ───
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+
   const shippingCost = shipping === "post" ? 80000 : 0;
   const finalPrice = totalAfterDiscount + shippingCost;
 
-  // کد اعمال شده ولی شرطش برقرار نیست؟
   const codeInvalid =
     appliedCode !== null &&
     discountAmount === 0 &&
@@ -51,12 +59,12 @@ export default function CheckoutPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleApplyCode(e: React.FormEvent) {
+  async function handleApplyCode(e: React.FormEvent) {
     e.preventDefault();
     setCodeError("");
     setCodeSuccess("");
 
-    const result = applyCode(codeInput);
+    const result = await applyCode(codeInput);
     if (result.success) {
       setCodeSuccess("کد تخفیف با موفقیت اعمال شد 🎉");
       setCodeInput("");
@@ -69,6 +77,134 @@ export default function CheckoutPage() {
     removeCode();
     setCodeError("");
     setCodeSuccess("");
+  }
+
+  // ─── ثبت نهایی سفارش ───
+  async function handleSubmitOrder() {
+    setSubmitError("");
+
+    // اعتبارسنجی
+    if (!form.firstName.trim() || !form.lastName.trim()) {
+      setSubmitError("نام و نام خانوادگی الزامی است");
+      return;
+    }
+    if (!form.phone.trim()) {
+      setSubmitError("شماره تماس الزامی است");
+      return;
+    }
+    if (shipping === "post") {
+      if (!form.province.trim() || !form.city.trim() || !form.address.trim()) {
+        setSubmitError("برای ارسال پستی، استان، شهر و آدرس الزامی است");
+        return;
+      }
+    }
+
+    setSubmitting(true);
+
+    // اطلاعات سبد برای ذخیره
+    const orderItems = items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image,
+    }));
+
+    // دریافت شماره پیگیری از تابع Supabase
+    const { data: numData, error: numError } = await supabase.rpc(
+      "generate_order_number"
+    );
+
+    if (numError || !numData) {
+      setSubmitError("خطا در تولید شماره پیگیری. لطفاً دوباره تلاش کنید.");
+      setSubmitting(false);
+      return;
+    }
+
+    // ثبت سفارش
+    const { error: insertError } = await supabase.from("orders").insert({
+      order_number: numData,
+      first_name: form.firstName.trim(),
+      last_name: form.lastName.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim() || null,
+      province: form.province.trim() || null,
+      city: form.city.trim() || null,
+      address: form.address.trim() || null,
+      postal_code: form.postalCode.trim() || null,
+      items: orderItems,
+      subtotal: totalPrice,
+      discount_amount: discountAmount,
+      discount_code: appliedCode?.code ?? null,
+      shipping_cost: shippingCost,
+      total: finalPrice,
+      shipping_method: shipping,
+      payment_method: payment,
+      status: "pending",
+      note: form.note.trim() || null,
+    });
+
+    if (insertError) {
+      console.error(insertError);
+      setSubmitError("خطا در ثبت سفارش: " + insertError.message);
+      setSubmitting(false);
+      return;
+    }
+
+    // موفقیت
+    setOrderNumber(numData);
+    clearCart();
+    setSubmitting(false);
+  }
+
+  // ─── صفحه موفقیت ───
+  if (orderNumber) {
+    return (
+      <main className="min-h-screen bg-[#F7F1E3]">
+        <Header />
+        <div className="mx-auto max-w-2xl px-6 py-16">
+          <div className="rounded-3xl border border-[#D4C5A0] bg-white p-8 text-center shadow-lg">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-5xl">
+              ✅
+            </div>
+            <h1 className="text-2xl font-black text-gray-900">
+              سفارش شما با موفقیت ثبت شد!
+            </h1>
+            <p className="mt-3 text-sm text-gray-600">
+              به‌زودی با شما تماس می‌گیریم تا سفارش را تأیید کنیم.
+            </p>
+
+            <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+              <p className="text-xs font-bold text-amber-700">
+                شماره پیگیری سفارش
+              </p>
+              <p className="mt-2 font-mono text-2xl font-black text-amber-800">
+                {orderNumber}
+              </p>
+              <p className="mt-2 text-xs text-amber-600">
+                این شماره را برای پیگیری سفارش نزد خود نگه دارید.
+              </p>
+            </div>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="/products"
+                className="flex-1 rounded-lg bg-[#F59E0B] py-3 text-sm font-bold text-white transition hover:bg-[#D97706]"
+              >
+                بازگشت به فروشگاه
+              </a>
+              <a
+                href="/"
+                className="flex-1 rounded-lg border border-[#D4C5A0] py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
+              >
+                صفحه اصلی
+              </a>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    );
   }
 
   return (
@@ -90,7 +226,6 @@ export default function CheckoutPage() {
         </h1>
 
         {items.length === 0 ? (
-          /* سبد خالی */
           <div className="rounded-2xl border border-[#D4C5A0] bg-white p-12 text-center">
             <p className="text-6xl">🛒</p>
             <p className="mt-4 text-lg font-bold text-gray-800">
@@ -108,7 +243,7 @@ export default function CheckoutPage() {
           </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-            {/* فرم - سمت راست */}
+            {/* فرم */}
             <div className="space-y-4">
               {/* اطلاعات گیرنده */}
               <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
@@ -344,7 +479,7 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* خلاصه سفارش - سمت چپ */}
+            {/* خلاصه سفارش */}
             <aside className="sticky top-4 h-fit space-y-4">
               {/* لیست محصولات */}
               <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
@@ -380,7 +515,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* ─── کد تخفیف ─── */}
+              {/* کد تخفیف */}
               <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
                 <h2 className="mb-3 text-sm font-bold text-gray-800">
                   🎟️ کد تخفیف
@@ -506,11 +641,19 @@ export default function CheckoutPage() {
                   </span>
                 </div>
 
+                {submitError && (
+                  <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-700">
+                    ⚠️ {submitError}
+                  </div>
+                )}
+
                 <button
                   type="button"
-                  className="mt-5 w-full rounded-lg bg-green-700 py-3 text-base font-bold text-white transition hover:bg-green-800"
+                  onClick={handleSubmitOrder}
+                  disabled={submitting}
+                  className="mt-5 w-full rounded-lg bg-green-700 py-3 text-base font-bold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  ثبت نهایی سفارش
+                  {submitting ? "در حال ثبت سفارش..." : "ثبت نهایی سفارش"}
                 </button>
 
                 <p className="mt-3 text-center text-xs text-gray-500">

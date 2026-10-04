@@ -8,9 +8,11 @@ import {
   ReactNode,
 } from "react";
 import { Product } from "@/data/products";
+import { createClient } from "@/lib/supabase/client";
 import {
-  findDiscountCode,
+  toDiscountCode,
   type DiscountCode,
+  type SupabaseDiscountCode,
 } from "@/lib/discountCodes";
 
 export type CartItem = {
@@ -37,7 +39,7 @@ type CartContextType = {
   appliedCode: DiscountCode | null;
   discountAmount: number;
   totalAfterDiscount: number;
-  applyCode: (code: string) => ApplyResult;
+  applyCode: (code: string) => Promise<ApplyResult>;
   removeCode: () => void;
 };
 
@@ -59,23 +61,53 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [appliedCode, setAppliedCode] = useState<DiscountCode | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const supabase = createClient();
 
-  // ─── لود از localStorage ───
+  // ─── لود از localStorage + بازاعتبارسنجی با Supabase ───
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem("kaw-cart");
-      if (savedCart) setItems(JSON.parse(savedCart));
+    async function load() {
+      try {
+        const savedCart = localStorage.getItem("kaw-cart");
+        if (savedCart) setItems(JSON.parse(savedCart));
 
-      const savedCode = localStorage.getItem("kaw-discount");
-      if (savedCode) {
-        const codeStr = JSON.parse(savedCode) as string;
-        const found = findDiscountCode(codeStr);
-        if (found) setAppliedCode(found);
+        const savedCodeStr = localStorage.getItem("kaw-discount");
+        if (savedCodeStr) {
+          const code = JSON.parse(savedCodeStr) as string;
+
+          // fetch fresh from Supabase
+          const { data, error } = await supabase
+            .from("discount_codes")
+            .select("*")
+            .eq("code", code)
+            .eq("is_active", true)
+            .maybeSingle();
+
+          if (!error && data) {
+            // چک انقضا
+            const expired =
+              data.expires_at && new Date(data.expires_at) < new Date();
+            // چک سقف استفاده
+            const usedUp =
+              data.usage_limit !== null &&
+              data.used_count >= data.usage_limit;
+
+            if (!expired && !usedUp) {
+              setAppliedCode(toDiscountCode(data as SupabaseDiscountCode));
+            } else {
+              localStorage.removeItem("kaw-discount");
+            }
+          } else {
+            // کد پاک شده یا غیرفعال شده
+            localStorage.removeItem("kaw-discount");
+          }
+        }
+      } catch (e) {
+        console.error("Error loading cart:", e);
       }
-    } catch (e) {
-      console.error("Error loading cart:", e);
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ─── ذخیره در localStorage ───
@@ -145,32 +177,51 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const discountAmount = calcDiscount(totalPrice, appliedCode);
   const totalAfterDiscount = Math.max(0, totalPrice - discountAmount);
 
-  // ─── کد تخفیف ───
-  function applyCode(code: string): ApplyResult {
+  // ─── کد تخفیف (async) ───
+  async function applyCode(code: string): Promise<ApplyResult> {
     const trimmed = code.trim().toUpperCase();
+
     if (!trimmed) {
       return { success: false, error: "کد تخفیف را وارد کنید" };
-    }
-
-    const found = findDiscountCode(trimmed);
-    if (!found) {
-      return { success: false, error: "کد تخفیف نامعتبر است" };
     }
 
     if (totalPrice === 0) {
       return { success: false, error: "سبد خرید شما خالی است" };
     }
 
-    if (found.minPurchase && totalPrice < found.minPurchase) {
+    // Fetch از Supabase
+    const { data, error } = await supabase
+      .from("discount_codes")
+      .select("*")
+      .eq("code", trimmed)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (error || !data) {
+      return { success: false, error: "کد تخفیف نامعتبر است" };
+    }
+
+    // چک انقضا
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      return { success: false, error: "این کد منقضی شده است" };
+    }
+
+    // چک سقف استفاده
+    if (data.usage_limit !== null && data.used_count >= data.usage_limit) {
+      return { success: false, error: "ظرفیت استفاده از این کد پر شده است" };
+    }
+
+    // چک حداقل خرید
+    if (data.min_purchase && totalPrice < data.min_purchase) {
       return {
         success: false,
-        error: `حداقل خرید برای این کد ${found.minPurchase.toLocaleString(
+        error: `حداقل خرید برای این کد ${data.min_purchase.toLocaleString(
           "fa-IR"
         )} تومان است`,
       };
     }
 
-    setAppliedCode(found);
+    setAppliedCode(toDiscountCode(data as SupabaseDiscountCode));
     return { success: true };
   }
 

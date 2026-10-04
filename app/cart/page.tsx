@@ -37,13 +37,13 @@ export default function CartPage() {
     appliedCode.minPurchase !== undefined &&
     totalPrice < appliedCode.minPurchase;
 
-  function handleApplyCode(e: React.FormEvent) {
-    e.preventDefault();
-    setErrorMsg("");
-    setSuccessMsg("");
+async function handleApplyCode(e: React.FormEvent) {
+  e.preventDefault();
+  setErrorMsg("");
+  setSuccessMsg("");
 
-    const result = applyCode(codeInput);
-    if (result.success) {
+  const result = await applyCode(codeInput);
+  if (result.success) {
       setSuccessMsg("کد تخفیف با موفقیت اعمال شد 🎉");
       setCodeInput("");
     } else {

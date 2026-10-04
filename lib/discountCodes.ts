@@ -1,3 +1,4 @@
+// ─── Type استفاده‌شده توی CartContext ───
 export type DiscountCode = {
   code: string;
   type: "percent" | "fixed";
@@ -7,31 +8,30 @@ export type DiscountCode = {
   description: string;
 };
 
-export const DISCOUNT_CODES: DiscountCode[] = [
-  {
-    code: "KAW10",
-    type: "percent",
-    value: 10,
-    description: "۱۰٪ تخفیف روی کل سبد خرید",
-  },
-  {
-    code: "KAW20",
-    type: "percent",
-    value: 20,
-    maxDiscount: 200_000,
-    minPurchase: 500_000,
-    description: "۲۰٪ تخفیف (حداکثر ۲۰۰ هزار تومان، حداقل خرید ۵۰۰ هزار تومان)",
-  },
-  {
-    code: "WELCOME50",
-    type: "fixed",
-    value: 50_000,
-    minPurchase: 300_000,
-    description: "۵۰ هزار تومان تخفیف (حداقل خرید ۳۰۰ هزار تومان)",
-  },
-];
+// ─── Type ردیف Supabase ───
+export type SupabaseDiscountCode = {
+  id: string;
+  code: string;
+  type: "percent" | "fixed";
+  value: number;
+  min_purchase: number | null;
+  max_discount: number | null;
+  description: string | null;
+  is_active: boolean;
+  usage_limit: number | null;
+  used_count: number;
+  expires_at: string | null;
+  created_at: string;
+};
 
-export function findDiscountCode(code: string): DiscountCode | null {
-  const normalized = code.trim().toUpperCase();
-  return DISCOUNT_CODES.find((c) => c.code === normalized) ?? null;
+// ─── تبدیل ردیف Supabase → DiscountCode ───
+export function toDiscountCode(row: SupabaseDiscountCode): DiscountCode {
+  return {
+    code: row.code,
+    type: row.type,
+    value: row.value,
+    minPurchase: row.min_purchase ?? undefined,
+    maxDiscount: row.max_discount ?? undefined,
+    description: row.description ?? "",
+  };
 }
