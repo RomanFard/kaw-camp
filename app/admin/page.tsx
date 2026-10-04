@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { products } from "@/data/products";
+import { useProducts } from "@/components/context/ProductsContext";
 import AnalyticsSection from "@/components/admin/AnalyticsSection";
 
 type DiscountStats = {
@@ -22,6 +22,7 @@ type DiscountStats = {
 export default function AdminPage() {
   const router = useRouter();
   const supabase = createClient();
+  const { products, loading: productsLoading } = useProducts();
 
   const [stats, setStats] = useState<DiscountStats>({
     total: 0,
@@ -78,7 +79,7 @@ export default function AdminPage() {
       value: products.length.toLocaleString("fa-IR"),
       icon: "📦",
       color: "from-blue-400 to-blue-600",
-      href: "/products",
+      href: "/admin/products", // ✅ اصلاح شد
       note: "فعال در فروشگاه",
     },
     {
@@ -119,9 +120,9 @@ export default function AdminPage() {
     {
       title: "محصولات",
       icon: "📦",
-      href: "#",
-      description: "به‌زودی...",
-      active: false,
+      href: "/admin/products", // ✅ اصلاح شد
+      description: "افزودن، ویرایش و حذف محصولات",
+      active: true, // ✅ فعال شد
     },
     {
       title: "سفارشات",
@@ -183,7 +184,7 @@ export default function AdminPage() {
                     {card.title}
                   </p>
                   <p className="mt-1 text-3xl font-black text-gray-900">
-                    {loading && !isDisabled ? "..." : card.value}
+                    {loading || productsLoading ? "..." : card.value}
                   </p>
                   <p className="mt-1 text-[11px] text-gray-400">{card.note}</p>
                 </div>
@@ -200,7 +201,7 @@ export default function AdminPage() {
           })}
         </div>
 
-        {/* ─── بخش تحلیل پیشرفته ─── */}
+        {/* بخش تحلیل پیشرفته */}
         <div className="mb-8">
           <AnalyticsSection />
         </div>

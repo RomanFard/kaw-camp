@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import ProductGallery from "./ProductGallery";
 import { Product } from "@/data/products";
 import { useCart } from "@/components/context/CartContext";
@@ -30,9 +30,15 @@ function getCategoryEmoji(cat: string) {
 
 export default function ProductPageClient({ product }: { product: Product }) {
   const colors = product.colors || [];
+  const sizes = product.sizes || [];
   const hasColors = colors.length > 0;
+  const hasSizes = sizes.length > 0;
+
   const [selectedColor, setSelectedColor] = useState<string>(
     hasColors ? colors[0].label : ""
+  );
+  const [selectedSize, setSelectedSize] = useState<string>(
+    hasSizes ? sizes[0].label : ""
   );
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -55,74 +61,106 @@ export default function ProductPageClient({ product }: { product: Product }) {
   const englishName = product.englishName || product.slug;
   const productCode = "KC-" + product.id.padStart(4, "0");
 
-  const currentImageIndex = colors.findIndex((c) => c.label === selectedColor);
+  // ─── عکس فعال بر اساس رنگ انتخاب‌شده ───
+  const activeColorImage = useMemo(() => {
+    if (!selectedColor) return null;
+    const color = colors.find((c) => c.label === selectedColor);
+    return color?.image || null;
+  }, [selectedColor, colors]);
 
-function handleAdd() {
-  if (hasColors && !selectedColor) {
-    setError("لطفاً ابتدا رنگ محصول را انتخاب کنید");
-    setTimeout(() => setError(""), 3000);
-    return;
-  }
+  // ─── عکس فعال بر اساس سایز انتخاب‌شده (fallback) ───
+  const activeSizeImage = useMemo(() => {
+    if (!selectedSize || activeColorImage) return null;
+    const size = sizes.find((s) => s.label === selectedSize);
+    return size?.image || null;
+  }, [selectedSize, sizes, activeColorImage]);
 
-  // شروع انیمیشن پرتاب
-  if (buttonRef.current) {
-    const rect = buttonRef.current.getBoundingClientRect();
-    const isMobile = window.innerWidth < 768;
+  // ─── لیست نهایی عکس‌ها برای گالری ───
+  // اگه رنگ انتخاب‌شده عکس داره، اول لیست میاد
+  const galleryImages = useMemo(() => {
+    const baseImages =
+      product.images && product.images.length > 0
+        ? product.images
+        : [product.image];
 
-    // پیدا کردن موقعیت آیکون سبد خرید
-    let cartX = 0;
-    let cartY = 0;
+    const activeImage = activeColorImage || activeSizeImage;
 
-    if (isMobile) {
-      // ─── موبایل: سبد در منوی پایین (وسط صفحه) ───
-      const mobileCart = document.querySelector(
-        "[data-cart-icon-mobile]"
-      ) as HTMLElement;
-      if (mobileCart) {
-        const cartRect = mobileCart.getBoundingClientRect();
-        cartX = cartRect.left + cartRect.width / 2;
-        cartY = cartRect.top + cartRect.height / 2;
-      } else {
-        // پیش‌فرض موبایل: وسط-پایین صفحه
-        cartX = window.innerWidth / 2;
-        cartY = window.innerHeight - 40;
-      }
-    } else {
-      // ─── دسکتاپ: سبد در هدر (بالا-چپ) ───
-      const desktopCart = document.querySelector(
-        "[data-cart-icon]"
-      ) as HTMLElement;
-      if (desktopCart) {
-        const cartRect = desktopCart.getBoundingClientRect();
-        cartX = cartRect.left + cartRect.width / 2;
-        cartY = cartRect.top + cartRect.height / 2;
-      } else {
-        // پیش‌فرض دسکتاپ: بالا-راست
-        cartX = window.innerWidth - 150;
-        cartY = 100;
-      }
+    if (activeImage) {
+      // عکس فعال رو اول بذار (بدون تکرار)
+      const filtered = baseImages.filter((img) => img !== activeImage);
+      return [activeImage, ...filtered];
     }
 
-    setFlyingImage({
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-      targetX: cartX,
-      targetY: cartY,
-    });
+    return baseImages;
+  }, [product.images, product.image, activeColorImage, activeSizeImage]);
+
+  function handleAdd() {
+    if (hasColors && !selectedColor) {
+      setError("لطفاً ابتدا رنگ محصول را انتخاب کنید");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+    if (hasSizes && !selectedSize) {
+      setError("لطفاً ابتدا سایز محصول را انتخاب کنید");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+
+    // انیمیشن پرتاب
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const isMobile = window.innerWidth < 768;
+
+      let cartX = 0;
+      let cartY = 0;
+
+      if (isMobile) {
+        const mobileCart = document.querySelector(
+          "[data-cart-icon-mobile]"
+        ) as HTMLElement;
+        if (mobileCart) {
+          const cartRect = mobileCart.getBoundingClientRect();
+          cartX = cartRect.left + cartRect.width / 2;
+          cartY = cartRect.top + cartRect.height / 2;
+        } else {
+          cartX = window.innerWidth / 2;
+          cartY = window.innerHeight - 40;
+        }
+      } else {
+        const desktopCart = document.querySelector(
+          "[data-cart-icon]"
+        ) as HTMLElement;
+        if (desktopCart) {
+          const cartRect = desktopCart.getBoundingClientRect();
+          cartX = cartRect.left + cartRect.width / 2;
+          cartY = cartRect.top + cartRect.height / 2;
+        } else {
+          cartX = window.innerWidth - 150;
+          cartY = 100;
+        }
+      }
+
+      setFlyingImage({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+        targetX: cartX,
+        targetY: cartY,
+      });
+    }
+
+    addItem(product, quantity);
+    setError("");
+
+    setTimeout(() => {
+      setFlyingImage(null);
+      setAdded(true);
+    }, 800);
+
+    setTimeout(() => {
+      setShowCheckout(true);
+    }, 2000);
   }
 
-  addItem(product, quantity);
-  setError("");
-
-  setTimeout(() => {
-    setFlyingImage(null);
-    setAdded(true);
-  }, 800);
-
-  setTimeout(() => {
-    setShowCheckout(true);
-  }, 2000);
-}
   return (
     <div>
       {/* ═══ بخش بالا: گالری + اطلاعات ═══ */}
@@ -130,15 +168,11 @@ function handleAdd() {
         {/* گالری تصاویر */}
         <div className="order-1">
           <ProductGallery
-            images={
-              product.images && product.images.length > 0
-                ? product.images
-                : [product.image]
-            }
+            images={galleryImages}
             productName={product.name}
             productCategory={product.category}
             fallbackEmoji={getCategoryEmoji(product.category)}
-            activeImageIndex={currentImageIndex >= 0 ? currentImageIndex : 0}
+            activeImageIndex={0}
           />
         </div>
 
@@ -213,7 +247,7 @@ function handleAdd() {
             </div>
           </div>
 
-          {/* انتخاب رنگ */}
+          {/* ─── انتخاب رنگ ─── */}
           {hasColors && (
             <div className="border-t border-[#E8DFC8] pt-4">
               <div className="mb-2 flex items-center justify-between text-sm">
@@ -230,13 +264,63 @@ function handleAdd() {
                       setError("");
                     }}
                     className={
-                      "rounded-lg border-2 px-4 py-2 text-sm font-semibold transition " +
+                      "group flex items-center gap-2 rounded-lg border-2 px-3 py-1.5 text-sm font-semibold transition " +
                       (selectedColor === c.label
                         ? "border-amber-500 bg-amber-50 text-amber-700"
                         : "border-[#E8DFC8] bg-white text-gray-700 hover:border-amber-300")
                     }
                   >
-                    {c.label}
+                    {c.image && (
+                      <span className="h-7 w-7 overflow-hidden rounded border border-[#D4C5A0] bg-white">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={c.image}
+                          alt={c.label}
+                          className="h-full w-full object-cover"
+                        />
+                      </span>
+                    )}
+                    <span>{c.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ─── انتخاب سایز ─── */}
+          {hasSizes && (
+            <div className="border-t border-[#E8DFC8] pt-4">
+              <div className="mb-2 flex items-center justify-between text-sm">
+                <span className="text-gray-500">سایز / ظرفیت:</span>
+                <span className="font-bold text-amber-600">{selectedSize}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {sizes.map((s) => (
+                  <button
+                    key={s.label}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSize(s.label);
+                      setError("");
+                    }}
+                    className={
+                      "group flex items-center gap-2 rounded-lg border-2 px-3 py-1.5 text-sm font-semibold transition " +
+                      (selectedSize === s.label
+                        ? "border-amber-500 bg-amber-50 text-amber-700"
+                        : "border-[#E8DFC8] bg-white text-gray-700 hover:border-amber-300")
+                    }
+                  >
+                    {s.image && (
+                      <span className="h-7 w-7 overflow-hidden rounded border border-[#D4C5A0] bg-white">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={s.image}
+                          alt={s.label}
+                          className="h-full w-full object-cover"
+                        />
+                      </span>
+                    )}
+                    <span>{s.label}</span>
                   </button>
                 ))}
               </div>
@@ -265,7 +349,6 @@ function handleAdd() {
               </button>
             </div>
 
-            {/* دکمه افزودن / ادامه فرآیند خرید */}
             {showCheckout && product.inStock ? (
               <a
                 href="/checkout"
@@ -301,7 +384,7 @@ function handleAdd() {
             </div>
           )}
 
-          {/* اشتراک‌گذاری + مقایسه */}
+          {/* اشتراک‌گذاری */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E8DFC8] pt-4 text-xs">
             <div className="flex items-center gap-3 text-gray-600">
               <span>اشتراک‌گذاری:</span>
@@ -321,11 +404,6 @@ function handleAdd() {
                 </svg>
               </button>
             </div>
-
-            <button className="flex items-center gap-1 text-gray-600 transition hover:text-amber-600">
-              <span>افزودن به لیست مقایسه</span>
-              <span>⚖</span>
-            </button>
           </div>
         </div>
       </div>
@@ -338,10 +416,11 @@ function handleAdd() {
           brand={brand}
           englishName={englishName}
           colors={colors}
+          sizes={sizes}
         />
       </div>
 
-      {/* ─── انیمیشن پرتاب به سبد ─── */}
+      {/* انیمیشن پرتاب */}
       {flyingImage && (
         <div
           className="pointer-events-none fixed z-[9999]"
@@ -383,19 +462,21 @@ function handleAdd() {
   );
 }
 
-/* ─────── تب‌های توضیحات و نظرات ─────── */
+/* ─────── تب‌های توضیحات ─────── */
 function ProductDetailTabs({
   product,
   productCode,
   brand,
   englishName,
   colors,
+  sizes,
 }: {
   product: Product;
   productCode: string;
   brand: string;
   englishName: string;
-  colors: { label: string; value: string }[];
+  colors: { label: string; value: string; image?: string }[];
+  sizes: { label: string; value: string; image?: string }[];
 }) {
   const [activeTab, setActiveTab] = useState<"desc" | "reviews">("desc");
 
@@ -496,6 +577,14 @@ function ProductDetailTabs({
                       </td>
                     </tr>
                   )}
+                  {sizes.length > 0 && (
+                    <tr className="border-b border-[#EDE4CE]">
+                      <td className="py-2.5 text-gray-500">سایزها</td>
+                      <td className="break-words py-2.5 text-left font-semibold text-gray-900">
+                        {sizes.map((s) => s.label).join(" / ")}
+                      </td>
+                    </tr>
+                  )}
                   <tr>
                     <td className="py-2.5 text-gray-500">امتیاز</td>
                     <td className="py-2.5 text-left font-semibold text-gray-900">
@@ -517,7 +606,6 @@ function ProductDetailTabs({
                 </div>
                 <div className="mt-1 text-xs text-gray-500">از ۵</div>
               </div>
-
               <div className="flex-1">
                 <div className="mb-2 text-2xl text-amber-500">
                   {"★".repeat(Math.round(product.rating))}
@@ -540,86 +628,12 @@ function ProductDetailTabs({
                 <p className="mt-2 text-sm text-gray-500">
                   اولین نفری باشید که نظر خود را ثبت می‌کند
                 </p>
-                <button
-                  type="button"
-                  className="mt-5 rounded-lg bg-amber-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-amber-600"
-                >
-                  ثبت دیدگاه
-                </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {[
-                  {
-                    name: "کاربر خریدار",
-                    rating: 5,
-                    date: "۳ روز پیش",
-                    text: "کیفیت فوق‌العاده‌ای داشت. دقیقاً همون چیزی بود که توی توضیحات نوشته شده بود. ارسال هم سریع انجام شد.",
-                    verified: true,
-                  },
-                  {
-                    name: "کوهنورد حرفه‌ای",
-                    rating: 4,
-                    date: "۱ هفته پیش",
-                    text: "محصول خوبیه ولی قیمتش یکم بالاست. با این حال از خریدم راضی‌ام.",
-                    verified: true,
-                  },
-                  {
-                    name: "مشتری",
-                    rating: 5,
-                    date: "۲ هفته پیش",
-                    text: "بسته‌بندی خیلی مرتب و حرفه‌ای بود. ممنون از تیم کو کمپ.",
-                    verified: true,
-                  },
-                ].map((review, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl border border-[#E8DFC8] p-5"
-                  >
-                    <div className="mb-3 flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-base font-bold text-amber-600">
-                          {review.name.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-gray-900">
-                              {review.name}
-                            </span>
-                            {review.verified && (
-                              <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">
-                                ✓ خرید تایید شده
-                              </span>
-                            )}
-                          </div>
-                          <div className="mt-0.5 flex items-center gap-2">
-                            <span className="text-xs text-amber-500">
-                              {"★".repeat(review.rating)}
-                              <span className="text-gray-300">
-                                {"★".repeat(5 - review.rating)}
-                              </span>
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {review.date}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm leading-7 text-gray-700">
-                      {review.text}
-                    </p>
-                  </div>
-                ))}
-
-                <div className="mt-4 text-center">
-                  <button
-                    type="button"
-                    className="rounded-lg border-2 border-amber-500 bg-white px-6 py-3 text-sm font-bold text-amber-600 transition hover:bg-amber-500 hover:text-white"
-                  >
-                    ثبت دیدگاه شما
-                  </button>
-                </div>
+              <div className="rounded-xl border-2 border-dashed border-[#E8DFC8] bg-[#F7F1E3]/30 p-8 text-center">
+                <p className="text-sm text-gray-500">
+                  {product.reviews} نظر ثبت شده
+                </p>
               </div>
             )}
           </div>

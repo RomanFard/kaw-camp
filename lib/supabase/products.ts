@@ -21,7 +21,8 @@ export type ProductRow = {
   features: string[] | null;
   brand: string | null;
   english_name: string | null;
-  colors: { label: string; value: string }[] | null;
+  colors: { label: string; value: string; image?: string }[] | null;
+  sizes: { label: string; value: string; image?: string }[] | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -48,6 +49,7 @@ export function rowToProduct(row: ProductRow): Product {
     brand: row.brand ?? undefined,
     englishName: row.english_name ?? undefined,
     colors: row.colors ?? undefined,
+    sizes: row.sizes ?? undefined,
   };
 }
 
@@ -75,6 +77,7 @@ export function productToRow(
     brand: p.brand ?? null,
     english_name: p.englishName ?? null,
     colors: p.colors ?? null,
+    sizes: p.sizes ?? null,
   };
 }
 
@@ -118,7 +121,7 @@ export async function createProduct(p: Product) {
 export async function updateProduct(id: string, p: Product) {
   const supabase = createClient();
   const row = productToRow(p);
-  // id رو از آپدیت حذف میکنیم (چون کلیدن)
+  // id رو از آپدیت حذف می‌کنیم (چون کلیدن)
   const { id: _, ...rest } = row;
   return supabase.from("products").update(rest).eq("id", id);
 }

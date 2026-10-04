@@ -1,43 +1,51 @@
+"use client";
+
+import { Suspense, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { products, categories } from "@/data/products";
+import { categories } from "@/data/products";
 import { searchProducts, popularSearches } from "@/lib/search";
+import { useProducts } from "@/components/context/ProductsContext";
 
-type SearchParams = Promise<{ q?: string; cat?: string; sort?: string }>;
+function SearchContent() {
+  const searchParams = useSearchParams();
+  const { products, loading } = useProducts();
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const { q, cat, sort } = await searchParams;
-  const query = (q || "").trim();
+  const query = (searchParams.get("q") || "").trim();
+  const cat = searchParams.get("cat");
+  const sort = searchParams.get("sort");
 
-  // جستجوی هوشمند
-  let results = query ? searchProducts(query, products) : [];
+  // ─── جستجو + فیلتر + مرتب‌سازی ───
+  const { results, resultProducts, availableCategories } = useMemo(() => {
+    let r = query ? searchProducts(query, products) : [];
 
-  // فیلتر بر اساس دسته (اگه انتخاب شده)
-  if (cat) {
-    results = results.filter((r) => r.product.category === cat);
-  }
+    // فیلتر دسته
+    if (cat) {
+      r = r.filter((x) => x.product.category === cat);
+    }
 
-  // مرتب‌سازی
-  if (sort === "cheap") {
-    results.sort((a, b) => a.product.price - b.product.price);
-  } else if (sort === "expensive") {
-    results.sort((a, b) => b.product.price - a.product.price);
-  } else if (sort === "popular") {
-    results.sort((a, b) => b.product.rating - a.product.rating);
-  }
+    // مرتب‌سازی
+    if (sort === "cheap") {
+      r.sort((a, b) => a.product.price - b.product.price);
+    } else if (sort === "expensive") {
+      r.sort((a, b) => b.product.price - a.product.price);
+    } else if (sort === "popular") {
+      r.sort((a, b) => b.product.rating - a.product.rating);
+    }
+
+    const resultProducts = r.map((x) => x.product);
+    const availableCategories = Array.from(
+      new Set(resultProducts.map((p) => p.category))
+    )
+      .map((key) => categories.find((c) => c.key === key)!)
+      .filter(Boolean);
+
+    return { results: r, resultProducts, availableCategories };
+  }, [query, cat, sort, products]);
 
   const totalResults = results.length;
-  const resultProducts = results.map((r) => r.product);
-
-  // دسته‌های موجود در نتایج
-  const availableCategories = Array.from(
-    new Set(resultProducts.map((p) => p.category))
-  ).map((key) => categories.find((c) => c.key === key)!);
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#F7F1E3]">
@@ -57,8 +65,17 @@ export default async function SearchPage({
           )}
         </nav>
 
+        {/* حالت لودینگ */}
+        {loading && (
+          <div className="mx-auto max-w-2xl">
+            <div className="rounded-2xl border border-[#D4C5A0] bg-white p-12 text-center">
+              <p className="text-sm text-gray-500">در حال بارگذاری محصولات...</p>
+            </div>
+          </div>
+        )}
+
         {/* حالت ۱: بدون query */}
-        {!query && (
+        {!loading && !query && (
           <div className="mx-auto max-w-2xl">
             <div className="rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
               <p className="text-6xl">🔍</p>
@@ -69,7 +86,6 @@ export default async function SearchPage({
                 از آیکون جستجو توی هدر استفاده کن یا از پیشنهادات زیر انتخاب کن
               </p>
 
-              {/* جستجوهای محبوب */}
               <div className="mt-6">
                 <p className="mb-3 text-xs font-bold text-gray-500">
                   🔥 جستجوهای محبوب
@@ -91,7 +107,7 @@ export default async function SearchPage({
         )}
 
         {/* حالت ۲: query داریم ولی نتیجه‌ای نیست */}
-        {query && totalResults === 0 && (
+        {!loading && query && totalResults === 0 && (
           <div className="mx-auto max-w-2xl">
             <div className="rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
               <p className="text-6xl">😔</p>
@@ -130,20 +146,19 @@ export default async function SearchPage({
         )}
 
         {/* حالت ۳: نتیجه داریم */}
-        {query && totalResults > 0 && (
+        {!loading && query && totalResults > 0 && (
           <>
             {/* هدر نتایج */}
             <div className="mb-5 rounded-xl border border-[#D4C5A0] bg-white px-4 py-4 md:px-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-sm text-gray-600 md:text-base">
                   <span className="font-bold text-gray-800">
-                    {totalResults}
+                    {totalResults.toLocaleString("fa-IR")}
                   </span>{" "}
                   نتیجه برای «
                   <span className="font-bold text-amber-600">{query}</span>»
                 </div>
 
-                {/* مرتب‌سازی */}
                 <div className="flex items-center gap-2 text-xs md:text-sm">
                   <span className="text-gray-500">مرتب‌سازی:</span>
                   <a
@@ -197,7 +212,6 @@ export default async function SearchPage({
                 </div>
               </div>
 
-              {/* فیلتر دسته‌بندی */}
               {availableCategories.length > 1 && (
                 <div className="mt-3 flex flex-wrap gap-2 border-t border-[#EDE4CE] pt-3">
                   <a
@@ -209,7 +223,7 @@ export default async function SearchPage({
                         : "border border-[#D4C5A0] bg-white text-gray-700 hover:border-amber-500")
                     }
                   >
-                    همه ({totalResults})
+                    همه ({totalResults.toLocaleString("fa-IR")})
                   </a>
                   {availableCategories.map((c) => {
                     const count = resultProducts.filter(
@@ -231,7 +245,7 @@ export default async function SearchPage({
                             : "border border-[#D4C5A0] bg-white text-gray-700 hover:border-amber-500")
                         }
                       >
-                        {c.label} ({count})
+                        {c.label} ({count.toLocaleString("fa-IR")})
                       </a>
                     );
                   })}
@@ -239,14 +253,12 @@ export default async function SearchPage({
               )}
             </div>
 
-            {/* گرید نتایج */}
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
               {resultProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
 
-            {/* پیشنهاد جستجوهای مرتبط */}
             <div className="mt-8 rounded-xl border border-[#D4C5A0] bg-white p-5 md:p-6">
               <p className="mb-3 text-sm font-bold text-gray-800 md:text-base">
                 🔎 جستجوهای مرتبط
@@ -272,5 +284,22 @@ export default async function SearchPage({
 
       <Footer />
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#F7F1E3]">
+          <Header />
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <div className="text-sm text-gray-500">در حال بارگذاری...</div>
+          </div>
+        </main>
+      }
+    >
+      <SearchContent />
+    </Suspense>
   );
 }

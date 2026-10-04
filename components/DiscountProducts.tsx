@@ -1,9 +1,42 @@
-import { products } from "@/data/products";
+"use client";
+
 import { formatPrice } from "@/lib/utils";
 import { getProductImage } from "@/lib/productImages";
+import { useProducts } from "@/components/context/ProductsContext";
 
 export default function DiscountProducts() {
+  const { products, loading } = useProducts();
   const discounted = products.filter((p) => p.oldPrice).slice(0, 6);
+
+  // حالت لودینگ
+  if (loading) {
+    return (
+      <section className="mx-auto max-w-[1600px] px-6 py-10">
+        <div className="mb-6 flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-xl text-white">
+            🔥
+          </span>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 md:text-2xl">
+              تخفیف‌های ویژه
+            </h2>
+            <p className="text-sm text-gray-500">در حال بارگذاری...</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-64 animate-pulse rounded-xl bg-gray-100"
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // اگه تخفیفی نبود، نشون نده
+  if (discounted.length === 0) return null;
 
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-10">
@@ -39,11 +72,9 @@ export default function DiscountProducts() {
               )
             : 0;
 
-          // اگه عکس لوکال داره، ازش استفاده کن، وگرنه از عکس دسته‌بندی
+          // ✅ هر URL معتبری (لوکال یا https) قبوله
           const image =
-            product.image && product.image.startsWith("/")
-              ? product.image
-              : getProductImage(product.category, product.id);
+            product.image || getProductImage(product.category, product.id);
 
           return (
             <a

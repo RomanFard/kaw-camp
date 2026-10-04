@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
 import { useToast } from "@/components/context/ToastContext";
-import ImageUploader from "@/components/admin/ImageUploader";
 import {
   getAllProducts,
   createProduct,
@@ -18,6 +17,10 @@ import {
   type Product,
   type Category,
 } from "@/data/products";
+import ImageUploader from "@/components/admin/ImageUploader";
+import GalleryManager from "@/components/admin/GalleryManager";
+import ColorManager, { type ColorItem } from "@/components/admin/ColorManager";
+import SizeManager, { type SizeItem } from "@/components/admin/SizeManager";
 
 // ─── فرم ───
 type FormData = {
@@ -29,7 +32,7 @@ type FormData = {
   oldPrice: string;
   category: Category;
   image: string;
-  images: string;
+  images: string[];
   rating: string;
   reviews: string;
   inStock: boolean;
@@ -37,6 +40,8 @@ type FormData = {
   description: string;
   features: string;
   brand: string;
+  colors: ColorItem[];
+  sizes: SizeItem[];
 };
 
 const EMPTY_FORM: FormData = {
@@ -48,7 +53,7 @@ const EMPTY_FORM: FormData = {
   oldPrice: "",
   category: "tent",
   image: "",
-  images: "",
+  images: [""],
   rating: "5",
   reviews: "0",
   inStock: true,
@@ -56,6 +61,8 @@ const EMPTY_FORM: FormData = {
   description: "",
   features: "",
   brand: "",
+  colors: [],
+  sizes: [],
 };
 
 export default function ProductsAdminPage() {
@@ -121,7 +128,7 @@ export default function ProductsAdminPage() {
       oldPrice: p.oldPrice ? String(p.oldPrice) : "",
       category: p.category,
       image: p.image,
-      images: (p.images ?? []).join("\n"),
+      images: p.images && p.images.length > 0 ? p.images : [""],
       rating: String(p.rating),
       reviews: String(p.reviews),
       inStock: p.inStock,
@@ -129,6 +136,16 @@ export default function ProductsAdminPage() {
       description: p.description,
       features: (p.features ?? []).join("\n"),
       brand: p.brand ?? "",
+      colors: (p.colors ?? []).map((c) => ({
+        label: c.label,
+        value: c.value,
+        image: c.image,
+      })),
+      sizes: (p.sizes ?? []).map((s) => ({
+        label: s.label,
+        value: s.value,
+        image: s.image,
+      })),
     });
     setFormError("");
     setModalOpen(true);
@@ -144,9 +161,22 @@ export default function ProductsAdminPage() {
     if (!form.slug.trim()) return setFormError("slug الزامی است");
     if (!form.price.trim() || Number(form.price) <= 0)
       return setFormError("قیمت باید بزرگتر از صفر باشد");
-    if (!form.image.trim()) return setFormError("آدرس تصویر الزامی است");
+    if (!form.image.trim()) return setFormError("عکس اصلی الزامی است");
+
+    // اعتبارسنجی رنگ‌ها
+    const invalidColor = form.colors.find((c) => !c.label.trim());
+    if (invalidColor) return setFormError("همه رنگ‌ها باید نام داشته باشن");
+
+    // اعتبارسنجی سایزها
+    const invalidSize = form.sizes.find((s) => !s.label.trim());
+    if (invalidSize) return setFormError("همه سایزها باید نام داشته باشن");
 
     setSaving(true);
+
+    // آماده‌سازی عکس‌های گالری (حذف خالی‌ها)
+    const cleanImages = form.images
+      .map((s) => s.trim())
+      .filter(Boolean);
 
     const productData: Product = {
       id: form.id,
@@ -157,12 +187,7 @@ export default function ProductsAdminPage() {
       oldPrice: form.oldPrice ? Number(form.oldPrice) : undefined,
       category: form.category,
       image: form.image.trim(),
-      images: form.images.trim()
-        ? form.images
-            .split("\n")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : undefined,
+      images: cleanImages.length > 0 ? cleanImages : undefined,
       rating: Number(form.rating) || 0,
       reviews: Number(form.reviews) || 0,
       inStock: form.inStock,
@@ -173,6 +198,8 @@ export default function ProductsAdminPage() {
         .map((s) => s.trim())
         .filter(Boolean),
       brand: form.brand.trim() || undefined,
+      colors: form.colors.length > 0 ? form.colors : undefined,
+      sizes: form.sizes.length > 0 ? form.sizes : undefined,
     };
 
     let result;
@@ -229,14 +256,13 @@ export default function ProductsAdminPage() {
   async function handleReset() {
     if (
       !confirm(
-        `آیا مطمئنی؟ این کار همه محصولات Supabase رو پاک میکنه و ${seedProducts.length} محصول اولیه رو برمیگردونه.`
+        `آیا مطمئنی؟ این کار همه محصولات Supabase رو پاک می‌کنه و ${seedProducts.length} محصول اولیه رو برمی‌گردونه.`
       )
     )
       return;
 
     setLoading(true);
 
-    // حذف همه
     const { error: delErr } = await supabase
       .from("products")
       .delete()
@@ -248,30 +274,28 @@ export default function ProductsAdminPage() {
       return;
     }
 
-    // درج دوباره
-    const { error: insErr } = await supabase
-      .from("products")
-      .insert(
-        seedProducts.map((p) => ({
-          id: p.id,
-          name: p.name,
-          slug: p.slug,
-          price: p.price,
-          old_price: p.oldPrice ?? null,
-          category: p.category,
-          image: p.image,
-          images: p.images ?? null,
-          rating: p.rating,
-          reviews: p.reviews,
-          in_stock: p.inStock,
-          short_desc: p.shortDesc,
-          description: p.description,
-          features: p.features ?? [],
-          brand: p.brand ?? null,
-          english_name: p.englishName ?? null,
-          colors: p.colors ?? null,
-        }))
-      );
+    const { error: insErr } = await supabase.from("products").insert(
+      seedProducts.map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        old_price: p.oldPrice ?? null,
+        category: p.category,
+        image: p.image,
+        images: p.images ?? null,
+        rating: p.rating,
+        reviews: p.reviews,
+        in_stock: p.inStock,
+        short_desc: p.shortDesc,
+        description: p.description,
+        features: p.features ?? [],
+        brand: p.brand ?? null,
+        english_name: p.englishName ?? null,
+        colors: p.colors ?? null,
+        sizes: p.sizes ?? null,
+      }))
+    );
 
     if (insErr) {
       toast.error("خطا در درج: " + insErr.message);
@@ -328,7 +352,7 @@ export default function ProductsAdminPage() {
           </div>
         </div>
 
-        {/* آمار کوچیک */}
+        {/* آمار */}
         <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
           <StatCard label="کل" value={stats.total} icon="📦" />
           <StatCard label="موجود" value={stats.inStock} icon="✅" green />
@@ -631,19 +655,22 @@ export default function ProductsAdminPage() {
               />
 
               {/* گالری */}
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                  گالری تصاویر (هر خط یک آدرس)
-                </label>
-                <textarea
-                  rows={3}
-                  value={form.images}
-                  onChange={(e) => setForm({ ...form, images: e.target.value })}
-                  dir="ltr"
-                  placeholder="/images/products/img-1.jpg&#10;/images/products/img-2.jpg"
-                  className="w-full resize-none rounded-lg border border-[#D4C5A0] px-4 py-2.5 font-mono text-left text-xs outline-none focus:border-amber-500"
-                />
-              </div>
+              <GalleryManager
+                images={form.images}
+                onChange={(images) => setForm({ ...form, images })}
+              />
+
+              {/* رنگ‌بندی */}
+              <ColorManager
+                colors={form.colors}
+                onChange={(colors) => setForm({ ...form, colors })}
+              />
+
+              {/* سایزبندی */}
+              <SizeManager
+                sizes={form.sizes}
+                onChange={(sizes) => setForm({ ...form, sizes })}
+              />
 
               {/* توضیح کوتاه */}
               <div>
@@ -803,7 +830,7 @@ function StatCard({
       </div>
       <div className={`mt-1 text-2xl font-black ${color}`}>
         {value.toLocaleString("fa-IR")}
-            </div>
+      </div>
     </div>
   );
 }

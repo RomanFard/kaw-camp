@@ -16,6 +16,18 @@ export type Category =
   | "bicycle"
   | "accessories";
 
+export type ProductColor = {
+  label: string;
+  value: string;
+  image?: string;
+};
+
+export type ProductSize = {
+  label: string;
+  value: string;
+  image?: string;
+};
+
 export type Product = {
   id: string;
   name: string;
@@ -33,7 +45,8 @@ export type Product = {
   features: string[];
   brand?: string;
   englishName?: string;
-  colors?: { label: string; value: string }[];
+  colors?: ProductColor[];
+  sizes?: ProductSize[];
 };
 
 export const categories: { key: Category; label: string; emoji: string }[] = [
