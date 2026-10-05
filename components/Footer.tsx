@@ -13,7 +13,7 @@ export default function Footer() {
       </div>
 
       {/* ═══ کادر اصلی — هم‌عرض با هدر ═══ */}
-      <div className="relative mx-auto w-full max-w-[1600px] px-6 py-12 md:px-12 md:py-16 lg:px-20">
+           <div className="relative mx-auto w-full max-w-[1400px] px-6 py-12 md:px-12 md:py-16 lg:px-16">
         {/* گرید اصلی */}
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {/* ─── ستون ۱: برند + درباره ─── */}

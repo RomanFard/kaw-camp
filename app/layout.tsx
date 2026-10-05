@@ -5,6 +5,7 @@ import "./globals.css";
 import { CartProvider } from "@/components/context/CartContext";
 import { WishlistProvider } from "@/components/context/WishlistContext";
 import { ToastProvider } from "@/components/context/ToastContext";
+import LoadingScreen from "@/components/LoadingScreen";
 import { ProductsProvider } from "@/components/context/ProductsContext";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import ToastContainer from "@/components/ToastContainer";
@@ -27,7 +28,8 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/gh/AmirAbbasVafaee/persian-fonts-cdn@main/css/iran-yekan.css"
         />
       </head>
-      <body className="font-[IranYekan] bg-gray-50">
+      <body className="font-[IranYekan] bg-[#050505]">
+        <LoadingScreen />
         <ToastProvider>
           <ProductsProvider>
             <CartProvider>

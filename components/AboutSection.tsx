@@ -55,7 +55,7 @@ export default function AboutSection() {
         <div className="absolute -left-40 bottom-10 h-64 w-64 rounded-full bg-[#E89070]/10 blur-[100px]" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-[1300px] px-6 md:px-10">
+                 <div className="relative mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-16">
         <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
           {/* ستون راست: متن */}
           <div className="flex flex-col justify-center">

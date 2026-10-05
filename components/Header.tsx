@@ -8,7 +8,6 @@ import MobileMenuDrawer from "./MobileMenuDrawer";
 import TopBar from "./TopBar";
 import { useWishlist } from "@/components/context/WishlistContext";
 
-// ─── ساختار منو با dropdown ───
 type MenuItem = {
   label: string;
   href: string;
@@ -71,7 +70,6 @@ export default function Header() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { totalItems: wishlistCount } = useWishlist();
 
-  // ─── هندلر hover با تأخیر (جلوگیری از پرش) ───
   function handleMouseEnter(label: string, hasChildren: boolean) {
     if (!hasChildren) return;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -94,19 +92,18 @@ export default function Header() {
   return (
     <>
       <header dir="rtl" className="w-full">
-        {/* ═══ TopBar (فقط دسکتاپ) ═══ */}
+        {/* TopBar */}
         <TopBar />
 
         {/* ═══ موبایل ═══ */}
         <div className="fixed top-0 left-0 right-0 z-[100] border-b border-zinc-800 bg-[#0A0A0A] md:hidden">
-          <div className="px-3 py-2.5">
+          <div className="mx-auto max-w-[1400px] px-6 py-2.5 md:px-12 lg:px-16">
             <div className="flex items-center gap-1.5">
-              {/* ۱. دسته‌بندی */}
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
                 aria-label="دسته‌بندی محصولات"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-amber-500 hover:text-white"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-[#E89070] hover:text-white"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +121,6 @@ export default function Header() {
                 </svg>
               </button>
 
-              {/* ۲. لوگو */}
               <a href="/" className="flex-shrink-0">
                 <Image
                   src="/images/logo.png"
@@ -135,16 +131,14 @@ export default function Header() {
                 />
               </a>
 
-              {/* ۳. جستجو */}
               <div className="min-w-0 flex-1">
                 <SearchButton />
               </div>
 
-              {/* ۴. ثبت‌نام */}
               <a
                 href="/login"
                 aria-label="حساب کاربری"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-amber-500 hover:text-white"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-[#E89070] hover:text-white"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +156,6 @@ export default function Header() {
                 </svg>
               </a>
 
-              {/* ۵. علاقه‌مندی */}
               <a
                 href="/wishlist"
                 aria-label="علاقه‌مندی"
@@ -195,10 +188,9 @@ export default function Header() {
         </div>
 
         {/* ═══ دسکتاپ ═══ */}
-                <div className="hidden border-b border-zinc-800 bg-[#0A0A0A] md:block">
-          <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-20">
+        <div className="relative hidden border-b border-zinc-800 bg-[#0A0A0A] md:block">
+          <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
             <div className="flex items-center justify-between gap-8 py-4">
-              {/* ─── راست: لوگو ─── */}
               <a href="/" className="flex flex-shrink-0 items-center">
                 <Image
                   src="/images/logo.png"
@@ -210,7 +202,6 @@ export default function Header() {
                 />
               </a>
 
-              {/* ─── وسط: منو با dropdown ─── */}
               <nav className="flex flex-1 items-center justify-center">
                 <ul className="flex items-center gap-1">
                   {menuItems.map((item) => {
@@ -231,7 +222,7 @@ export default function Header() {
                           className={
                             "group relative flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-bold transition lg:text-[15px] " +
                             (isOpen
-                              ? "text-amber-500"
+                              ? "text-[#E89070]"
                               : "text-zinc-300 hover:text-white")
                           }
                         >
@@ -245,7 +236,7 @@ export default function Header() {
                               stroke="currentColor"
                               className={
                                 "h-3.5 w-3.5 transition-transform duration-200 " +
-                                (isOpen ? "rotate-180 text-amber-500" : "")
+                                (isOpen ? "rotate-180 text-[#E89070]" : "")
                               }
                             >
                               <path
@@ -255,16 +246,14 @@ export default function Header() {
                               />
                             </svg>
                           )}
-                          {/* underline */}
                           <span
                             className={
-                              "absolute bottom-1 right-1/2 h-[2px] translate-x-1/2 bg-amber-500 transition-all duration-300 " +
+                              "absolute bottom-1 right-1/2 h-[2px] translate-x-1/2 bg-[#E89070] transition-all duration-300 " +
                               (isOpen ? "w-8" : "w-0 group-hover:w-8")
                             }
                           />
                         </a>
 
-                        {/* ─── Dropdown ─── */}
                         {hasChildren && (
                           <div
                             className={
@@ -279,7 +268,7 @@ export default function Header() {
                                 <a
                                   key={child.label}
                                   href={child.href}
-                                  className="block border-r-2 border-transparent px-4 py-2.5 text-sm text-zinc-300 transition hover:border-amber-500 hover:bg-zinc-900 hover:text-amber-500"
+                                  className="block border-r-2 border-transparent px-4 py-2.5 text-sm text-zinc-300 transition hover:border-[#E89070] hover:bg-zinc-900 hover:text-[#E89070]"
                                 >
                                   {child.label}
                                 </a>
@@ -293,7 +282,6 @@ export default function Header() {
                 </ul>
               </nav>
 
-              {/* ─── چپ: آیکون‌ها + CTA ─── */}
               <div className="flex flex-shrink-0 items-center gap-3">
                 <SearchPanel />
 
@@ -301,7 +289,7 @@ export default function Header() {
                   href="/wishlist"
                   aria-label="علاقه‌مندی"
                   data-wishlist-icon
-                  className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 text-zinc-300 transition hover:border-amber-500 hover:bg-amber-500 hover:text-white"
+                  className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 text-zinc-300 transition hover:border-[#E89070] hover:bg-[#E89070] hover:text-white"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -328,7 +316,7 @@ export default function Header() {
 
                 <a
                   href="/contact"
-                  className="ml-2 hidden items-center gap-2 rounded-lg bg-[#E89070] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/20 transition hover:bg-[#D77E5E] hover:shadow-amber-500/40 lg:flex"
+                  className="ml-2 hidden items-center gap-2 rounded-lg bg-[#E89070] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#E89070]/20 transition hover:bg-[#D77E5E] hover:shadow-[#E89070]/40 lg:flex"
                 >
                   <span>💬</span>
                   <span>مشاوره رایگان</span>
@@ -339,12 +327,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ⚠️ RightSidebar غیرفعال شد ولی فایلش باقیه */}
-      {/* <RightSidebar
-        forceOpen={sidebarOpen}
-        onForceClose={() => setSidebarOpen(false)}
-      /> */}
-
       <MobileMenuDrawer
         isOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
@@ -353,7 +335,6 @@ export default function Header() {
   );
 }
 
-// ─── دکمه جستجو (موبایل) ───
 function SearchButton() {
   const [open, setOpen] = useState(false);
 
@@ -362,7 +343,7 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-400 transition hover:border-amber-500"
+        className="flex w-full items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-400 transition hover:border-[#E89070]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -370,7 +351,7 @@ function SearchButton() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-4 w-4 flex-shrink-0 text-amber-500"
+          className="h-4 w-4 flex-shrink-0 text-[#E89070]"
         >
           <path
             strokeLinecap="round"

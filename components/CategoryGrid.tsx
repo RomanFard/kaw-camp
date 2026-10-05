@@ -29,7 +29,7 @@ export default function CategoryGrid() {
 
   return (
     <section className="relative py-12 md:py-16">
-      <div className="mx-auto max-w-[1300px] px-6 md:px-10">
+            <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
         {/* Header وسط‌چین */}
         <div className="mb-8 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E89070]/30 bg-[#E89070]/5 px-3.5 py-1.5 backdrop-blur-sm">

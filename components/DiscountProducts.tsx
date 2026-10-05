@@ -159,7 +159,7 @@ export default function DiscountProducts() {
   return (
     <section className="relative py-16 md:py-20">
       {/* Header */}
-      <div className="mx-auto max-w-[1600px] px-6 text-center md:px-12 lg:px-20">
+            <div className="mx-auto max-w-[1400px] px-6 text-center md:px-12 lg:px-16">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E89070]/30 bg-[#E89070]/5 px-4 py-1.5 backdrop-blur-sm">
           <span className="text-[11px] font-bold tracking-[0.15em] text-[#E89070] md:text-xs">
             SHOP
@@ -174,7 +174,7 @@ export default function DiscountProducts() {
       </div>
 
       {/* Slider: باریک و وسط‌چین */}
-      <div className="relative mx-auto mt-10 w-full max-w-[1000px] px-6 lg:px-0">
+           <div className="relative mx-auto mt-10 w-full max-w-[1400px] px-6 md:px-12 lg:px-16">
         {/* فلش چپ */}
         <button
           type="button"

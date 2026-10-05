@@ -131,11 +131,11 @@ export default function HeroVideo() {
 
       {/* ─── محتوای اصلی ─── */}
       <div className="relative z-10 flex h-full items-center overflow-hidden">
-        <div className="mx-auto w-full max-w-[1600px] px-6 md:px-12 lg:px-20">
+        <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
-            className="mx-auto max-w-3xl text-center"
+            className="max-w-2xl text-right"
           >
             <div key={textKey}>
               {/* Eyebrow */}
@@ -160,13 +160,13 @@ export default function HeroVideo() {
 
               {/* توضیحات */}
               {slide.description && (
-                <p className="animate-hero-4 mx-auto mb-8 max-w-xl text-sm leading-7 text-zinc-300 md:text-base md:leading-8">
+                <p className="animate-hero-4 mb-8 max-w-xl text-sm leading-7 text-zinc-300 md:text-base md:leading-8">
                   {slide.description}
                 </p>
               )}
 
               {/* دکمه‌ها */}
-              <div className="animate-hero-5 flex flex-wrap items-center justify-center gap-3">
+                    <div className="animate-hero-5 flex flex-wrap items-center justify-start gap-3">
                 {slide.primary_label && slide.primary_href && (
                   <a
                     href={slide.primary_href}

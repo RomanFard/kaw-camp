@@ -15,11 +15,13 @@ export default function LiveBackground({
   particleCount = 60,
   connectionDistance = 150,
   className = "",
+  quality = "high",
 }: {
   color?: string;
   particleCount?: number;
   connectionDistance?: number;
   className?: string;
+  quality?: "high" | "medium" | "low";
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
@@ -82,7 +84,8 @@ export default function LiveBackground({
         p.x = Math.max(0, Math.min(width, p.x));
         p.y = Math.max(0, Math.min(height, p.y));
 
-        if (mouse) {
+        // جذب به موس — فقط در high
+        if (mouse && quality === "high") {
           const dx = mouse.x - p.x;
           const dy = mouse.y - p.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -93,27 +96,29 @@ export default function LiveBackground({
         }
       }
 
-      // ─── خطوط بین ذرات نزدیک ───
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+      // ─── خطوط بین ذرات نزدیک — فقط در high ───
+      if (quality === "high") {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < connectionDistance) {
-            const opacity = (1 - dist / connectionDistance) * 0.4;
-            ctx.strokeStyle = hexToRgba(color, opacity);
-            ctx.lineWidth = 0.6;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
+            if (dist < connectionDistance) {
+              const opacity = (1 - dist / connectionDistance) * 0.4;
+              ctx.strokeStyle = hexToRgba(color, opacity);
+              ctx.lineWidth = 0.6;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
           }
         }
       }
 
-      // ─── خطوط بین ذرات و موس ───
-      if (mouse) {
+      // ─── خطوط بین ذرات و موس — فقط در high ───
+      if (mouse && quality === "high") {
         for (const p of particles) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
@@ -130,24 +135,27 @@ export default function LiveBackground({
         }
       }
 
-      // ─── رسم ذرات (نقطه‌ها) ───
+      // ─── رسم ذرات ───
       for (const p of particles) {
-        // هاله نرم
-        const gradient = ctx.createRadialGradient(
-          p.x,
-          p.y,
-          0,
-          p.x,
-          p.y,
-          p.radius * 6
-        );
-               gradient.addColorStop(0, hexToRgba(color, 0.35));
-        gradient.addColorStop(1, hexToRgba(color, 0));
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius * 6, 0, Math.PI * 2);
-        ctx.fill();
-        // نقطه مرکزی (کم‌رنگ‌تر)
+        // هاله نرم — فقط در high/medium
+        if (quality !== "low") {
+          const gradient = ctx.createRadialGradient(
+            p.x,
+            p.y,
+            0,
+            p.x,
+            p.y,
+            p.radius * 6
+          );
+          gradient.addColorStop(0, hexToRgba(color, 0.35));
+          gradient.addColorStop(1, hexToRgba(color, 0));
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius * 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // نقطه مرکزی
         ctx.fillStyle = hexToRgba(color, 0.6);
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -159,6 +167,8 @@ export default function LiveBackground({
 
     function handleMouseMove(e: MouseEvent) {
       if (!canvas) return;
+      // موس فقط در high اهمیت داره
+      if (quality !== "high") return;
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
         x: e.clientX - rect.left,
@@ -179,8 +189,10 @@ export default function LiveBackground({
       initParticles();
     });
 
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
+    if (quality === "high") {
+      canvas.addEventListener("mousemove", handleMouseMove);
+      canvas.addEventListener("mouseleave", handleMouseLeave);
+    }
 
     return () => {
       cancelAnimationFrame(animationRef.current);
@@ -188,7 +200,7 @@ export default function LiveBackground({
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [color, particleCount, connectionDistance]);
+  }, [color, particleCount, connectionDistance, quality]);
 
   return (
     <canvas
