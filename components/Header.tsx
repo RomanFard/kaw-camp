@@ -328,7 +328,7 @@ export default function Header() {
 
                 <a
                   href="/contact"
-                  className="ml-2 hidden items-center gap-2 rounded-lg bg-[#FF6B4A] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/20 transition hover:bg-[#E55A3A] hover:shadow-amber-500/40 lg:flex"
+                  className="ml-2 hidden items-center gap-2 rounded-lg bg-[#E89070] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/20 transition hover:bg-[#D77E5E] hover:shadow-amber-500/40 lg:flex"
                 >
                   <span>💬</span>
                   <span>مشاوره رایگان</span>

@@ -79,7 +79,7 @@ export default function AdminPage() {
       value: products.length.toLocaleString("fa-IR"),
       icon: "📦",
       color: "from-blue-400 to-blue-600",
-      href: "/admin/products", // ✅ اصلاح شد
+      href: "/admin/products",
       note: "فعال در فروشگاه",
     },
     {
@@ -118,11 +118,39 @@ export default function AdminPage() {
       active: true,
     },
     {
+      title: "بنر اصلی",
+      icon: "🎬",
+      href: "/admin/hero-slides",
+      description: "مدیریت اسلایدهای صفحه اصلی",
+      active: true,
+    },
+      {
+    title: "بخش درباره ما",
+    icon: "📄",
+    href: "/admin/about",
+    description: "ویرایش متن و تصویر بخش درباره ما",
+    active: true,
+  },
+    {
+      title: "برندها",
+      icon: "🏷️",
+      href: "/admin/brands",
+      description: "مدیریت برندهای نمایش داده شده",
+      active: true,
+    },
+    {
+      title: "دسته‌بندی‌ها",
+      icon: "🖼️",
+      href: "/admin/categories",
+      description: "مدیریت تصاویر دسته‌بندی‌ها",
+      active: true,
+    },
+    {
       title: "محصولات",
       icon: "📦",
-      href: "/admin/products", // ✅ اصلاح شد
+      href: "/admin/products",
       description: "افزودن، ویرایش و حذف محصولات",
-      active: true, // ✅ فعال شد
+      active: true,
     },
     {
       title: "سفارشات",
@@ -144,20 +172,64 @@ export default function AdminPage() {
     <main className="min-h-screen bg-[#F7F1E3]">
       <div className="mx-auto max-w-6xl px-6 py-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-3xl font-black text-gray-900">
               🎛️ پنل مدیریت KAW CAMP
             </h1>
             <p className="mt-1 text-sm text-gray-500">نمای کلی فروشگاه</p>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-bold text-red-700 transition hover:bg-red-100"
-          >
-            🚪 خروج
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href="/admin/hero-slides"
+              className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
+            >
+              🎬 مدیریت بنر
+            </a>
+                        <a
+              href="/admin/about"
+              className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
+            >
+              📄 درباره ما
+            </a>
+            <a
+              href="/admin/products"
+              className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
+            >
+              📦 محصولات
+            </a>
+            <a
+              href="/admin/discounts"
+              className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
+            >
+              🎟️ کدهای تخفیف
+            </a>
+            <a
+              href="/admin/orders"
+              className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
+            >
+              🛒 سفارشات
+            </a>
+            <a
+              href="/admin/brands"
+              className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
+            >
+              🏷️ برندها
+            </a>
+            <a
+              href="/admin/categories"
+              className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
+            >
+              🖼️ دسته‌بندی‌ها
+            </a>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-bold text-red-700 transition hover:bg-red-100"
+            >
+              🚪 خروج
+            </button>
+          </div>
         </div>
 
         {/* کارت‌های آماری */}

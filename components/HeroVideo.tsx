@@ -1,232 +1,336 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  getActiveHeroSlides,
+  type HeroSlide,
+} from "@/lib/supabase/heroSlides";
 
-const SLIDES = [
+const AUTOPLAY_MS = 4000;
+
+// ─── Fallback: اگه Supabase خالی بود ───
+const FALLBACK_SLIDES: HeroSlide[] = [
   {
+    id: "fallback-1",
+    order_index: 0,
     eyebrow: "KAW CAMP — فروشگاه تخصصی",
-    titleLine1: "تجهیزات",
-    titleLine2: "کوهنوردی حرفه‌ای",
+    title_line1: "تجهیزات",
+    title_line2: "کوهنوردی حرفه‌ای",
     description:
       "لوازم فنی، کوله‌های تخصصی، چادرهای چهارفصل و تجهیزات کمپینگ. تجربه‌ات را به سطح بعد ببر.",
-    primaryCta: { label: "شروع خرید", href: "/products" },
-    secondaryCta: { label: "آفرود و تور", href: "/explore" },
+    primary_label: "شروع خرید",
+    primary_href: "/products",
+    secondary_label: "آفرود و تور",
+    secondary_href: "/explore",
     video: "",
     poster: "https://picsum.photos/seed/hero1/1920/1080",
-  },
-  {
-    eyebrow: "آفرود و تور — KAW CAMP",
-    titleLine1: "ماجراجویی",
-    titleLine2: "در دل طبیعت",
-    description:
-      "تورهای آفرود، کوهنوردی و کمپینگ با لیدرهای حرفه‌ای و تجهیزات کامل.",
-    primaryCta: { label: "مشاهده تورها", href: "/explore" },
-    secondaryCta: { label: "تماس با ما", href: "/contact" },
-    video: "",
-    poster: "https://picsum.photos/seed/hero2/1920/1080",
-  },
-  {
-    eyebrow: "تخفیف‌های ویژه",
-    titleLine1: "فصل",
-    titleLine2: "ماجراجویی",
-    description:
-      "با تخفیف‌های ویژه KAW CAMP، تجهیزات رویایی‌ات را با بهترین قیمت تهیه کن.",
-    primaryCta: { label: "تخفیف‌ها", href: "/products?sort=discount" },
-    secondaryCta: { label: "جدیدترین‌ها", href: "/products?sort=newest" },
-    video: "",
-    poster: "https://picsum.photos/seed/hero3/1920/1080",
+    is_active: true,
   },
 ];
 
 export default function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [loaded, setLoaded] = useState(false);
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [loading, setLoading] = useState(true);
   const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [textKey, setTextKey] = useState(0);
+
+  // ─── لود اسلایدها از Supabase ───
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      const data = await getActiveHeroSlides();
+      setSlides(data.length > 0 ? data : FALLBACK_SLIDES);
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  const slide = slides[current] || FALLBACK_SLIDES[0];
 
   useEffect(() => {
-    if (videoRef.current && SLIDES[current].video) {
+    if (videoRef.current && slide?.video) {
       videoRef.current.load();
       videoRef.current.play().catch(() => {});
     }
-    setLoaded(true);
-  }, [current]);
+    setTextKey((k) => k + 1);
+  }, [current, slide?.video]);
+
+  useEffect(() => {
+    if (paused || slides.length <= 1) return;
+    const id = setInterval(() => {
+      setCurrent((c) => (c + 1) % slides.length);
+    }, AUTOPLAY_MS);
+    return () => clearInterval(id);
+  }, [paused, current, slides.length]);
 
   function goNext() {
-    setCurrent((c) => (c + 1) % SLIDES.length);
+    setCurrent((c) => (c + 1) % slides.length);
   }
 
   function goPrev() {
-    setCurrent((c) => (c - 1 + SLIDES.length) % SLIDES.length);
+    setCurrent((c) => (c - 1 + slides.length) % slides.length);
   }
 
-  const slide = SLIDES[current];
+  // ─── حالت لودینگ ───
+  if (loading) {
+    return (
+      <section
+        dir="rtl"
+        className="relative h-[600px] w-full overflow-hidden bg-black md:h-[700px] lg:h-screen lg:max-h-[900px]"
+      >
+        <div className="h-full w-full animate-pulse bg-zinc-900" />
+      </section>
+    );
+  }
 
   return (
     <section
       dir="rtl"
       className="relative h-[600px] w-full overflow-hidden bg-black md:h-[700px] lg:h-screen lg:max-h-[900px]"
     >
-      {/* ─── ویدیو یا عکس ─── */}
-      {slide.video ? (
-        <video
-          key={current}
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          poster={slide.poster}
-          onLoadedData={() => setLoaded(true)}
-          className={
-            "absolute inset-0 h-full w-full object-cover transition-opacity duration-700 " +
-            (loaded ? "opacity-100" : "opacity-0")
-          }
-        >
-          <source src={slide.video} type="video/mp4" />
-        </video>
-      ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={current}
-          src={slide.poster}
-          alt={slide.titleLine1}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      )}
+      {/* ─── تصاویر: fade آرام ─── */}
+      {slides.map((s, i) => {
+        const isActive = i === current;
+        return (
+          <div
+            key={s.id || i}
+            className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out"
+            style={{ opacity: isActive ? 1 : 0 }}
+          >
+            {s.video ? (
+              <video
+                ref={i === current ? videoRef : null}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                poster={s.poster}
+                className="h-full w-full object-cover"
+              >
+                <source src={s.video} type="video/mp4" />
+              </video>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={s.poster}
+                alt={s.title_line1}
+                className={`h-full w-full object-cover transition-transform duration-[8000ms] ease-out ${
+                  isActive ? "scale-110" : "scale-100"
+                }`}
+              />
+            )}
+          </div>
+        );
+      })}
 
       {/* ─── Overlay تیره ─── */}
       <div className="absolute inset-0 bg-gradient-to-l from-black via-black/70 to-black/30" />
 
-      {/* ─── محتوای اصلی (وسط‌چین) ─── */}
-      <div className="relative z-10 flex h-full items-center">
+      {/* ─── محتوای اصلی ─── */}
+      <div className="relative z-10 flex h-full items-center overflow-hidden">
         <div className="mx-auto w-full max-w-[1600px] px-6 md:px-12 lg:px-20">
-          <div className="mx-auto max-w-3xl text-center">
-            {/* Eyebrow */}
-            <div className="mb-4 flex items-center justify-center gap-3">
-              <span className="h-[2px] w-10 bg-[#FF6B4A]" />
-              <span className="text-xs font-bold tracking-wider text-[#FF6B4A] md:text-sm">
-                {slide.eyebrow}
-              </span>
-            </div>
+          <div
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            className="mx-auto max-w-3xl text-center"
+          >
+            <div key={textKey}>
+              {/* Eyebrow */}
+              {slide.eyebrow && (
+                <div className="animate-hero-1 mb-4 flex items-center justify-center gap-3">
+                  <span className="h-[2px] w-10 bg-[#E89070]" />
+                  <span className="text-xs font-bold tracking-wider text-[#E89070] md:text-sm">
+                    {slide.eyebrow}
+                  </span>
+                </div>
+              )}
 
-            {/* عنوان بزرگ */}
-            <h1 className="mb-5 text-4xl font-black leading-[1.15] text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-              {slide.titleLine1}
-              <br />
-              <span className="text-[#FF6B4A]">{slide.titleLine2}</span>
-            </h1>
+              {/* خط اول عنوان */}
+              <h1 className="animate-hero-2 mb-0 text-4xl font-black leading-[1.15] text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
+                {slide.title_line1}
+              </h1>
 
-            {/* توضیحات */}
-            <p className="mx-auto mb-8 max-w-xl text-sm leading-7 text-zinc-300 md:text-base md:leading-8">
-              {slide.description}
-            </p>
+              {/* خط دوم عنوان */}
+              <h1 className="animate-hero-3 mb-5 text-4xl font-black leading-[1.15] text-[#E89070] drop-shadow-2xl md:text-6xl lg:text-7xl">
+                {slide.title_line2}
+              </h1>
 
-            {/* دکمه‌ها */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <a
-                href={slide.primaryCta.href}
-                className="group inline-flex items-center gap-2 rounded-lg bg-[#FF6B4A] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-[#FF6B4A]/30 transition hover:bg-[#E55A3A] hover:shadow-[#FF6B4A]/50 md:px-8 md:text-base"
-              >
-                <span>{slide.primaryCta.label}</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="h-4 w-4 transition group-hover:-translate-x-1"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-                  />
-                </svg>
-              </a>
+              {/* توضیحات */}
+              {slide.description && (
+                <p className="animate-hero-4 mx-auto mb-8 max-w-xl text-sm leading-7 text-zinc-300 md:text-base md:leading-8">
+                  {slide.description}
+                </p>
+              )}
 
-              <a
-                href={slide.secondaryCta.href}
-                className="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 bg-transparent px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/10 md:px-8 md:text-base"
-              >
-                {slide.secondaryCta.label}
-              </a>
+              {/* دکمه‌ها */}
+              <div className="animate-hero-5 flex flex-wrap items-center justify-center gap-3">
+                {slide.primary_label && slide.primary_href && (
+                  <a
+                    href={slide.primary_href}
+                    className="group inline-flex items-center gap-2 rounded-lg bg-[#E89070] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-[#E89070]/30 transition hover:bg-[#D77E5E] hover:shadow-[#E89070]/50 md:px-8 md:text-base"
+                  >
+                    <span>{slide.primary_label}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="h-4 w-4 transition group-hover:-translate-x-1"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+                      />
+                    </svg>
+                  </a>
+                )}
+
+                {slide.secondary_label && slide.secondary_href && (
+                  <a
+                    href={slide.secondary_href}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 bg-transparent px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/10 md:px-8 md:text-base"
+                  >
+                    {slide.secondary_label}
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* ─── فلش راست ─── */}
-      <button
-        type="button"
-        onClick={goNext}
-        aria-label="اسلاید بعدی"
-        className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#FF6B4A] lg:flex"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2.5}
-          stroke="currentColor"
-          className="h-8 w-8"
+      {slides.length > 1 && (
+        <button
+          type="button"
+          onClick={goNext}
+          aria-label="اسلاید بعدی"
+          className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#E89070] lg:flex"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 19.5L8.25 12l7.5-7.5"
-          />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="h-8 w-8"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 19.5L8.25 12l7.5-7.5"
+            />
+          </svg>
+        </button>
+      )}
 
       {/* ─── فلش چپ ─── */}
-      <button
-        type="button"
-        onClick={goPrev}
-        aria-label="اسلاید قبلی"
-        className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#FF6B4A] lg:flex"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2.5}
-          stroke="currentColor"
-          className="h-8 w-8"
+      {slides.length > 1 && (
+        <button
+          type="button"
+          onClick={goPrev}
+          aria-label="اسلاید قبلی"
+          className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#E89070] lg:flex"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8.25 4.5l7.5 7.5-7.5 7.5"
-          />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="h-8 w-8"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8.25 4.5l7.5 7.5-7.5 7.5"
+            />
+          </svg>
+        </button>
+      )}
 
       {/* ─── نقطه‌های پایین ─── */}
-      <div className="absolute bottom-6 right-1/2 z-20 flex translate-x-1/2 items-center gap-3 md:bottom-8">
-        {SLIDES.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => setCurrent(i)}
-            aria-label={`اسلاید ${i + 1}`}
-            className={
-              "h-1 rounded-full transition-all duration-300 " +
-              (i === current
-                ? "w-10 bg-[#FF6B4A]"
-                : "w-5 bg-white/40 hover:bg-white/70")
-            }
-          />
-        ))}
-      </div>
+      {slides.length > 1 && (
+        <div className="absolute bottom-6 right-1/2 z-20 flex translate-x-1/2 items-center gap-3 md:bottom-8">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setCurrent(i)}
+              aria-label={`اسلاید ${i + 1}`}
+              className="group relative h-1 overflow-hidden rounded-full bg-white/30 transition-all duration-300"
+              style={{ width: i === current ? "40px" : "20px" }}
+            >
+              {i === current && !paused && (
+                <span
+                  key={current}
+                  className="absolute inset-y-0 right-0 bg-[#E89070]"
+                  style={{
+                    animation: `heroProgress ${AUTOPLAY_MS}ms linear forwards`,
+                  }}
+                />
+              )}
+              {i === current && paused && (
+                <span className="absolute inset-0 bg-[#E89070]" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ─── دایره تزئینی ─── */}
       <div className="pointer-events-none absolute right-8 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center lg:flex xl:right-16">
-        <div className="absolute inset-0 animate-ping rounded-full border-2 border-[#FF6B4A]/40" />
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#FF6B4A]">
-          <div className="h-2 w-2 rounded-full bg-[#FF6B4A]" />
+        <div className="absolute inset-0 animate-ping rounded-full border-2 border-[#E89070]/40" />
+        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#E89070]">
+          <div className="h-2 w-2 rounded-full bg-[#E89070]" />
         </div>
       </div>
+
+      {/* ─── انیمیشن‌ها ─── */}
+      <style jsx global>{`
+        @keyframes heroProgress {
+          from {
+            width: 0%;
+          }
+          to {
+            width: 100%;
+          }
+        }
+
+        @keyframes heroSlideIn {
+          0% {
+            opacity: 0;
+            transform: translateX(120px);
+            filter: blur(8px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+            filter: blur(0);
+          }
+        }
+
+        .animate-hero-1 {
+          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0s both;
+        }
+        .animate-hero-2 {
+          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+        }
+        .animate-hero-3 {
+          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+        }
+        .animate-hero-4 {
+          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+        }
+        .animate-hero-5 {
+          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+        }
+      `}</style>
     </section>
   );
 }

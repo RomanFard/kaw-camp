@@ -8,8 +8,8 @@ export default function Footer() {
     >
       {/* تزئینات نارنجی */}
       <div className="pointer-events-none absolute inset-0 opacity-20">
-        <div className="absolute -right-40 top-10 h-64 w-64 rounded-full bg-[#FF6B4A]/20 blur-[100px]" />
-        <div className="absolute -left-40 bottom-10 h-64 w-64 rounded-full bg-[#FF6B4A]/10 blur-[100px]" />
+        <div className="absolute -right-40 top-10 h-64 w-64 rounded-full bg-[#E89070]/20 blur-[100px]" />
+        <div className="absolute -left-40 bottom-10 h-64 w-64 rounded-full bg-[#E89070]/10 blur-[100px]" />
       </div>
 
       {/* ═══ کادر اصلی — هم‌عرض با هدر ═══ */}
@@ -19,7 +19,7 @@ export default function Footer() {
           {/* ─── ستون ۱: برند + درباره ─── */}
           <div className="lg:col-span-1">
             <h3 className="mb-3 text-xl font-black text-white">
-              کو کمپ <span className="text-[#FF6B4A]">KAW CAMP</span>
+              کو کمپ <span className="text-[#E89070]">KAW CAMP</span>
             </h3>
             <p className="text-xs leading-6 text-zinc-400 md:text-sm md:leading-7">
               کو کمپ مرجع تخصصی تجهیزات کمپینگ، طبیعت‌گردی و کوهنوردی است. تلاش
@@ -36,7 +36,7 @@ export default function Footer() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.8}
                   stroke="currentColor"
-                  className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#FF6B4A]"
+                  className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#E89070]"
                 >
                   <path
                     strokeLinecap="round"
@@ -60,7 +60,7 @@ export default function Footer() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.8}
                   stroke="currentColor"
-                  className="h-3.5 w-3.5 flex-shrink-0 text-[#FF6B4A]"
+                  className="h-3.5 w-3.5 flex-shrink-0 text-[#E89070]"
                 >
                   <path
                     strokeLinecap="round"
@@ -77,7 +77,7 @@ export default function Footer() {
           <div>
             <h4 className="relative mb-5 inline-block text-sm font-black text-white md:text-base">
               دسترسی سریع
-              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#FF6B4A]" />
+              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#E89070]" />
             </h4>
             <ul className="space-y-2.5 text-xs md:text-sm">
               {[
@@ -91,9 +91,9 @@ export default function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="group flex items-center gap-2 text-zinc-400 transition hover:text-[#FF6B4A]"
+                    className="group flex items-center gap-2 text-zinc-400 transition hover:text-[#E89070]"
                   >
-                    <span className="h-1 w-1 rounded-full bg-zinc-600 transition group-hover:bg-[#FF6B4A]" />
+                    <span className="h-1 w-1 rounded-full bg-zinc-600 transition group-hover:bg-[#E89070]" />
                     <span>{item.label}</span>
                   </Link>
                 </li>
@@ -105,7 +105,7 @@ export default function Footer() {
           <div>
             <h4 className="relative mb-5 inline-block text-sm font-black text-white md:text-base">
               خدمات مشتریان
-              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#FF6B4A]" />
+              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#E89070]" />
             </h4>
             <ul className="space-y-2.5 text-xs md:text-sm">
               {[
@@ -119,9 +119,9 @@ export default function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="group flex items-center gap-2 text-zinc-400 transition hover:text-[#FF6B4A]"
+                    className="group flex items-center gap-2 text-zinc-400 transition hover:text-[#E89070]"
                   >
-                    <span className="h-1 w-1 rounded-full bg-zinc-600 transition group-hover:bg-[#FF6B4A]" />
+                    <span className="h-1 w-1 rounded-full bg-zinc-600 transition group-hover:bg-[#E89070]" />
                     <span>{item.label}</span>
                   </Link>
                 </li>
@@ -133,14 +133,14 @@ export default function Footer() {
           <div>
             <h4 className="relative mb-5 inline-block text-sm font-black text-white md:text-base">
               ارتباط با ما
-              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#FF6B4A]" />
+              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#E89070]" />
             </h4>
 
             <ul className="space-y-2.5 text-xs md:text-sm">
               <li>
                 <a
                   href="tel:09180540019"
-                  className="flex items-center gap-2 text-zinc-400 transition hover:text-[#FF6B4A]"
+                  className="flex items-center gap-2 text-zinc-400 transition hover:text-[#E89070]"
                   dir="ltr"
                 >
                   <svg
@@ -149,7 +149,7 @@ export default function Footer() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.8}
                     stroke="currentColor"
-                    className="h-3.5 w-3.5 flex-shrink-0 text-[#FF6B4A]"
+                    className="h-3.5 w-3.5 flex-shrink-0 text-[#E89070]"
                   >
                     <path
                       strokeLinecap="round"
@@ -163,7 +163,7 @@ export default function Footer() {
               <li>
                 <a
                   href="mailto:info@kawcamp.com"
-                  className="flex items-center gap-2 text-zinc-400 transition hover:text-[#FF6B4A]"
+                  className="flex items-center gap-2 text-zinc-400 transition hover:text-[#E89070]"
                   dir="ltr"
                 >
                   <svg
@@ -172,7 +172,7 @@ export default function Footer() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.8}
                     stroke="currentColor"
-                    className="h-3.5 w-3.5 flex-shrink-0 text-[#FF6B4A]"
+                    className="h-3.5 w-3.5 flex-shrink-0 text-[#E89070]"
                   >
                     <path
                       strokeLinecap="round"
@@ -197,7 +197,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="اینستاگرام"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 transition hover:border-[#FF6B4A] hover:bg-[#FF6B4A] hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 transition hover:border-[#E89070] hover:bg-[#E89070] hover:text-white"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -271,18 +271,18 @@ export default function Footer() {
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-6 md:flex-row">
           <p className="text-[11px] text-zinc-500 md:text-xs">
             تمامی حقوق برای{" "}
-            <span className="font-bold text-[#FF6B4A]">KAW CAMP</span> محفوظ
+            <span className="font-bold text-[#E89070]">KAW CAMP</span> محفوظ
             است © ۱۴۰۴
           </p>
 
           <div className="flex items-center gap-5 text-[11px] text-zinc-400 md:text-xs">
-            <Link href="/rules" className="transition hover:text-[#FF6B4A]">
+            <Link href="/rules" className="transition hover:text-[#E89070]">
               قوانین و مقررات
             </Link>
-            <Link href="/returns" className="transition hover:text-[#FF6B4A]">
+            <Link href="/returns" className="transition hover:text-[#E89070]">
               بازگشت کالا
             </Link>
-            <Link href="/warranty" className="transition hover:text-[#FF6B4A]">
+            <Link href="/warranty" className="transition hover:text-[#E89070]">
               گارانتی
             </Link>
           </div>

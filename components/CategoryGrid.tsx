@@ -32,24 +32,24 @@ export default function CategoryGrid() {
       <div className="mx-auto max-w-[1300px] px-6 md:px-10">
         {/* Header وسط‌چین */}
         <div className="mb-8 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#FF6B4A]/30 bg-[#FF6B4A]/5 px-3.5 py-1.5 backdrop-blur-sm">
-            <span className="text-[11px] font-bold tracking-[0.15em] text-[#FF6B4A] md:text-xs">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E89070]/30 bg-[#E89070]/5 px-3.5 py-1.5 backdrop-blur-sm">
+            <span className="text-[11px] font-bold tracking-[0.15em] text-[#E89070] md:text-xs">
               OUR WORK
             </span>
           </div>
 
           <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl lg:text-4xl">
-            دسته‌بندی‌های <span className="text-[#FF6B4A]">محبوب</span>
+            دسته‌بندی‌های <span className="text-[#E89070]">محبوب</span>
           </h2>
 
-          <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-[#FF6B4A]" />
+          <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-[#E89070]" />
         </div>
 
         {/* فیلترها */}
         <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
           <a
             href="/products"
-            className="rounded-full border border-[#FF6B4A] bg-[#FF6B4A] px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg shadow-[#FF6B4A]/20 transition md:text-xs"
+            className="rounded-full border border-[#E89070] bg-[#E89070] px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg shadow-[#E89070]/20 transition md:text-xs"
           >
             همه
           </a>
@@ -57,7 +57,7 @@ export default function CategoryGrid() {
             <a
               key={cat.key}
               href={`/products?cat=${cat.key}`}
-              className="rounded-full border border-zinc-800 bg-transparent px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-400 transition hover:border-[#FF6B4A]/50 hover:text-[#FF6B4A] md:text-xs"
+              className="rounded-full border border-zinc-800 bg-transparent px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-400 transition hover:border-[#E89070]/50 hover:text-[#E89070] md:text-xs"
             >
               {cat.label}
             </a>
@@ -100,25 +100,25 @@ export default function CategoryGrid() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent transition duration-500 group-hover:from-black/90 group-hover:via-black/60" />
 
                 {/* دایره نارنجی گوشه */}
-                <div className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#FF6B4A] opacity-0 transition duration-500 group-hover:opacity-100">
-                  <div className="h-1.5 w-1.5 rounded-full bg-[#FF6B4A]" />
+                <div className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#E89070] opacity-0 transition duration-500 group-hover:opacity-100">
+                  <div className="h-1.5 w-1.5 rounded-full bg-[#E89070]" />
                 </div>
 
                 {/* محتوا (پایین) */}
                 <div className="absolute bottom-0 right-0 left-0 p-4">
-                  <div className="mb-2.5 h-[3px] w-0 bg-[#FF6B4A] transition-all duration-500 group-hover:w-8" />
+                  <div className="mb-2.5 h-[3px] w-0 bg-[#E89070] transition-all duration-500 group-hover:w-8" />
 
                   <h3 className="translate-y-2 text-sm font-black text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:text-base">
                     {cat.label}
                   </h3>
 
-                  <p className="mt-0.5 translate-y-2 text-[10px] font-bold text-[#FF6B4A] opacity-0 transition-all duration-500 delay-75 group-hover:translate-y-0 group-hover:opacity-100 md:text-[11px]">
+                  <p className="mt-0.5 translate-y-2 text-[10px] font-bold text-[#E89070] opacity-0 transition-all duration-500 delay-75 group-hover:translate-y-0 group-hover:opacity-100 md:text-[11px]">
                     مشاهده محصولات
                   </p>
                 </div>
 
                 {/* خط زیرین نارنجی */}
-                <div className="absolute bottom-0 right-0 left-0 h-[3px] w-0 bg-[#FF6B4A] transition-all duration-500 group-hover:w-full" />
+                <div className="absolute bottom-0 right-0 left-0 h-[3px] w-0 bg-[#E89070] transition-all duration-500 group-hover:w-full" />
               </a>
             );
           })}

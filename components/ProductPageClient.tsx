@@ -1,32 +1,10 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
-import ProductGallery from "./ProductGallery";
+import { useState } from "react";
 import { Product } from "@/data/products";
 import { useCart } from "@/components/context/CartContext";
+import { useWishlist } from "@/components/context/WishlistContext";
 import { formatPrice } from "@/lib/utils";
-
-function getCategoryEmoji(cat: string) {
-  const map: Record<string, string> = {
-    tent: "⛺",
-    sleep: "🛏️",
-    mattress: "🟦",
-    backpack: "🎒",
-    clothing: "🧥",
-    shoes: "🥾",
-    socks: "🧦",
-    gaiters: "🦵",
-    tools: "🧰",
-    lighting: "🔦",
-    bottle: "🥤",
-    cooking: "🍳",
-    sunglasses: "🕶️",
-    watch: "⌚",
-    bicycle: "🚲",
-    accessories: "🎁",
-  };
-  return map[cat] || "📦";
-}
 
 export default function ProductPageClient({ product }: { product: Product }) {
   const colors = product.colors || [];
@@ -34,610 +12,458 @@ export default function ProductPageClient({ product }: { product: Product }) {
   const hasColors = colors.length > 0;
   const hasSizes = sizes.length > 0;
 
-  const [selectedColor, setSelectedColor] = useState<string>(
+  const [selectedColor, setSelectedColor] = useState(
     hasColors ? colors[0].label : ""
   );
-  const [selectedSize, setSelectedSize] = useState<string>(
+  const [selectedSize, setSelectedSize] = useState(
     hasSizes ? sizes[0].label : ""
   );
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [error, setError] = useState("");
-  const [flyingImage, setFlyingImage] = useState<{
-    x: number;
-    y: number;
-    targetX: number;
-    targetY: number;
-  } | null>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
   const { addItem } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
+  const inWishlist = isInWishlist(product.id);
+
+  const galleryImages = product.images?.length
+    ? product.images
+    : [product.image];
+
+  const activeImage = galleryImages[activeImageIndex] || product.image;
 
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
 
-  const brand = product.brand || "کو کمپ";
+  const brand = product.brand || "KAW CAMP";
   const englishName = product.englishName || product.slug;
   const productCode = "KC-" + product.id.padStart(4, "0");
 
-  // ─── عکس فعال بر اساس رنگ انتخاب‌شده ───
-  const activeColorImage = useMemo(() => {
-    if (!selectedColor) return null;
-    const color = colors.find((c) => c.label === selectedColor);
-    return color?.image || null;
-  }, [selectedColor, colors]);
-
-  // ─── عکس فعال بر اساس سایز انتخاب‌شده (fallback) ───
-  const activeSizeImage = useMemo(() => {
-    if (!selectedSize || activeColorImage) return null;
-    const size = sizes.find((s) => s.label === selectedSize);
-    return size?.image || null;
-  }, [selectedSize, sizes, activeColorImage]);
-
-  // ─── لیست نهایی عکس‌ها برای گالری ───
-  // اگه رنگ انتخاب‌شده عکس داره، اول لیست میاد
-  const galleryImages = useMemo(() => {
-    const baseImages =
-      product.images && product.images.length > 0
-        ? product.images
-        : [product.image];
-
-    const activeImage = activeColorImage || activeSizeImage;
-
-    if (activeImage) {
-      // عکس فعال رو اول بذار (بدون تکرار)
-      const filtered = baseImages.filter((img) => img !== activeImage);
-      return [activeImage, ...filtered];
-    }
-
-    return baseImages;
-  }, [product.images, product.image, activeColorImage, activeSizeImage]);
-
-  function handleAdd() {
-    if (hasColors && !selectedColor) {
-      setError("لطفاً ابتدا رنگ محصول را انتخاب کنید");
-      setTimeout(() => setError(""), 3000);
-      return;
-    }
-    if (hasSizes && !selectedSize) {
-      setError("لطفاً ابتدا سایز محصول را انتخاب کنید");
-      setTimeout(() => setError(""), 3000);
-      return;
-    }
-
-    // انیمیشن پرتاب
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const isMobile = window.innerWidth < 768;
-
-      let cartX = 0;
-      let cartY = 0;
-
-      if (isMobile) {
-        const mobileCart = document.querySelector(
-          "[data-cart-icon-mobile]"
-        ) as HTMLElement;
-        if (mobileCart) {
-          const cartRect = mobileCart.getBoundingClientRect();
-          cartX = cartRect.left + cartRect.width / 2;
-          cartY = cartRect.top + cartRect.height / 2;
-        } else {
-          cartX = window.innerWidth / 2;
-          cartY = window.innerHeight - 40;
-        }
-      } else {
-        const desktopCart = document.querySelector(
-          "[data-cart-icon]"
-        ) as HTMLElement;
-        if (desktopCart) {
-          const cartRect = desktopCart.getBoundingClientRect();
-          cartX = cartRect.left + cartRect.width / 2;
-          cartY = cartRect.top + cartRect.height / 2;
-        } else {
-          cartX = window.innerWidth - 150;
-          cartY = 100;
-        }
-      }
-
-      setFlyingImage({
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-        targetX: cartX,
-        targetY: cartY,
-      });
-    }
-
-    addItem(product, quantity);
-    setError("");
-
-    setTimeout(() => {
-      setFlyingImage(null);
-      setAdded(true);
-    }, 800);
-
-    setTimeout(() => {
-      setShowCheckout(true);
-    }, 2000);
+  function nextImage() {
+    setActiveImageIndex((i) => (i + 1) % galleryImages.length);
   }
 
+  function prevImage() {
+    setActiveImageIndex(
+      (i) => (i - 1 + galleryImages.length) % galleryImages.length
+    );
+  }
+
+  const whyUsItems = [
+    {
+      title: "پرداخت امن",
+      desc: "رمزنگاری SSL ۲۵۶ بیتی",
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+        </svg>
+      ),
+    },
+    {
+      title: "ارسال سریع",
+      desc: "۲ تا ۵ روز کاری",
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+        </svg>
+      ),
+    },
+    {
+      title: "بازگشت آسان",
+      desc: "تا ۳۰ روز فرصت بازگشت",
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+        </svg>
+      ),
+    },
+    {
+      title: "تضمین کیفیت",
+      desc: "محصولات اورجینال و باکیفیت",
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+        </svg>
+      ),
+    },
+    {
+      title: "مورد اعتماد مشتریان",
+      desc: "هزاران مشتری راضی",
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+        </svg>
+      ),
+    },
+  ];
+
   return (
-    <div>
-      {/* ═══ بخش بالا: گالری + اطلاعات ═══ */}
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
-        {/* گالری تصاویر */}
-        <div className="order-1">
-          <ProductGallery
-            images={galleryImages}
-            productName={product.name}
-            productCategory={product.category}
-            fallbackEmoji={getCategoryEmoji(product.category)}
-            activeImageIndex={0}
-          />
+    <div className="space-y-5">
+      {/* ═══════ بخش بالا ═══════ */}
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-6">
+        {/* ═══ ستون چپ: گالری ═══ */}
+        <div className="flex flex-col rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-2.5">
+          <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={activeImage}
+              alt={product.name}
+              className="aspect-square h-auto w-full object-cover"
+            />
+
+            {discount > 0 && (
+              <span className="absolute right-3 top-3 rounded-md bg-[#E89070] px-3 py-1.5 text-sm font-black text-white shadow-lg">
+                -{discount}٪ OFF
+              </span>
+            )}
+
+            {!product.inStock && (
+              <span className="absolute left-3 top-3 rounded-md bg-zinc-700 px-3 py-1.5 text-sm font-black text-white shadow-lg">
+                ناموجود
+              </span>
+            )}
+          </div>
+
+          {galleryImages.length > 1 && (
+            <div className="relative mt-2.5">
+              <button
+                type="button"
+                onClick={prevImage}
+                aria-label="قبلی"
+                className="absolute -left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A] text-white shadow-lg transition hover:border-[#E89070] hover:bg-[#E89070]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={nextImage}
+                aria-label="بعدی"
+                className="absolute -right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A] text-white shadow-lg transition hover:border-[#E89070] hover:bg-[#E89070]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+
+              <div className="scrollbar-hide grid grid-cols-3 gap-2">
+                {galleryImages.slice(0, 3).map((img, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setActiveImageIndex(i)}
+                    className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-zinc-950 transition ${
+                      i === activeImageIndex
+                        ? "border-[#E89070]"
+                        : "border-zinc-800 hover:border-zinc-600"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={img}
+                      alt={`${product.name} ${i + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* اطلاعات محصول */}
-        <div className="order-2 space-y-4">
-          {/* عنوان */}
-          <div>
-            <h1 className="text-lg font-black leading-8 text-gray-900 md:text-2xl md:leading-10">
-              {product.name}
-            </h1>
-            <p
-              className="mt-1 hidden break-words text-xs text-gray-400 md:block md:text-sm"
-              dir="ltr"
-            >
-              {englishName}
-            </p>
-          </div>
+        {/* ═══ ستون راست: اطلاعات ═══ */}
+        <div className="flex flex-col rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6">
+          {discount > 0 && (
+            <span className="mb-4 inline-flex w-fit rounded-md bg-[#E89070] px-3 py-1.5 text-sm font-black text-white">
+              -{discount}٪ OFF
+            </span>
+          )}
 
-          {/* ویژگی‌های کلیدی (فقط دسکتاپ) */}
-          <div className="hidden space-y-2.5 border-y border-[#E8DFC8] py-4 md:block">
-            {product.features.slice(0, 6).map((f) => (
-              <div key={f} className="flex items-start gap-2 text-sm">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500"></span>
-                <span className="break-words text-gray-700">{f}</span>
-              </div>
-            ))}
-          </div>
+          <p className="text-sm font-black uppercase tracking-widest text-zinc-500">
+            {brand}
+          </p>
 
-          {/* برند + شناسه */}
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <span className="text-gray-500">برند: </span>
-              <span className="font-bold text-gray-900">{brand}</span>
-            </div>
-            <div>
-              <span className="text-gray-500">شناسه: </span>
-              <span className="font-bold text-gray-900" dir="ltr">
-                {productCode}
+          <h1 className="mt-2 text-2xl font-black leading-9 text-white md:text-3xl md:leading-tight">
+            {product.name}
+          </h1>
+
+          <p className="mt-3 text-sm text-zinc-500" dir="ltr">
+            SKU:{" "}
+            <span className="font-mono text-zinc-400">{productCode}</span>
+          </p>
+
+          <div className="mt-2 flex items-center gap-2 text-base">
+            <span className="text-[#E89070]">
+              {"★".repeat(Math.round(product.rating))}
+              <span className="text-zinc-700">
+                {"★".repeat(5 - Math.round(product.rating))}
               </span>
-            </div>
-          </div>
-
-          {/* وضعیت موجودی */}
-          <div>
-            <span
-              className={
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold " +
-                (product.inStock
-                  ? "border border-green-200 bg-green-50 text-green-700"
-                  : "border border-red-200 bg-red-50 text-red-700")
-              }
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-current"></span>
-              {product.inStock ? "موجود در انبار" : "ناموجود"}
+            </span>
+            <span className="text-zinc-500">
+              ({product.reviews.toLocaleString("fa-IR")} reviews)
             </span>
           </div>
 
-          {/* قیمت */}
-          <div className="border-t border-[#E8DFC8] pt-4">
-            {product.oldPrice && (
-              <div className="mb-1 flex items-center gap-2 text-sm">
-                <span className="text-gray-400 line-through">
-                  {formatPrice(product.oldPrice)}
-                </span>
-                <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
-                  {discount}٪ تخفیف
-                </span>
-              </div>
-            )}
-            <div className="text-2xl font-black text-gray-900 md:text-3xl">
+          <div className="mt-4 flex items-baseline gap-4">
+            <span className="text-3xl font-black text-[#E89070] md:text-4xl">
               {formatPrice(product.price)}
-            </div>
-          </div>
-
-          {/* ─── انتخاب رنگ ─── */}
-          {hasColors && (
-            <div className="border-t border-[#E8DFC8] pt-4">
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="text-gray-500">رنگ:</span>
-                <span className="font-bold text-amber-600">{selectedColor}</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {colors.map((c) => (
-                  <button
-                    key={c.label}
-                    type="button"
-                    onClick={() => {
-                      setSelectedColor(c.label);
-                      setError("");
-                    }}
-                    className={
-                      "group flex items-center gap-2 rounded-lg border-2 px-3 py-1.5 text-sm font-semibold transition " +
-                      (selectedColor === c.label
-                        ? "border-amber-500 bg-amber-50 text-amber-700"
-                        : "border-[#E8DFC8] bg-white text-gray-700 hover:border-amber-300")
-                    }
-                  >
-                    {c.image && (
-                      <span className="h-7 w-7 overflow-hidden rounded border border-[#D4C5A0] bg-white">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={c.image}
-                          alt={c.label}
-                          className="h-full w-full object-cover"
-                        />
-                      </span>
-                    )}
-                    <span>{c.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ─── انتخاب سایز ─── */}
-          {hasSizes && (
-            <div className="border-t border-[#E8DFC8] pt-4">
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="text-gray-500">سایز / ظرفیت:</span>
-                <span className="font-bold text-amber-600">{selectedSize}</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {sizes.map((s) => (
-                  <button
-                    key={s.label}
-                    type="button"
-                    onClick={() => {
-                      setSelectedSize(s.label);
-                      setError("");
-                    }}
-                    className={
-                      "group flex items-center gap-2 rounded-lg border-2 px-3 py-1.5 text-sm font-semibold transition " +
-                      (selectedSize === s.label
-                        ? "border-amber-500 bg-amber-50 text-amber-700"
-                        : "border-[#E8DFC8] bg-white text-gray-700 hover:border-amber-300")
-                    }
-                  >
-                    {s.image && (
-                      <span className="h-7 w-7 overflow-hidden rounded border border-[#D4C5A0] bg-white">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={s.image}
-                          alt={s.label}
-                          className="h-full w-full object-cover"
-                        />
-                      </span>
-                    )}
-                    <span>{s.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* تعداد + دکمه */}
-          <div className="flex items-stretch gap-3">
-            <div className="flex items-center rounded-lg border border-[#E8DFC8] p-1">
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex h-10 w-10 items-center justify-center rounded text-lg font-bold text-gray-600 transition hover:bg-[#F7F1E3]"
-              >
-                −
-              </button>
-              <span className="min-w-[40px] text-center font-bold text-gray-900">
-                {quantity}
+            </span>
+            {product.oldPrice && (
+              <span className="text-base text-zinc-500 line-through">
+                {formatPrice(product.oldPrice)}
               </span>
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => q + 1)}
-                className="flex h-10 w-10 items-center justify-center rounded text-lg font-bold text-gray-600 transition hover:bg-[#F7F1E3]"
-              >
-                +
-              </button>
-            </div>
-
-            {showCheckout && product.inStock ? (
-              <a
-                href="/checkout"
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-base font-bold text-white shadow-sm transition hover:bg-green-700"
-              >
-                <span>✓</span>
-                <span>ادامه فرآیند خرید</span>
-              </a>
-            ) : (
-              <button
-                ref={buttonRef}
-                type="button"
-                onClick={handleAdd}
-                disabled={!product.inStock || added}
-                className={
-                  "flex-1 rounded-lg px-6 py-3 text-base font-bold text-white shadow-sm transition disabled:cursor-not-allowed disabled:bg-gray-300 " +
-                  (added ? "bg-green-600" : "bg-blue-800 hover:bg-blue-900")
-                }
-              >
-                {added
-                  ? "✓ به سبد اضافه شد"
-                  : product.inStock
-                  ? "افزودن به سبد خرید"
-                  : "ناموجود"}
-              </button>
             )}
           </div>
 
-          {/* پیام خطا */}
-          {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-700">
-              ⚠️ {error}
+          <p className="mt-4 text-base leading-8 text-zinc-400">
+            {product.shortDesc}
+          </p>
+
+          <div className="mt-5 space-y-4">
+            {hasColors && (
+              <div>
+                <p className="mb-3 text-sm font-bold text-zinc-400">
+                  رنگ: <span className="text-white">{selectedColor}</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((c) => (
+                    <button
+                      key={c.label}
+                      type="button"
+                      onClick={() => setSelectedColor(c.label)}
+                      className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold transition ${
+                        selectedColor === c.label
+                          ? "border-[#E89070] bg-[#E89070]/10 text-[#E89070]"
+                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                      }`}
+                    >
+                      {c.image && (
+                        <span className="h-6 w-6 overflow-hidden rounded border border-zinc-700 bg-zinc-950">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={c.image}
+                            alt={c.label}
+                            className="h-full w-full object-cover"
+                          />
+                        </span>
+                      )}
+                      <span>{c.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {hasSizes && (
+              <div>
+                <p className="mb-3 text-sm font-bold text-zinc-400">
+                  سایز: <span className="text-white">{selectedSize}</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {sizes.map((s) => (
+                    <button
+                      key={s.label}
+                      type="button"
+                      onClick={() => setSelectedSize(s.label)}
+                      className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold transition ${
+                        selectedSize === s.label
+                          ? "border-[#E89070] bg-[#E89070]/10 text-[#E89070]"
+                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                      }`}
+                    >
+                      {s.image && (
+                        <span className="h-6 w-6 overflow-hidden rounded border border-zinc-700 bg-zinc-950">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={s.image}
+                            alt={s.label}
+                            className="h-full w-full object-cover"
+                          />
+                        </span>
+                      )}
+                      <span>{s.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ─── تعداد + دکمه + علاقه‌مندی ─── */}
+            <div className="flex flex-wrap items-center gap-2 pt-2">
+              <div className="flex items-center rounded-full border border-zinc-800 bg-zinc-950/50 px-1">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="flex h-12 w-9 items-center justify-center text-lg font-bold text-zinc-400 transition hover:text-white"
+                >
+                  −
+                </button>
+                <span className="min-w-[32px] text-center text-base font-black text-white">
+                  {quantity.toLocaleString("fa-IR")}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => q + 1)}
+                  className="flex h-12 w-9 items-center justify-center text-lg font-bold text-zinc-400 transition hover:text-white"
+                >
+                  +
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => product.inStock && addItem(product, quantity)}
+                disabled={!product.inStock}
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#E89070] px-10 py-3.5 text-base font-black text-white transition hover:bg-[#D77E5E] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600 md:text-lg"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+                <span>{product.inStock ? "افزودن به سبد" : "ناموجود"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleItem(product, "product")}
+                aria-label="علاقه‌مندی"
+                className={`inline-flex h-12 w-12 items-center justify-center rounded-full border transition ${
+                  inWishlist
+                    ? "border-red-500 bg-red-500/10 text-red-500"
+                    : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                }`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill={inWishlist ? "currentColor" : "none"}
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="h-5 w-5"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+              </button>
             </div>
+          </div>
+
+          <div className="mt-auto space-y-3 border-t border-zinc-800 pt-4">
+            {[
+              "موجود در انبار، ارسال فوری",
+              "ضمانت اصالت و کیفیت کالا",
+              "ارسال رایگان بالای ۲ میلیون",
+            ].map((text, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 text-sm text-zinc-400"
+              >
+                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border border-[#E89070]/40 text-[#E89070]">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="h-3 w-3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </span>
+                <span>{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════ بخش پایین: توضیحات + چرا ما ═══════ */}
+      <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+        <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6 md:p-7">
+          <h2 className="mb-5 text-lg font-black text-white md:text-xl">
+            توضیحات
+          </h2>
+          <p className="whitespace-pre-line text-sm leading-8 text-zinc-400 md:text-base md:leading-9">
+            {product.description}
+          </p>
+
+          {product.features.length > 0 && (
+            <ul className="mt-6 space-y-3">
+              {product.features.map((f) => (
+                <li
+                  key={f}
+                  className="flex items-start gap-3 text-sm text-zinc-400 md:text-base"
+                >
+                  <span className="mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#E89070]" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
           )}
+        </div>
 
-          {/* اشتراک‌گذاری */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E8DFC8] pt-4 text-xs">
-            <div className="flex items-center gap-3 text-gray-600">
-              <span>اشتراک‌گذاری:</span>
-              <button aria-label="تلگرام" className="transition hover:text-amber-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="h-4 w-4">
-                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-                </svg>
-              </button>
-              <button aria-label="ایمیل" className="transition hover:text-amber-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-4 w-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                </svg>
-              </button>
-              <button aria-label="واتساپ" className="transition hover:text-amber-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="h-4 w-4">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                </svg>
-              </button>
-            </div>
+        <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6 md:p-7">
+          <h2 className="mb-6 text-lg font-black text-white md:text-xl">
+            چرا از ما بخرید؟
+          </h2>
+          <div className="space-y-5">
+            {whyUsItems.map((item, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#E89070]/30 text-[#E89070]">
+                  {item.icon}
+                </span>
+                <div>
+                  <p className="text-sm font-black text-white md:text-base">
+                    {item.title}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500 md:text-sm">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* ═══ بخش پایین: تب‌های توضیحات و نظرات ═══ */}
-      <div className="mt-8">
-        <ProductDetailTabs
-          product={product}
-          productCode={productCode}
-          brand={brand}
-          englishName={englishName}
-          colors={colors}
-          sizes={sizes}
-        />
-      </div>
-
-      {/* انیمیشن پرتاب */}
-      {flyingImage && (
-        <div
-          className="pointer-events-none fixed z-[9999]"
-          style={{
-            left: flyingImage.x,
-            top: flyingImage.y,
-            ["--target-x" as any]: `${flyingImage.targetX - flyingImage.x}px`,
-            ["--target-y" as any]: `${flyingImage.targetY - flyingImage.y}px`,
-            animation: "flyToCart 0.8s cubic-bezier(0.5, -0.5, 1, 1) forwards",
-          }}
-        >
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500 text-2xl shadow-2xl md:h-16 md:w-16">
-            {getCategoryEmoji(product.category)}
-          </div>
+      {/* ═══════ مشخصات فنی ═══════ */}
+      <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6 md:p-7">
+        <h2 className="mb-6 text-lg font-black text-white md:text-xl">
+          مشخصات فنی
+        </h2>
+        <div className="grid gap-3 md:grid-cols-2 md:gap-x-8">
+          {[
+            { label: "برند", value: brand },
+            { label: "نام انگلیسی", value: englishName },
+            { label: "شناسه", value: productCode },
+            {
+              label: "امتیاز",
+              value: `${product.rating} از ۵`,
+            },
+            ...(colors.length > 0
+              ? [
+                  {
+                    label: "رنگ‌ها",
+                    value: colors.map((c) => c.label).join(" / "),
+                  },
+                ]
+              : []),
+            ...(sizes.length > 0
+              ? [
+                  {
+                    label: "سایزها",
+                    value: sizes.map((s) => s.label).join(" / "),
+                  },
+                ]
+              : []),
+          ].map((row, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between border-b border-zinc-800 py-3 text-sm md:text-base"
+            >
+              <span className="text-zinc-500">{row.label}</span>
+              <span
+                className="font-bold text-white"
+                dir={row.label === "نام انگلیسی" || row.label === "شناسه" ? "ltr" : undefined}
+              >
+                {row.value}
+              </span>
+            </div>
+          ))}
         </div>
-      )}
-
-      <style jsx global>{`
-        @keyframes flyToCart {
-          0% {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-          }
-          30% {
-            transform: translate(-50%, -150%) scale(1.4);
-            opacity: 1;
-          }
-          100% {
-            transform: translate(
-                calc(-50% + var(--target-x)),
-                calc(-50% + var(--target-y))
-              )
-              scale(0.2);
-            opacity: 0;
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-/* ─────── تب‌های توضیحات ─────── */
-function ProductDetailTabs({
-  product,
-  productCode,
-  brand,
-  englishName,
-  colors,
-  sizes,
-}: {
-  product: Product;
-  productCode: string;
-  brand: string;
-  englishName: string;
-  colors: { label: string; value: string; image?: string }[];
-  sizes: { label: string; value: string; image?: string }[];
-}) {
-  const [activeTab, setActiveTab] = useState<"desc" | "reviews">("desc");
-
-  return (
-    <div className="rounded-xl border border-[#E8DFC8] bg-white">
-      <div className="flex border-b border-[#E8DFC8]">
-        <button
-          type="button"
-          onClick={() => setActiveTab("desc")}
-          className={
-            "flex items-center gap-2 border-b-2 px-4 py-4 text-sm font-bold transition md:px-6 md:text-base " +
-            (activeTab === "desc"
-              ? "border-amber-500 text-amber-600"
-              : "border-transparent text-gray-600 hover:text-amber-600")
-          }
-        >
-          <span>📝</span>
-          <span>توضیحات محصول</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("reviews")}
-          className={
-            "flex items-center gap-2 border-b-2 px-4 py-4 text-sm font-bold transition md:px-6 md:text-base " +
-            (activeTab === "reviews"
-              ? "border-amber-500 text-amber-600"
-              : "border-transparent text-gray-600 hover:text-amber-600")
-          }
-        >
-          <span>💬</span>
-          <span>نظرات ({product.reviews})</span>
-        </button>
-      </div>
-
-      <div className="p-4 md:p-6">
-        {activeTab === "desc" && (
-          <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
-            <div>
-              <h3 className="mb-3 text-base font-bold text-gray-900">
-                {product.name}
-              </h3>
-              <p className="whitespace-pre-line text-sm leading-8 text-gray-700">
-                {product.description}
-              </p>
-
-              <h4 className="mt-6 mb-3 text-sm font-bold text-gray-800">
-                ویژگی‌های کلیدی
-              </h4>
-              <ul className="space-y-2">
-                {product.features.map((f) => (
-                  <li
-                    key={f}
-                    className="flex items-start gap-2 text-sm text-gray-700"
-                  >
-                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500"></span>
-                    <span className="break-words">{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="rounded-xl bg-[#F7F1E3]/50 p-5">
-              <h4 className="mb-4 border-b border-[#E8DFC8] pb-3 text-sm font-bold text-gray-900">
-                مشخصات فنی
-              </h4>
-              <table className="w-full text-xs md:text-sm">
-                <tbody>
-                  <tr className="border-b border-[#EDE4CE]">
-                    <td className="py-2.5 text-gray-500">برند</td>
-                    <td className="py-2.5 text-left font-semibold text-gray-900">
-                      {brand}
-                    </td>
-                  </tr>
-                  <tr className="border-b border-[#EDE4CE]">
-                    <td className="py-2.5 text-gray-500">نام انگلیسی</td>
-                    <td
-                      className="break-words py-2.5 text-left font-semibold text-gray-900"
-                      dir="ltr"
-                    >
-                      {englishName}
-                    </td>
-                  </tr>
-                  <tr className="border-b border-[#EDE4CE]">
-                    <td className="py-2.5 text-gray-500">شناسه</td>
-                    <td
-                      className="py-2.5 text-left font-semibold text-gray-900"
-                      dir="ltr"
-                    >
-                      {productCode}
-                    </td>
-                  </tr>
-                  {colors.length > 0 && (
-                    <tr className="border-b border-[#EDE4CE]">
-                      <td className="py-2.5 text-gray-500">رنگ‌ها</td>
-                      <td className="break-words py-2.5 text-left font-semibold text-gray-900">
-                        {colors.map((c) => c.label).join(" / ")}
-                      </td>
-                    </tr>
-                  )}
-                  {sizes.length > 0 && (
-                    <tr className="border-b border-[#EDE4CE]">
-                      <td className="py-2.5 text-gray-500">سایزها</td>
-                      <td className="break-words py-2.5 text-left font-semibold text-gray-900">
-                        {sizes.map((s) => s.label).join(" / ")}
-                      </td>
-                    </tr>
-                  )}
-                  <tr>
-                    <td className="py-2.5 text-gray-500">امتیاز</td>
-                    <td className="py-2.5 text-left font-semibold text-gray-900">
-                      {product.rating} از ۵ ⭐
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "reviews" && (
-          <div>
-            <div className="mb-6 flex flex-wrap items-center gap-6 rounded-xl border border-[#E8DFC8] bg-[#F7F1E3]/50 p-5">
-              <div className="text-center">
-                <div className="text-4xl font-black text-amber-600">
-                  {product.rating}
-                </div>
-                <div className="mt-1 text-xs text-gray-500">از ۵</div>
-              </div>
-              <div className="flex-1">
-                <div className="mb-2 text-2xl text-amber-500">
-                  {"★".repeat(Math.round(product.rating))}
-                  <span className="text-gray-300">
-                    {"★".repeat(5 - Math.round(product.rating))}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-600">
-                  بر اساس {product.reviews} نظر
-                </div>
-              </div>
-            </div>
-
-            {product.reviews === 0 ? (
-              <div className="rounded-xl border-2 border-dashed border-[#E8DFC8] bg-[#F7F1E3]/30 p-8 text-center">
-                <p className="text-5xl">💬</p>
-                <p className="mt-4 text-base font-bold text-gray-700">
-                  هنوز دیدگاهی ثبت نشده
-                </p>
-                <p className="mt-2 text-sm text-gray-500">
-                  اولین نفری باشید که نظر خود را ثبت می‌کند
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-xl border-2 border-dashed border-[#E8DFC8] bg-[#F7F1E3]/30 p-8 text-center">
-                <p className="text-sm text-gray-500">
-                  {product.reviews} نظر ثبت شده
-                </p>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

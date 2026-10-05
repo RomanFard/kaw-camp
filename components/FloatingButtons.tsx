@@ -61,7 +61,7 @@ export default function FloatingButtons() {
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="بازگشت به بالا"
-          className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#FF6B4A] bg-black text-[#FF6B4A] shadow-lg transition hover:scale-110 hover:bg-[#FF6B4A] hover:text-white"
+          className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#E89070] bg-black text-[#E89070] shadow-lg transition hover:scale-110 hover:bg-[#E89070] hover:text-white"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

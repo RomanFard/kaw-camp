@@ -9,6 +9,7 @@ type Props = {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  aspect?: number;
 };
 
 type Area = {
@@ -98,7 +99,12 @@ async function getCroppedBlob(
   });
 }
 
-export default function ImageUploader({ value, onChange, label }: Props) {
+export default function ImageUploader({
+  value,
+  onChange,
+  label,
+  aspect = 1,
+}: Props) {
   const supabase = createClient();
   const toast = useToast();
 
@@ -232,7 +238,7 @@ export default function ImageUploader({ value, onChange, label }: Props) {
                 crop={crop}
                 zoom={zoom}
                 rotation={rotation}
-                aspect={1}
+                aspect={aspect}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onRotationChange={setRotation}
@@ -307,7 +313,7 @@ export default function ImageUploader({ value, onChange, label }: Props) {
                 type="button"
                 onClick={handleCropSave}
                 disabled={uploading}
-                className="flex-1 rounded-lg bg-[#FF6B4A] py-2.5 text-sm font-bold text-white transition hover:bg-[#E55A3A] disabled:opacity-50"
+                className="flex-1 rounded-lg bg-[#E89070] py-2.5 text-sm font-bold text-white transition hover:bg-[#D77E5E] disabled:opacity-50"
               >
                 {uploading ? "در حال آپلود..." : "✅ تأیید و آپلود"}
               </button>

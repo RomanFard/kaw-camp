@@ -29,13 +29,13 @@ import {
 
 // ─── رنگ‌های چارت ───
 const COLORS = [
-  "#FF6B4A",
+  "#E89070",
   "#1E40AF",
   "#16A34A",
   "#DC2626",
   "#7C3AED",
   "#0891B2",
-  "#E55A3A",
+  "#D77E5E",
   "#059669",
   "#DB2777",
   "#4F46E5",
@@ -173,10 +173,10 @@ export default function DynamicChart({
               <Line
                 type="monotone"
                 dataKey={metric}
-                stroke="#FF6B4A"
+                stroke="#E89070"
                 strokeWidth={3}
                 dot={{
-                  fill: "#FF6B4A",
+                  fill: "#E89070",
                   r: 5,
                   strokeWidth: 2,
                   stroke: "#fff",

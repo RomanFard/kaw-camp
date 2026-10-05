@@ -48,10 +48,10 @@ export default function ProductPage({
     product.category;
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#F7F1E3]">
+       <main className="min-h-screen overflow-x-hidden bg-[#050505]">
       <Header />
 
-      <div className="mx-auto max-w-[1600px] px-4 py-4 md:px-6 md:py-6">
+          <div className="mx-auto max-w-[1600px] px-6 py-6 md:px-12 md:py-8 lg:px-20">
         {/* مسیر ناوبری */}
         <nav className="mb-4 text-xs text-gray-500 md:mb-5 md:text-sm">
           <a href="/" className="hover:text-amber-600">خانه</a>

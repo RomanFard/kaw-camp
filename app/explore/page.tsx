@@ -66,7 +66,7 @@ function TourCard({ tour, onBook }: { tour: Tour; onBook: (t: Tour) => void }) {
           alt={tour.title}
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
-        <span className="absolute right-3 top-3 rounded-full bg-[#FF6B4A] px-3 py-1 text-xs font-bold text-white shadow">
+        <span className="absolute right-3 top-3 rounded-full bg-[#E89070] px-3 py-1 text-xs font-bold text-white shadow">
           {tourTypeLabels[tour.type]}
         </span>
         {discount > 0 && (
@@ -123,7 +123,7 @@ function TourCard({ tour, onBook }: { tour: Tour; onBook: (t: Tour) => void }) {
           <button
             type="button"
             onClick={() => onBook(tour)}
-            className="rounded-xl bg-[#FF6B4A] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#E55A3A]"
+            className="rounded-xl bg-[#E89070] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#D77E5E]"
           >
             رزرو تور
           </button>
@@ -169,7 +169,7 @@ function WeatherRouteSection({ tours }: { tours: Tour[] }) {
             const t = tours.find((x) => x.id === e.target.value) ?? null;
             setSelectedTour(t);
           }}
-          className="w-full max-w-md rounded-xl border border-[#E8DFC8] bg-white px-4 py-2.5 text-sm outline-none focus:border-[#FF6B4A]"
+          className="w-full max-w-md rounded-xl border border-[#E8DFC8] bg-white px-4 py-2.5 text-sm outline-none focus:border-[#E89070]"
         >
           <option value="">— انتخاب تور —</option>
           {tours.map((t) => (
@@ -295,7 +295,7 @@ function ExploreContent() {
       <Header />
 
       {/* ==================== Hero ==================== */}
-      <section className="bg-gradient-to-l from-[#FF6B4A] to-[#E55A3A] text-white">
+      <section className="bg-gradient-to-l from-[#E89070] to-[#D77E5E] text-white">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-16 text-center md:py-24">
           <HeroWeather />
 
@@ -324,8 +324,8 @@ function ExploreContent() {
                 onClick={() => setFilter(f.key)}
                 className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition ${
                   active
-                    ? "border-[#FF6B4A] bg-[#FF6B4A] text-white"
-                    : "border-[#E8DFC8] bg-white text-gray-700 hover:border-[#FF6B4A]"
+                    ? "border-[#E89070] bg-[#E89070] text-white"
+                    : "border-[#E8DFC8] bg-white text-gray-700 hover:border-[#E89070]"
                 }`}
               >
                 <span>{f.icon}</span>
@@ -366,7 +366,7 @@ function ExploreContent() {
               <button
                 type="button"
                 onClick={() => setSubmitted(false)}
-                className="mt-4 rounded-xl bg-[#FF6B4A] px-5 py-2 text-sm font-bold text-white"
+                className="mt-4 rounded-xl bg-[#E89070] px-5 py-2 text-sm font-bold text-white"
               >
                 ثبت درخواست جدید
               </button>
@@ -379,21 +379,21 @@ function ExploreContent() {
                   placeholder="نام و نام خانوادگی"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#FF6B4A]"
+                  className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#E89070]"
                 />
                 <input
                   required
                   placeholder="شماره تماس"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#FF6B4A]"
+                  className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#E89070]"
                 />
               </div>
 
               <select
                 value={selectedTourId}
                 onChange={(e) => setSelectedTourId(e.target.value)}
-                className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#FF6B4A]"
+                className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#E89070]"
               >
                 {tours.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -408,7 +408,7 @@ function ExploreContent() {
                   type="date"
                   value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#FF6B4A]"
+                  className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#E89070]"
                 />
                 <input
                   required
@@ -417,7 +417,7 @@ function ExploreContent() {
                   max={20}
                   value={form.people}
                   onChange={(e) => setForm({ ...form, people: e.target.value })}
-                  className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#FF6B4A]"
+                  className="rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#E89070]"
                 />
               </div>
 
