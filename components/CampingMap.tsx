@@ -156,7 +156,7 @@ export default function CampingMap() {
       const icon = L.divIcon({
         className: "custom-camping-icon",
         html: `<div style="
-          background: #F59E0B;
+          background: #FF6B4A;
           width: 28px;
           height: 28px;
           border-radius: 50% 50% 50% 0;
@@ -225,7 +225,7 @@ export default function CampingMap() {
         // خط نارنجی خط‌چین
         if (lineRef.current) map.removeLayer(lineRef.current);
         lineRef.current = L.polyline([userLatLng, clickLatLng], {
-          color: "#F59E0B",
+          color: "#FF6B4A",
           weight: 3,
           dashArray: "8 8",
           opacity: 0.8,
@@ -305,7 +305,7 @@ export default function CampingMap() {
 
       <div className="mb-4 flex flex-wrap gap-4 text-xs text-gray-600">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-full bg-[#F59E0B]" />
+          <span className="inline-block h-3 w-3 rounded-full bg-[#FF6B4A]" />
           مکان‌های کمپینگ
         </span>
         <span className="flex items-center gap-1.5">

@@ -307,7 +307,7 @@ export default function ImageUploader({ value, onChange, label }: Props) {
                 type="button"
                 onClick={handleCropSave}
                 disabled={uploading}
-                className="flex-1 rounded-lg bg-[#F59E0B] py-2.5 text-sm font-bold text-white transition hover:bg-[#D97706] disabled:opacity-50"
+                className="flex-1 rounded-lg bg-[#FF6B4A] py-2.5 text-sm font-bold text-white transition hover:bg-[#E55A3A] disabled:opacity-50"
               >
                 {uploading ? "در حال آپلود..." : "✅ تأیید و آپلود"}
               </button>

@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md rounded-2xl border border-[#D4C5A0] bg-white p-8 shadow-lg">
         {/* لوگو / عنوان */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#F59E0B] text-3xl">
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#FF6B4A] text-3xl">
             🔐
           </div>
           <h1 className="text-2xl font-black text-gray-900">ورود ادمین</h1>
@@ -88,7 +88,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-[#F59E0B] py-3 text-sm font-bold text-white transition hover:bg-[#D97706] disabled:opacity-50"
+            className="w-full rounded-lg bg-[#FF6B4A] py-3 text-sm font-bold text-white transition hover:bg-[#E55A3A] disabled:opacity-50"
           >
             {loading ? "در حال ورود..." : "ورود به پنل"}
           </button>

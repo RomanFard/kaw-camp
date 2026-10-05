@@ -6,31 +6,33 @@ import { getProductImage } from "@/lib/productImages";
 import { useProducts } from "@/components/context/ProductsContext";
 import { useCart } from "@/components/context/CartContext";
 
-const EDGE_MASK =
-  "linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%)";
+const PIXELS_PER_SECOND = 40;
+const BUTTON_STEP = 300;
+const BUTTON_DURATION = 600;
 
-// تنظیمات حالت سه‌بعدی
-const MAX_ANGLE = 55; // بیشترین زاویه چرخش (درجه)
-const MAX_DEPTH = 80; // میزان رفتن به عقب (پیکسل)
-const MIN_SCALE = 0.82; // کوچک‌ترین اندازه در لبه
-const FLAT_ZONE = 0.5; // بخش میانی که کارت‌ها صاف می‌مانند (۰ تا ۱)
+function easeInOut(t: number) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
 
 export default function DiscountProducts() {
   const { products, loading } = useProducts();
   const { addItem } = useCart();
-  const scrollRef = useRef<HTMLDivElement>(null);
 
+  const trackRef = useRef<HTMLDivElement>(null);
   const hoverRef = useRef(false);
-  const busyRef = useRef(false);
-  const posRef = useRef(0);
-  const busyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const offsetRef = useRef(0);
 
-  // وضعیت کشیدن با موس
+  const animRef = useRef<{
+    from: number;
+    to: number;
+    start: number;
+  } | null>(null);
+
   const dragRef = useRef({
     active: false,
     moved: false,
     startX: 0,
-    startScroll: 0,
+    startOffset: 0,
     pointerId: -1,
   });
 
@@ -42,141 +44,94 @@ export default function DiscountProducts() {
 
   const loopItems = useMemo(() => [...items, ...items], [items]);
 
-  // ─── حرکت خودکار + افکت سه‌بعدی ───
+  // ─── حلقه‌ی انیمیشن: حرکت خودکار + دکمه‌ها با transform ───
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-card]"));
-    posRef.current = el.scrollLeft;
+    const track = trackRef.current;
+    if (!track) return;
 
     let frameId: number;
     let lastTime = performance.now();
-    const pixelsPerSecond = 40;
+
+    function apply() {
+      if (!track) return;
+      const half = track.offsetWidth / 2;
+      if (half > 0) {
+        offsetRef.current = ((offsetRef.current % half) + half) % half;
+      }
+      track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
+    }
 
     function step(time: number) {
-      const delta = time - lastTime;
+      const delta = Math.min(time - lastTime, 50);
       lastTime = time;
 
-      // حرکت خودکار
-      if (
-        el &&
-        !hoverRef.current &&
-        !busyRef.current &&
-        !dragRef.current.active
-      ) {
-        const half = el.scrollWidth / 2;
-        posRef.current += (pixelsPerSecond * delta) / 1000;
-        if (posRef.current >= half) posRef.current -= half;
-        el.scrollLeft = posRef.current;
+      const anim = animRef.current;
+      if (anim) {
+        const t = Math.min(1, (time - anim.start) / BUTTON_DURATION);
+        offsetRef.current = anim.from + (anim.to - anim.from) * easeInOut(t);
+        if (t >= 1) animRef.current = null;
+      } else if (!hoverRef.current && !dragRef.current.active) {
+        offsetRef.current += (PIXELS_PER_SECOND * delta) / 1000;
       }
 
-      // افکت سه‌بعدی بر اساس فاصله از مرکز
-      if (el) {
-        const box = el.getBoundingClientRect();
-        const centerX = box.left + box.width / 2;
-        const halfWidth = box.width / 2;
-
-        for (const card of cards) {
-          const r = card.getBoundingClientRect();
-          const t = Math.max(
-            -1,
-            Math.min(1, (r.left + r.width / 2 - centerX) / halfWidth)
-          );
-          const e = Math.max(0, (Math.abs(t) - FLAT_ZONE) / (1 - FLAT_ZONE));
-
-          const angle = Math.sign(t) * MAX_ANGLE * e;
-          const depth = -MAX_DEPTH * e;
-          const scale = 1 - (1 - MIN_SCALE) * e;
-
-          card.style.transform = `perspective(900px) translateZ(${depth}px) rotateY(${angle}deg) scale(${scale})`;
-        }
-      }
-
+      apply();
       frameId = requestAnimationFrame(step);
     }
 
     frameId = requestAnimationFrame(step);
-    return () => {
-      cancelAnimationFrame(frameId);
-      if (busyTimerRef.current) clearTimeout(busyTimerRef.current);
-    };
+    return () => cancelAnimationFrame(frameId);
   }, [items.length]);
 
   // ─── دکمه‌های فلش ───
   function scrollBy(dir: "left" | "right") {
-    const el = scrollRef.current;
-    if (!el) return;
+    const track = trackRef.current;
+    if (!track) return;
 
-    const amount = 300;
-    const half = el.scrollWidth / 2;
-
-    busyRef.current = true;
-    if (busyTimerRef.current) clearTimeout(busyTimerRef.current);
-
-    if (el.scrollLeft >= half) el.scrollLeft -= half;
-    if (dir === "left" && el.scrollLeft < amount) el.scrollLeft += half;
-
-    el.scrollBy({
-      left: dir === "left" ? -amount : amount,
-      behavior: "smooth",
-    });
-
-    busyTimerRef.current = setTimeout(() => {
-      posRef.current = el.scrollLeft;
-      busyRef.current = false;
-    }, 700);
+    const current = animRef.current ? animRef.current.to : offsetRef.current;
+    animRef.current = {
+      from: offsetRef.current,
+      to: current + (dir === "left" ? -BUTTON_STEP : BUTTON_STEP),
+      start: performance.now(),
+    };
   }
 
-  // ─── کشیدن با موس ───
+  // ─── کشیدن با موس و لمس ───
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.pointerType !== "mouse" || e.button !== 0) return;
-    const el = scrollRef.current;
-    if (!el) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
 
+    animRef.current = null;
     const d = dragRef.current;
     d.active = true;
     d.moved = false;
     d.startX = e.clientX;
-    d.startScroll = el.scrollLeft;
+    d.startOffset = offsetRef.current;
     d.pointerId = e.pointerId;
   }
 
   function handlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
     const d = dragRef.current;
-    const el = scrollRef.current;
-    if (!d.active || !el) return;
+    if (!d.active) return;
 
     const dx = e.clientX - d.startX;
 
     if (!d.moved) {
       if (Math.abs(dx) < 5) return;
       d.moved = true;
-      el.setPointerCapture(d.pointerId);
-      el.style.cursor = "grabbing";
+      e.currentTarget.setPointerCapture(d.pointerId);
+      e.currentTarget.style.cursor = "grabbing";
     }
 
-    // لیست دو بار تکرار شده، پس با باقی‌مانده نیمه‌ی عرض لوپ می‌شود
-    const half = el.scrollWidth / 2;
-    const raw = d.startScroll - dx;
-    const next = ((raw % half) + half) % half;
-
-    el.scrollLeft = next;
-    posRef.current = next;
+    offsetRef.current = d.startOffset - dx;
   }
 
-  function endDrag() {
+  function endDrag(e: React.PointerEvent<HTMLDivElement>) {
     const d = dragRef.current;
-    const el = scrollRef.current;
     if (!d.active) return;
 
     d.active = false;
-    if (el) {
-      el.style.cursor = "";
-      if (el.hasPointerCapture?.(d.pointerId)) {
-        el.releasePointerCapture(d.pointerId);
-      }
-      posRef.current = el.scrollLeft;
+    e.currentTarget.style.cursor = "";
+    if (e.currentTarget.hasPointerCapture?.(d.pointerId)) {
+      e.currentTarget.releasePointerCapture(d.pointerId);
     }
   }
 
@@ -218,13 +173,14 @@ export default function DiscountProducts() {
         <div className="mx-auto mt-4 h-[2px] w-16 bg-[#F59E0B]" />
       </div>
 
-      {/* Slider: داخل کادر ۱۶۰۰px */}
-      <div className="relative mx-auto mt-10 w-full max-w-[1600px] px-6 md:px-12 lg:px-20">
+      {/* Slider: باریک و وسط‌چین */}
+      <div className="relative mx-auto mt-10 w-full max-w-[1000px] px-6 lg:px-0">
+        {/* فلش چپ */}
         <button
           type="button"
           onClick={() => scrollBy("left")}
           aria-label="قبلی"
-          className="absolute left-3 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A]/95 text-white backdrop-blur-sm transition hover:border-[#F59E0B] hover:bg-[#F59E0B] lg:flex xl:left-5"
+          className="absolute -left-14 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A]/95 text-white backdrop-blur-sm transition hover:border-[#F59E0B] hover:bg-[#F59E0B] xl:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -242,11 +198,12 @@ export default function DiscountProducts() {
           </svg>
         </button>
 
+        {/* فلش راست */}
         <button
           type="button"
           onClick={() => scrollBy("right")}
           aria-label="بعدی"
-          className="absolute right-3 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A]/95 text-white backdrop-blur-sm transition hover:border-[#F59E0B] hover:bg-[#F59E0B] lg:flex xl:right-5"
+          className="absolute -right-14 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A]/95 text-white backdrop-blur-sm transition hover:border-[#F59E0B] hover:bg-[#F59E0B] xl:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -264,9 +221,8 @@ export default function DiscountProducts() {
           </svg>
         </button>
 
-        {/* ناحیه اسکرول */}
+        {/* قاب نمایش: لبه‌ها تیز بریده می‌شوند */}
         <div
-          ref={scrollRef}
           dir="ltr"
           onMouseEnter={() => {
             hoverRef.current = true;
@@ -279,15 +235,16 @@ export default function DiscountProducts() {
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
           onClickCapture={handleClickCapture}
-          className="scrollbar-hide cursor-grab select-none overflow-x-auto overflow-y-hidden"
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-            WebkitMaskImage: EDGE_MASK,
-            maskImage: EDGE_MASK,
-          }}
+          className="cursor-grab select-none overflow-hidden"
+          style={{ touchAction: "pan-y" }}
         >
-          <div dir="rtl" className="flex w-max gap-3 py-4">
+          {/* ریل متحرک */}
+          <div
+            ref={trackRef}
+            dir="rtl"
+            className="flex w-max"
+            style={{ willChange: "transform", backfaceVisibility: "hidden" }}
+          >
             {loopItems.map((product, idx) => {
               const hasDiscount = !!product.oldPrice;
               const discount = product.oldPrice
@@ -302,11 +259,9 @@ export default function DiscountProducts() {
               return (
                 <a
                   key={`${product.id}-${idx}`}
-                  data-card
                   draggable={false}
                   href={`/product/${product.id}`}
-                  className="group/card relative w-[160px] flex-shrink-0 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50 transition-colors duration-300 hover:border-[#F59E0B]/50 sm:w-[180px] md:w-[200px] lg:w-[220px]"
-                  style={{ willChange: "transform" }}
+                  className="group/card relative ml-5 w-[180px] flex-shrink-0 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 transition-colors duration-300 hover:border-[#F59E0B]/50 md:w-[200px] lg:w-[228px]"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-zinc-950">
                     {/* eslint-disable-next-line @next/next/no-img-element */}

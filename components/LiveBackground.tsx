@@ -11,7 +11,7 @@ type Particle = {
 };
 
 export default function LiveBackground({
-  color = "#F59E0B",
+  color = "#FF6B4A",
   particleCount = 60,
   connectionDistance = 150,
   className = "",

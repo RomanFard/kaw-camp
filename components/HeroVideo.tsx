@@ -98,14 +98,14 @@ export default function HeroVideo() {
       {/* ─── Overlay تیره ─── */}
       <div className="absolute inset-0 bg-gradient-to-l from-black via-black/70 to-black/30" />
 
-      {/* ─── محتوای اصلی ─── */}
+      {/* ─── محتوای اصلی (وسط‌چین) ─── */}
       <div className="relative z-10 flex h-full items-center">
         <div className="mx-auto w-full max-w-[1600px] px-6 md:px-12 lg:px-20">
-          <div className="max-w-2xl">
+          <div className="mx-auto max-w-3xl text-center">
             {/* Eyebrow */}
-            <div className="mb-4 flex items-center gap-3">
-              <span className="h-[2px] w-10 bg-[#F59E0B]" />
-              <span className="text-xs font-bold tracking-wider text-[#F59E0B] md:text-sm">
+            <div className="mb-4 flex items-center justify-center gap-3">
+              <span className="h-[2px] w-10 bg-[#FF6B4A]" />
+              <span className="text-xs font-bold tracking-wider text-[#FF6B4A] md:text-sm">
                 {slide.eyebrow}
               </span>
             </div>
@@ -114,19 +114,19 @@ export default function HeroVideo() {
             <h1 className="mb-5 text-4xl font-black leading-[1.15] text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
               {slide.titleLine1}
               <br />
-              <span className="text-[#F59E0B]">{slide.titleLine2}</span>
+              <span className="text-[#FF6B4A]">{slide.titleLine2}</span>
             </h1>
 
             {/* توضیحات */}
-            <p className="mb-8 max-w-xl text-sm leading-7 text-zinc-300 md:text-base md:leading-8">
+            <p className="mx-auto mb-8 max-w-xl text-sm leading-7 text-zinc-300 md:text-base md:leading-8">
               {slide.description}
             </p>
 
             {/* دکمه‌ها */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3">
               <a
                 href={slide.primaryCta.href}
-                className="group inline-flex items-center gap-2 rounded-lg bg-[#F59E0B] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-[#F59E0B]/30 transition hover:bg-[#D97706] hover:shadow-[#F59E0B]/50 md:px-8 md:text-base"
+                className="group inline-flex items-center gap-2 rounded-lg bg-[#FF6B4A] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-[#FF6B4A]/30 transition hover:bg-[#E55A3A] hover:shadow-[#FF6B4A]/50 md:px-8 md:text-base"
               >
                 <span>{slide.primaryCta.label}</span>
                 <svg
@@ -161,7 +161,7 @@ export default function HeroVideo() {
         type="button"
         onClick={goNext}
         aria-label="اسلاید بعدی"
-        className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#F59E0B] lg:flex"
+        className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#FF6B4A] lg:flex"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -184,7 +184,7 @@ export default function HeroVideo() {
         type="button"
         onClick={goPrev}
         aria-label="اسلاید قبلی"
-        className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#F59E0B] lg:flex"
+        className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#FF6B4A] lg:flex"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -213,7 +213,7 @@ export default function HeroVideo() {
             className={
               "h-1 rounded-full transition-all duration-300 " +
               (i === current
-                ? "w-10 bg-[#F59E0B]"
+                ? "w-10 bg-[#FF6B4A]"
                 : "w-5 bg-white/40 hover:bg-white/70")
             }
           />
@@ -222,9 +222,9 @@ export default function HeroVideo() {
 
       {/* ─── دایره تزئینی ─── */}
       <div className="pointer-events-none absolute right-8 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center lg:flex xl:right-16">
-        <div className="absolute inset-0 animate-ping rounded-full border-2 border-[#F59E0B]/40" />
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#F59E0B]">
-          <div className="h-2 w-2 rounded-full bg-[#F59E0B]" />
+        <div className="absolute inset-0 animate-ping rounded-full border-2 border-[#FF6B4A]/40" />
+        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#FF6B4A]">
+          <div className="h-2 w-2 rounded-full bg-[#FF6B4A]" />
         </div>
       </div>
     </section>

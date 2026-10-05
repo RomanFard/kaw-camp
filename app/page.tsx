@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen bg-black">
       <div className="pointer-events-none fixed inset-0 z-0">
-        <LiveBackground color="#F59E0B" particleCount={60} />
+        <LiveBackground color="#FF6B4A" particleCount={60} />
       </div>
 
       <div className="relative z-10">
