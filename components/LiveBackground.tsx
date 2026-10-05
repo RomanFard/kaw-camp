@@ -36,7 +36,6 @@ export default function LiveBackground({
     let height = 0;
     let dpr = 1;
 
-    // ─── تنظیم اندازه ───
     function resize() {
       if (!canvas) return;
       dpr = window.devicePixelRatio || 1;
@@ -48,7 +47,6 @@ export default function LiveBackground({
       ctx!.scale(dpr, dpr);
     }
 
-    // ─── ساخت ذرات ───
     function initParticles() {
       const count = Math.min(
         particleCount,
@@ -66,7 +64,6 @@ export default function LiveBackground({
       }
     }
 
-    // ─── رسم ───
     function draw() {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
@@ -79,15 +76,12 @@ export default function LiveBackground({
         p.x += p.vx;
         p.y += p.vy;
 
-        // برخورد با دیواره‌ها
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
-        // محدود کردن به محدوده
         p.x = Math.max(0, Math.min(width, p.x));
         p.y = Math.max(0, Math.min(height, p.y));
 
-        // جذب به سمت موس (خیلی ملایم)
         if (mouse) {
           const dx = mouse.x - p.x;
           const dy = mouse.y - p.y;
@@ -136,7 +130,7 @@ export default function LiveBackground({
         }
       }
 
-      // ─── رسم ذرات ───
+      // ─── رسم ذرات (نقطه‌ها) ───
       for (const p of particles) {
         // هاله نرم
         const gradient = ctx.createRadialGradient(
@@ -147,15 +141,14 @@ export default function LiveBackground({
           p.y,
           p.radius * 6
         );
-        gradient.addColorStop(0, hexToRgba(color, 0.8));
+               gradient.addColorStop(0, hexToRgba(color, 0.35));
         gradient.addColorStop(1, hexToRgba(color, 0));
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius * 6, 0, Math.PI * 2);
         ctx.fill();
-
-        // نقطه مرکزی
-        ctx.fillStyle = color;
+        // نقطه مرکزی (کم‌رنگ‌تر)
+        ctx.fillStyle = hexToRgba(color, 0.6);
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -164,7 +157,6 @@ export default function LiveBackground({
       animationRef.current = requestAnimationFrame(draw);
     }
 
-    // ─── موس ───
     function handleMouseMove(e: MouseEvent) {
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
@@ -178,7 +170,6 @@ export default function LiveBackground({
       mouseRef.current = null;
     }
 
-    // ─── شروع ───
     resize();
     initParticles();
     draw();
@@ -210,7 +201,6 @@ export default function LiveBackground({
   );
 }
 
-// ─── تبدیل hex به rgba با opacity ───
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);

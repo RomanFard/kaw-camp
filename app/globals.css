@@ -74,3 +74,30 @@
     transform: translateY(0);
   }
 }
+/* ═══ Marquee Animation ═══ */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee-scroll 60s linear infinite;
+}
+
+/* توقف روی hover کل ناحیه */
+.marquee-wrapper:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* اسکرول‌بار مخفی */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

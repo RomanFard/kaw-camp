@@ -11,17 +11,16 @@ import LiveBackground from "@/components/LiveBackground";
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-black">
-      {/* ─── بک‌گراند لایو: کل صفحه، ثابت ─── */}
       <div className="pointer-events-none fixed inset-0 z-0">
         <LiveBackground color="#F59E0B" particleCount={60} />
       </div>
 
-      {/* ─── محتوا ─── */}
       <div className="relative z-10">
         <Header />
+
+        {/* بنر تمام صفحه */}
         <HeroVideo />
 
-        {/* ─── سکشن‌ها: همه شفاف ─── */}
         <AboutSection />
         <BrandCarousel />
         <CategoryGrid />

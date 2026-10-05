@@ -195,8 +195,8 @@ export default function Header() {
         </div>
 
         {/* ═══ دسکتاپ ═══ */}
-        <div className="relative hidden border-b border-zinc-800 bg-[#0A0A0A] md:block">
-          <div className="mx-auto max-w-[1600px] px-6">
+                <div className="hidden border-b border-zinc-800 bg-[#0A0A0A] md:block">
+          <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-20">
             <div className="flex items-center justify-between gap-8 py-4">
               {/* ─── راست: لوگو ─── */}
               <a href="/" className="flex flex-shrink-0 items-center">

@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function TopBar() {
   return (
     <div className="hidden border-b border-zinc-800 bg-[#0A0A0A] text-zinc-300 lg:block">
-      <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-6 py-2 text-[13px]">
+            <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-6 py-2 text-[13px] md:px-12 lg:px-20">
         {/* ─── سمت راست (RTL): ایمیل + ساعت ─── */}
         <div className="flex items-center gap-5">
           {/* ایمیل */}
