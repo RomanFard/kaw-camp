@@ -101,150 +101,154 @@ export default function ContactSection() {
   ];
 
   return (
-    <section className="relative py-16 md:py-20">
-      <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-20">
-        <div className="mb-10 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E89070]/30 bg-[#E89070]/5 px-4 py-1.5 backdrop-blur-sm">
-            <span className="text-[11px] font-bold tracking-[0.15em] text-[#E89070] md:text-xs">
-              CONTACT
-            </span>
-          </div>
-
-          <h2 className="text-2xl font-black tracking-tight text-white md:text-4xl lg:text-5xl">
-            درخواست <span className="text-[#E89070]">مشاوره</span>
-          </h2>
-
-          <div className="mx-auto mt-4 h-[2px] w-16 bg-[#E89070]" />
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 backdrop-blur-sm md:p-6">
-            <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3237.8847837777436!2d45.88517831526225!3d35.998384980118556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDU5JzU0LjIiTiA0NcKwNTMnMTQuNSJF!5e0!3m2!1sen!2s!4v1234567890"
-                width="100%"
-                height="280"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="grayscale-[30%]"
-                title="KAW CAMP Location"
-              />
+    <section className="relative py-12 md:py-16">
+      {/* ═══ کادر مشکی تمامعرض — از لبه تا لبه ═══ */}
+      <div className="relative w-full bg-black py-12 md:py-16">
+        {/* محتوا — هم‌عرض بقیه سایت */}
+        <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
+          <div className="mb-10 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#6ECB9E]/30 bg-[#6ECB9E]/5 px-3.5 py-1.5 backdrop-blur-sm">
+              <span className="text-[11px] font-bold tracking-[0.15em] text-[#6ECB9E] md:text-xs">
+                CONTACT
+              </span>
             </div>
 
-            <div className="mt-6 space-y-4">
-              {contactInfo.map((info, idx) => (
-                <a
-                  key={idx}
-                  href={info.href}
-                  target={info.href.startsWith("http") ? "_blank" : undefined}
-                  rel={
-                    info.href.startsWith("http")
-                      ? "noopener noreferrer"
-                      : undefined
-                  }
-                  className="group flex items-center gap-4"
-                >
-                  <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-[#E89070]/30 bg-[#E89070]/10 text-[#E89070] transition group-hover:border-[#E89070] group-hover:bg-[#E89070] group-hover:text-white">
-                    {info.icon}
-                  </span>
-                  <div className="flex-1">
-                    <p className="text-[10px] font-bold text-zinc-500 md:text-xs">
-                      {info.label}
-                    </p>
-                    <p className="mt-0.5 text-xs font-bold text-white transition group-hover:text-[#E89070] md:text-sm">
-                      {info.value}
-                    </p>
-                  </div>
-                </a>
-              ))}
-            </div>
+            <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl lg:text-4xl">
+              درخواست <span className="text-[#6ECB9E]">مشاوره</span>
+            </h2>
+
+            <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-[#6ECB9E]" />
           </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 backdrop-blur-sm md:p-6">
-            <h3 className="mb-5 text-center text-lg font-black text-white md:text-xl">
-              فرم درخواست
-            </h3>
-
-            {submitted ? (
-              <div className="flex h-full min-h-[380px] flex-col items-center justify-center gap-3 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20 text-3xl">
-                  ✅
-                </div>
-                <p className="text-base font-black text-white">
-                  درخواست شما ثبت شد!
-                </p>
-                <p className="text-xs text-zinc-400">
-                  به‌زودی با شما تماس می‌گیریم
-                </p>
+          <div className="grid gap-5 lg:grid-cols-2 lg:gap-6">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 backdrop-blur-sm md:p-6">
+              <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3237.8847837777436!2d45.88517831526225!3d35.998384980118556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDU5JzU0LjIiTiA0NcKwNTMnMTQuNSJF!5e0!3m2!1sen!2s!4v1234567890"
+                  width="100%"
+                  height="260"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="grayscale-[30%]"
+                  title="KAW CAMP Location"
+                />
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <input
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="نام و نام خانوادگی"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#E89070]"
-                />
 
-                <input
-                  type="tel"
-                  required
-                  dir="ltr"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="شماره تماس"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#E89070]"
-                />
+              <div className="mt-5 space-y-4">
+                {contactInfo.map((info, idx) => (
+                  <a
+                    key={idx}
+                    href={info.href}
+                    target={info.href.startsWith("http") ? "_blank" : undefined}
+                    rel={
+                      info.href.startsWith("http")
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
+                    className="group flex items-center gap-4"
+                  >
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[#6ECB9E]/30 bg-[#6ECB9E]/10 text-[#6ECB9E] transition group-hover:border-[#6ECB9E] group-hover:bg-[#6ECB9E] group-hover:text-white">
+                      {info.icon}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-[10px] font-bold text-zinc-500 md:text-xs">
+                        {info.label}
+                      </p>
+                      <p className="mt-0.5 text-xs font-bold text-white transition group-hover:text-[#6ECB9E] md:text-sm">
+                        {info.value}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
 
-                <input
-                  type="email"
-                  dir="ltr"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="ایمیل (اختیاری)"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#E89070]"
-                />
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 backdrop-blur-sm md:p-6">
+              <h3 className="mb-5 text-center text-base font-black text-white md:text-lg">
+                فرم درخواست
+              </h3>
 
-                <select
-                  required
-                  value={form.service}
-                  onChange={(e) =>
-                    setForm({ ...form, service: e.target.value })
-                  }
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-sm text-white outline-none transition focus:border-[#E89070]"
-                >
-                  <option value="" className="bg-zinc-900">
-                    انتخاب خدمت
-                  </option>
-                  {services.map((s) => (
-                    <option key={s} value={s} className="bg-zinc-900">
-                      {s}
+              {submitted ? (
+                <div className="flex h-full min-h-[360px] flex-col items-center justify-center gap-3 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20 text-3xl">
+                    ✅
+                  </div>
+                  <p className="text-base font-black text-white">
+                    درخواست شما ثبت شد!
+                  </p>
+                  <p className="text-xs text-zinc-400">
+                    به‌زودی با شما تماس می‌گیریم
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <input
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="نام و نام خانوادگی"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#6ECB9E]"
+                  />
+
+                  <input
+                    type="tel"
+                    required
+                    dir="ltr"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="شماره تماس"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#6ECB9E]"
+                  />
+
+                  <input
+                    type="email"
+                    dir="ltr"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="ایمیل (اختیاری)"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#6ECB9E]"
+                  />
+
+                  <select
+                    required
+                    value={form.service}
+                    onChange={(e) =>
+                      setForm({ ...form, service: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#6ECB9E]"
+                  >
+                    <option value="" className="bg-zinc-900">
+                      انتخاب خدمت
                     </option>
-                  ))}
-                </select>
+                    {services.map((s) => (
+                      <option key={s} value={s} className="bg-zinc-900">
+                        {s}
+                      </option>
+                    ))}
+                  </select>
 
-                <textarea
-                  rows={5}
-                  value={form.message}
-                  onChange={(e) =>
-                    setForm({ ...form, message: e.target.value })
-                  }
-                  placeholder="توضیحات..."
-                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#E89070]"
-                />
+                  <textarea
+                    rows={4}
+                    value={form.message}
+                    onChange={(e) =>
+                      setForm({ ...form, message: e.target.value })
+                    }
+                    placeholder="توضیحات..."
+                    className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#6ECB9E]"
+                  />
 
-                <button
-                  type="submit"
-                  className="w-full rounded-lg bg-[#E89070] py-3.5 text-sm font-black uppercase tracking-widest text-white transition hover:bg-[#D77E5E] md:text-base"
-                >
-                  ارسال درخواست
-                </button>
-              </form>
-            )}
+                  <button
+                    type="submit"
+                    className="w-full rounded-lg bg-[#6ECB9E] py-3 text-sm font-black text-white transition hover:bg-[#5AB88A]"
+                  >
+                    ارسال درخواست
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </div>

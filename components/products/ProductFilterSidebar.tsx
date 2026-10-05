@@ -68,11 +68,11 @@ export default function ProductFilterSidebar({
               >
                 <span
                   className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded-full border transition ${
-                    isActive ? "border-[#E89070]" : "border-zinc-600"
+                    isActive ? "border-[#6ECB9E]" : "border-zinc-600"
                   }`}
                 >
                   {isActive && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#E89070]" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#6ECB9E]" />
                   )}
                 </span>
                 <input
@@ -98,13 +98,13 @@ export default function ProductFilterSidebar({
 
           {/* Track پر شده (کورال) */}
           <div
-            className="absolute right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-[#E89070]"
+            className="absolute right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-[#6ECB9E]"
             style={{ width: `${100 - percent}%` }}
           />
 
           {/* Thumb (دایره نارنجی) */}
           <div
-            className="pointer-events-none absolute top-1/2 h-3 w-3 -translate-y-1/2 translate-x-1/2 rounded-full bg-[#E89070] shadow-lg shadow-[#E89070]/40"
+            className="pointer-events-none absolute top-1/2 h-3 w-3 -translate-y-1/2 translate-x-1/2 rounded-full bg-[#6ECB9E] shadow-lg shadow-[#6ECB9E]/40"
             style={{ right: `${100 - percent}%` }}
           />
 
@@ -122,7 +122,7 @@ export default function ProductFilterSidebar({
 
         <div className="mt-2 flex items-center justify-between text-[11px]">
           <span className="text-zinc-400">۰ تومان</span>
-          <span className="font-bold text-[#E89070]">
+          <span className="font-bold text-[#6ECB9E]">
             {formatShort(maxPrice)} تومان
           </span>
         </div>
@@ -135,11 +135,11 @@ export default function ProductFilterSidebar({
           <label className="group flex cursor-pointer items-center gap-2.5 text-xs text-zinc-400 transition hover:text-white">
             <span
               className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded border transition ${
-                onlyInStock ? "border-[#E89070]" : "border-zinc-600"
+                onlyInStock ? "border-[#6ECB9E]" : "border-zinc-600"
               }`}
             >
               {onlyInStock && (
-                <span className="h-1.5 w-1.5 rounded-sm bg-[#E89070]" />
+                <span className="h-1.5 w-1.5 rounded-sm bg-[#6ECB9E]" />
               )}
             </span>
             <input
@@ -154,11 +154,11 @@ export default function ProductFilterSidebar({
           <label className="group flex cursor-pointer items-center gap-2.5 text-xs text-zinc-400 transition hover:text-white">
             <span
               className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded border transition ${
-                onlyOnSale ? "border-[#E89070]" : "border-zinc-600"
+                onlyOnSale ? "border-[#6ECB9E]" : "border-zinc-600"
               }`}
             >
               {onlyOnSale && (
-                <span className="h-1.5 w-1.5 rounded-sm bg-[#E89070]" />
+                <span className="h-1.5 w-1.5 rounded-sm bg-[#6ECB9E]" />
               )}
             </span>
             <input

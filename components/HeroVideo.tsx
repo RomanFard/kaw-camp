@@ -141,8 +141,8 @@ export default function HeroVideo() {
               {/* Eyebrow */}
               {slide.eyebrow && (
                 <div className="animate-hero-1 mb-4 flex items-center justify-center gap-3">
-                  <span className="h-[2px] w-10 bg-[#E89070]" />
-                  <span className="text-xs font-bold tracking-wider text-[#E89070] md:text-sm">
+                  <span className="h-[2px] w-10 bg-[#6ECB9E]" />
+                  <span className="text-xs font-bold tracking-wider text-[#6ECB9E] md:text-sm">
                     {slide.eyebrow}
                   </span>
                 </div>
@@ -154,7 +154,7 @@ export default function HeroVideo() {
               </h1>
 
               {/* خط دوم عنوان */}
-              <h1 className="animate-hero-3 mb-5 text-4xl font-black leading-[1.15] text-[#E89070] drop-shadow-2xl md:text-6xl lg:text-7xl">
+              <h1 className="animate-hero-3 mb-5 text-4xl font-black leading-[1.15] text-[#6ECB9E] drop-shadow-2xl md:text-6xl lg:text-7xl">
                 {slide.title_line2}
               </h1>
 
@@ -170,7 +170,7 @@ export default function HeroVideo() {
                 {slide.primary_label && slide.primary_href && (
                   <a
                     href={slide.primary_href}
-                    className="group inline-flex items-center gap-2 rounded-lg bg-[#E89070] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-[#E89070]/30 transition hover:bg-[#D77E5E] hover:shadow-[#E89070]/50 md:px-8 md:text-base"
+                    className="group inline-flex items-center gap-2 rounded-lg bg-[#6ECB9E] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-[#6ECB9E]/30 transition hover:bg-[#5AB88A] hover:shadow-[#6ECB9E]/50 md:px-8 md:text-base"
                   >
                     <span>{slide.primary_label}</span>
                     <svg
@@ -210,7 +210,7 @@ export default function HeroVideo() {
           type="button"
           onClick={goNext}
           aria-label="اسلاید بعدی"
-          className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#E89070] lg:flex"
+          className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#6ECB9E] lg:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -235,7 +235,7 @@ export default function HeroVideo() {
           type="button"
           onClick={goPrev}
           aria-label="اسلاید قبلی"
-          className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#E89070] lg:flex"
+          className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#6ECB9E] lg:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -269,14 +269,14 @@ export default function HeroVideo() {
               {i === current && !paused && (
                 <span
                   key={current}
-                  className="absolute inset-y-0 right-0 bg-[#E89070]"
+                  className="absolute inset-y-0 right-0 bg-[#6ECB9E]"
                   style={{
                     animation: `heroProgress ${AUTOPLAY_MS}ms linear forwards`,
                   }}
                 />
               )}
               {i === current && paused && (
-                <span className="absolute inset-0 bg-[#E89070]" />
+                <span className="absolute inset-0 bg-[#6ECB9E]" />
               )}
             </button>
           ))}
@@ -285,9 +285,9 @@ export default function HeroVideo() {
 
       {/* ─── دایره تزئینی ─── */}
       <div className="pointer-events-none absolute right-8 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center lg:flex xl:right-16">
-        <div className="absolute inset-0 animate-ping rounded-full border-2 border-[#E89070]/40" />
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#E89070]">
-          <div className="h-2 w-2 rounded-full bg-[#E89070]" />
+        <div className="absolute inset-0 animate-ping rounded-full border-2 border-[#6ECB9E]/40" />
+        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#6ECB9E]">
+          <div className="h-2 w-2 rounded-full bg-[#6ECB9E]" />
         </div>
       </div>
 

@@ -345,7 +345,7 @@ export default function ProductsAdminPage() {
             <button
               type="button"
               onClick={openAddModal}
-              className="rounded-lg bg-[#E89070] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#D77E5E]"
+              className="rounded-lg bg-[#6ECB9E] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#5AB88A]"
             >
               ➕ محصول جدید
             </button>
@@ -779,7 +779,7 @@ export default function ProductsAdminPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 rounded-lg bg-[#E89070] py-3 text-sm font-bold text-white transition hover:bg-[#D77E5E] disabled:opacity-50"
+                  className="flex-1 rounded-lg bg-[#6ECB9E] py-3 text-sm font-bold text-white transition hover:bg-[#5AB88A] disabled:opacity-50"
                 >
                   {saving
                     ? "در حال ذخیره..."

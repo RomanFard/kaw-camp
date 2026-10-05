@@ -27,7 +27,7 @@ export default function BrandCarousel() {
             type="button"
             onClick={scrollLeft}
             aria-label="قبلی"
-            className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg font-bold text-zinc-300 shadow-md transition hover:bg-zinc-800 hover:text-[#E89070] md:h-12 md:w-12"
+            className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg font-bold text-zinc-300 shadow-md transition hover:bg-zinc-800 hover:text-[#6ECB9E] md:h-12 md:w-12"
           >
             ›
           </button>
@@ -42,7 +42,7 @@ export default function BrandCarousel() {
               <a
                 key={brand.key}
                 href={brand.href}
-                className="group flex h-20 w-[140px] flex-shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition hover:border-[#E89070] hover:shadow-md md:h-24 md:w-[160px]"
+                className="group flex h-20 w-[140px] flex-shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition hover:border-[#6ECB9E] hover:shadow-md md:h-24 md:w-[160px]"
               >
                 <img
                   src={brand.logo}
@@ -58,7 +58,7 @@ export default function BrandCarousel() {
             type="button"
             onClick={scrollRight}
             aria-label="بعدی"
-            className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg font-bold text-zinc-300 shadow-md transition hover:bg-zinc-800 hover:text-[#E89070] md:h-12 md:w-12"
+            className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg font-bold text-zinc-300 shadow-md transition hover:bg-zinc-800 hover:text-[#6ECB9E] md:h-12 md:w-12"
           >
             ‹
           </button>

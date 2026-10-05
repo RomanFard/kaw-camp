@@ -85,7 +85,7 @@ export default function ProductGridCard({ product }: { product: Product }) {
           />
 
           {discount > 0 && (
-            <span className="absolute right-2 top-2 rounded bg-[#E89070] px-2 py-0.5 text-[10px] font-black text-white shadow-lg">
+            <span className="absolute right-2 top-2 rounded bg-[#6ECB9E] px-2 py-0.5 text-[10px] font-black text-white shadow-lg">
               {discount}٪
             </span>
           )}

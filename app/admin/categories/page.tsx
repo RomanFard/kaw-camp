@@ -93,7 +93,7 @@ export default function CategoriesPage() {
         <div className="mb-6">
           <a
             href="/admin"
-            className="text-sm text-zinc-500 hover:text-[#E89070]"
+            className="text-sm text-zinc-500 hover:text-[#6ECB9E]"
           >
             ← بازگشت به داشبورد
           </a>
@@ -155,7 +155,7 @@ export default function CategoriesPage() {
                     <div className="mt-3 flex gap-1.5">
                       <button
                         onClick={() => openModal(cat.key)}
-                        className="flex-1 rounded-lg border border-[#E89070]/40 bg-[#E89070]/10 px-2 py-1.5 text-[11px] font-bold text-[#E89070] transition hover:bg-[#E89070] hover:text-white"
+                        className="flex-1 rounded-lg border border-[#6ECB9E]/40 bg-[#6ECB9E]/10 px-2 py-1.5 text-[11px] font-bold text-[#6ECB9E] transition hover:bg-[#6ECB9E] hover:text-white"
                       >
                         {photo ? "✏️ ویرایش" : "➕ افزودن"}
                       </button>
@@ -209,7 +209,7 @@ export default function CategoriesPage() {
                   type="checkbox"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="h-4 w-4 accent-[#E89070]"
+                  className="h-4 w-4 accent-[#6ECB9E]"
                 />
                 <span className="text-sm font-bold text-white">
                   نمایش در صفحه اصلی
@@ -226,7 +226,7 @@ export default function CategoriesPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 rounded-lg bg-[#E89070] py-3 text-sm font-black text-white transition hover:bg-[#D77E5E] disabled:opacity-50"
+                  className="flex-1 rounded-lg bg-[#6ECB9E] py-3 text-sm font-black text-white transition hover:bg-[#5AB88A] disabled:opacity-50"
                 >
                   {saving ? "در حال ذخیره..." : "ذخیره"}
                 </button>

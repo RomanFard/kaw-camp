@@ -11,7 +11,7 @@ type Particle = {
 };
 
 export default function LiveBackground({
-  color = "#E89070",
+  color = "#6ECB9E",
   particleCount = 60,
   connectionDistance = 150,
   className = "",
@@ -96,8 +96,8 @@ export default function LiveBackground({
         }
       }
 
-      // ─── خطوط بین ذرات نزدیک — فقط در high ───
-      if (quality === "high") {
+      // ─── خطوط بین ذرات نزدیک — در high و medium ───
+      if (quality === "high" || quality === "medium") {
         for (let i = 0; i < particles.length; i++) {
           for (let j = i + 1; j < particles.length; j++) {
             const dx = particles[i].x - particles[j].x;

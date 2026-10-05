@@ -103,7 +103,7 @@ export default function Header() {
                 type="button"
                 onClick={() => setMobileOpen(true)}
                 aria-label="دسته‌بندی محصولات"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-[#E89070] hover:text-white"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-[#6ECB9E] hover:text-white"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -138,7 +138,7 @@ export default function Header() {
               <a
                 href="/login"
                 aria-label="حساب کاربری"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-[#E89070] hover:text-white"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-[#6ECB9E] hover:text-white"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -222,7 +222,7 @@ export default function Header() {
                           className={
                             "group relative flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-bold transition lg:text-[15px] " +
                             (isOpen
-                              ? "text-[#E89070]"
+                              ? "text-[#6ECB9E]"
                               : "text-zinc-300 hover:text-white")
                           }
                         >
@@ -236,7 +236,7 @@ export default function Header() {
                               stroke="currentColor"
                               className={
                                 "h-3.5 w-3.5 transition-transform duration-200 " +
-                                (isOpen ? "rotate-180 text-[#E89070]" : "")
+                                (isOpen ? "rotate-180 text-[#6ECB9E]" : "")
                               }
                             >
                               <path
@@ -248,7 +248,7 @@ export default function Header() {
                           )}
                           <span
                             className={
-                              "absolute bottom-1 right-1/2 h-[2px] translate-x-1/2 bg-[#E89070] transition-all duration-300 " +
+                              "absolute bottom-1 right-1/2 h-[2px] translate-x-1/2 bg-[#6ECB9E] transition-all duration-300 " +
                               (isOpen ? "w-8" : "w-0 group-hover:w-8")
                             }
                           />
@@ -268,7 +268,7 @@ export default function Header() {
                                 <a
                                   key={child.label}
                                   href={child.href}
-                                  className="block border-r-2 border-transparent px-4 py-2.5 text-sm text-zinc-300 transition hover:border-[#E89070] hover:bg-zinc-900 hover:text-[#E89070]"
+                                  className="block border-r-2 border-transparent px-4 py-2.5 text-sm text-zinc-300 transition hover:border-[#6ECB9E] hover:bg-zinc-900 hover:text-[#6ECB9E]"
                                 >
                                   {child.label}
                                 </a>
@@ -289,7 +289,7 @@ export default function Header() {
                   href="/wishlist"
                   aria-label="علاقه‌مندی"
                   data-wishlist-icon
-                  className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 text-zinc-300 transition hover:border-[#E89070] hover:bg-[#E89070] hover:text-white"
+                  className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 text-zinc-300 transition hover:border-[#6ECB9E] hover:bg-[#6ECB9E] hover:text-white"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -316,7 +316,7 @@ export default function Header() {
 
                 <a
                   href="/contact"
-                  className="ml-2 hidden items-center gap-2 rounded-lg bg-[#E89070] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#E89070]/20 transition hover:bg-[#D77E5E] hover:shadow-[#E89070]/40 lg:flex"
+                  className="ml-2 hidden items-center gap-2 rounded-lg bg-[#6ECB9E] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#6ECB9E]/20 transition hover:bg-[#5AB88A] hover:shadow-[#6ECB9E]/40 lg:flex"
                 >
                   <span>💬</span>
                   <span>مشاوره رایگان</span>
@@ -343,7 +343,7 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-400 transition hover:border-[#E89070]"
+        className="flex w-full items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-400 transition hover:border-[#6ECB9E]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -351,7 +351,7 @@ function SearchButton() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-4 w-4 flex-shrink-0 text-[#E89070]"
+          className="h-4 w-4 flex-shrink-0 text-[#6ECB9E]"
         >
           <path
             strokeLinecap="round"
