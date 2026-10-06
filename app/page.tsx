@@ -76,14 +76,14 @@ export default function Home() {
       )}
 
       <div className="relative z-10">
-        <Header />
-        <HeroVideo />
-        <AboutSection />
-        <CategoryGrid />
-        <CategoryShowcase />
-        <DiscountProducts />
-        <ContactSection />
-        <Footer />
+<Header />
+<HeroVideo />
+<CategoryShowcase />
+<DiscountProducts />
+<AboutSection />
+<CategoryGrid />
+<ContactSection />
+<Footer />
       </div>
     </main>
   );

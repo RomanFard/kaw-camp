@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 import { getProductPlaceholder } from "@/lib/placeholder";
+
 function getCategoryEmojiFromName(name: string) {
   if (name.includes("چادر")) return "⛺";
   if (name.includes("کوله")) return "🎒";
@@ -22,6 +23,35 @@ function getCategoryEmojiFromName(name: string) {
   if (name.includes("دوچرخه")) return "🚲";
   return "📦";
 }
+
+function BackpackIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
+      {/* دستگیره بالایی */}
+      <path d="M11 1h2a0.5 0.5 0 0 1 0 1h-2a0.5 0.5 0 0 1 0-1z" opacity="0.55" />
+      {/* فلپ بالایی */}
+      <path d="M8.5 3C8.5 2.2 9.2 1.5 10 1.5h4c0.8 0 1.5 0.7 1.5 1.5V4h-7V3z" />
+      {/* بدنه اصلی — باریک و کشیده */}
+      <path d="M7 6.5C7 5.7 7.7 5 8.5 5h7c0.8 0 1.5 0.7 1.5 1.5V22c0 0.8-0.7 1.5-1.5 1.5h-7c-0.8 0-1.5-0.7-1.5-1.5V6.5z" />
+      {/* جیب کناری چپ */}
+      <ellipse cx="6.3" cy="14" rx="0.9" ry="3.5" />
+      {/* جیب کناری راست */}
+      <ellipse cx="17.7" cy="14" rx="0.9" ry="3.5" />
+      {/* زیپ وسط چپ */}
+      <rect x="11.05" y="6.5" width="0.55" height="15.5" rx="0.27" fill="#fff" opacity="0.9" />
+      {/* زیپ وسط راست */}
+      <rect x="12.4" y="6.5" width="0.55" height="15.5" rx="0.27" fill="#fff" opacity="0.9" />
+      {/* بند فلپ */}
+      <rect x="11.5" y="1.7" width="1" height="3.3" rx="0.25" fill="#fff" opacity="0.55" />
+    </svg>
+  );
+}
+
 export default function CartDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const { items, removeItem, totalItems, totalPrice } = useCart();
@@ -29,27 +59,14 @@ export default function CartDropdown() {
   return (
     <>
       {/* دکمه سبد */}
-<button
-  type="button"
-  onClick={() => setIsOpen(true)}
-  data-cart-icon
-  className="relative flex items-center gap-2 text-gray-700 transition hover:text-amber-600"
->
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        data-cart-icon
+        className="relative flex items-center gap-2 text-gray-700 transition hover:text-amber-600"
+      >
         <span className="relative">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="h-7 w-7"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-            />
-          </svg>
+          <BackpackIcon className="h-10 w-9" />
           {totalItems > 0 && (
             <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white">
               {totalItems}
@@ -57,8 +74,8 @@ export default function CartDropdown() {
           )}
         </span>
         <span className="hidden text-lg font-bold md:inline">
-  {formatPrice(totalPrice)}
-</span>
+          {formatPrice(totalPrice)}
+        </span>
       </button>
 
       {/* Backdrop تاریک */}
@@ -80,7 +97,7 @@ export default function CartDropdown() {
         {/* هدر پنل */}
         <div className="flex items-center justify-between border-b border-[#EDE4CE] px-5 py-4">
           <span className="text-base font-bold text-gray-800">
-            محصولات داخل سبد
+            محصولات داخل کوله
           </span>
           <button
             type="button"
@@ -93,11 +110,11 @@ export default function CartDropdown() {
         </div>
 
         {items.length === 0 ? (
-          /* سبد خالی */
+          /* کوله خالی */
           <div className="flex h-[calc(100vh-140px)] flex-col items-center justify-center p-8 text-center">
-            <p className="text-6xl">🛒</p>
+            <BackpackIcon className="h-24 w-20 text-gray-300" />
             <p className="mt-4 text-base font-bold text-gray-700">
-              سبد خرید شما خالی است
+              کوله شما خالی است
             </p>
             <a
               href="/products"
@@ -120,11 +137,11 @@ export default function CartDropdown() {
                     href={"/product/" + item.id}
                     className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-[#EDE4CE] bg-[#F7F1E3]"
                   >
-                   <img
-  src={getProductPlaceholder(item.name, getCategoryEmojiFromName(item.name))}
-  alt={item.name}
-  className="h-full w-full object-cover"
-/>
+                    <img
+                      src={getProductPlaceholder(item.name, getCategoryEmojiFromName(item.name))}
+                      alt={item.name}
+                      className="h-full w-full object-cover"
+                    />
                   </a>
 
                   {/* اطلاعات */}
@@ -172,8 +189,8 @@ export default function CartDropdown() {
                   href="/cart"
                   className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-100 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-200"
                 >
-                  <span>🛒</span>
-                  <span>مشاهده سبد خرید</span>
+                  <BackpackIcon className="h-4 w-3.5" />
+                  <span>مشاهده کوله</span>
                 </a>
                 <a
                   href="/checkout"

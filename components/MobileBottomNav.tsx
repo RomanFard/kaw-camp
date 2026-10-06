@@ -5,10 +5,30 @@ import { useCart } from "@/components/context/CartContext";
 
 const navItems = [
   { label: "خانه", href: "/", icon: "home" },
-  { label: "سبد خرید", href: "/cart", icon: "cart" },
+  { label: "کوله من", href: "/cart", icon: "cart" },
   { label: "آفرود و تور", href: "/explore", icon: "compass" },
   { label: "تماس با ما", href: "/contact", icon: "chat" },
 ];
+
+function BackpackIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M11 1h2a0.5 0.5 0 0 1 0 1h-2a0.5 0.5 0 0 1 0-1z" opacity="0.55" />
+      <path d="M8.5 3C8.5 2.2 9.2 1.5 10 1.5h4c0.8 0 1.5 0.7 1.5 1.5V4h-7V3z" />
+      <path d="M7 6.5C7 5.7 7.7 5 8.5 5h7c0.8 0 1.5 0.7 1.5 1.5V22c0 0.8-0.7 1.5-1.5 1.5h-7c-0.8 0-1.5-0.7-1.5-1.5V6.5z" />
+      <ellipse cx="6.3" cy="14" rx="0.9" ry="3.5" />
+      <ellipse cx="17.7" cy="14" rx="0.9" ry="3.5" />
+      <rect x="11.05" y="6.5" width="0.55" height="15.5" rx="0.27" fill="#fff" opacity="0.9" />
+      <rect x="12.4" y="6.5" width="0.55" height="15.5" rx="0.27" fill="#fff" opacity="0.9" />
+      <rect x="11.5" y="1.7" width="1" height="3.3" rx="0.25" fill="#fff" opacity="0.55" />
+    </svg>
+  );
+}
 
 function Icon({ name, active }: { name: string; active: boolean }) {
   const cls = "h-6 w-6";
@@ -31,24 +51,11 @@ function Icon({ name, active }: { name: string; active: boolean }) {
       </svg>
     );
   }
+
   if (name === "cart") {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.8}
-        stroke="currentColor"
-        className={cls}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-        />
-      </svg>
-    );
+    return <BackpackIcon className={cls} />;
   }
+
   if (name === "compass") {
     return (
       <svg
@@ -72,6 +79,7 @@ function Icon({ name, active }: { name: string; active: boolean }) {
       </svg>
     );
   }
+
   // chat
   return (
     <svg
@@ -100,7 +108,7 @@ export default function MobileBottomNav() {
   return (
     <nav
       dir="rtl"
-      className="pb-safe fixed bottom-0 left-0 right-0 z-[150] border-t border-[#E8DFC8] bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)] md:hidden"
+      className="pb-safe fixed bottom-0 left-0 right-0 z-[150] border-t border-theme bg-theme-card shadow-[0_-4px_16px_rgba(0,0,0,0.25)] backdrop-blur-md md:hidden"
     >
       <ul className="mx-auto flex max-w-[600px] items-stretch justify-between px-1">
         {navItems.map((item) => {
@@ -121,12 +129,12 @@ export default function MobileBottomNav() {
                 className={
                   "relative flex flex-col items-center gap-1 px-1 py-2 transition " +
                   (isActive
-                    ? "text-amber-600"
-                    : "text-gray-500 hover:text-amber-600")
+                    ? "text-accent"
+                    : "text-theme-muted hover:text-accent")
                 }
               >
                 {showBadge && (
-                  <span className="absolute right-1/2 top-1 z-10 flex h-4 min-w-[16px] translate-x-[13px] items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-white shadow-md">
+                  <span className="absolute right-1/2 top-1 z-10 flex h-4 min-w-[16px] translate-x-[13px] items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-white shadow-md">
                     {totalItems}
                   </span>
                 )}

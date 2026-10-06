@@ -44,7 +44,6 @@ export default function DiscountProducts() {
 
   const loopItems = useMemo(() => [...items, ...items], [items]);
 
-  // ─── حلقه‌ی انیمیشن: حرکت خودکار + دکمه‌ها با transform ───
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -82,7 +81,6 @@ export default function DiscountProducts() {
     return () => cancelAnimationFrame(frameId);
   }, [items.length]);
 
-  // ─── دکمه‌های فلش ───
   function scrollBy(dir: "left" | "right") {
     const track = trackRef.current;
     if (!track) return;
@@ -95,7 +93,6 @@ export default function DiscountProducts() {
     };
   }
 
-  // ─── کشیدن با موس و لمس ───
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (e.pointerType === "mouse" && e.button !== 0) return;
 
@@ -135,7 +132,6 @@ export default function DiscountProducts() {
     }
   }
 
-  // اگر کاربر کشیده بود، کلیک روی لینک کارت نباید انجام شود
   function handleClickCapture(e: React.MouseEvent) {
     if (dragRef.current.moved) {
       e.preventDefault();
@@ -157,24 +153,24 @@ export default function DiscountProducts() {
   if (loading || items.length === 0) return null;
 
   return (
-    <section className="relative py-16 md:py-20">
+    <section className="relative py-10 md:py-20">
       {/* Header */}
-            <div className="mx-auto max-w-[1400px] px-6 text-center md:px-12 lg:px-16">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-4 py-1.5 backdrop-blur-sm">
-          <span className="text-[11px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
+      <div className="mx-auto max-w-[1400px] px-4 text-center md:px-12 lg:px-16">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-3 py-1 backdrop-blur-sm md:mb-4 md:px-4 md:py-1.5">
+          <span className="text-[10px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
             SHOP
           </span>
         </div>
 
-        <h2 className="text-2xl font-black tracking-tight text-theme md:text-4xl lg:text-5xl">
+        <h2 className="text-xl font-black tracking-tight text-theme md:text-4xl lg:text-5xl">
           تخفیف‌های <span className="text-accent">ویژه</span>
         </h2>
 
-        <div className="mx-auto mt-4 h-[2px] w-16 bg-[#E84C4C]" />
+        <div className="mx-auto mt-3 h-[2px] w-12 bg-[#E84C4C] md:mt-4 md:w-16" />
       </div>
 
-      {/* Slider: باریک و وسط‌چین */}
-           <div className="relative mx-auto mt-10 w-full max-w-[1400px] px-6 md:px-12 lg:px-16">
+      {/* Slider */}
+      <div className="relative mx-auto mt-6 w-full max-w-[1400px] px-4 md:mt-10 md:px-12 lg:px-16">
         {/* فلش چپ */}
         <button
           type="button"
@@ -221,7 +217,7 @@ export default function DiscountProducts() {
           </svg>
         </button>
 
-        {/* قاب نمایش: لبه‌ها تیز بریده می‌شوند */}
+        {/* قاب نمایش */}
         <div
           dir="ltr"
           onMouseEnter={() => {
@@ -261,7 +257,7 @@ export default function DiscountProducts() {
                   key={`${product.id}-${idx}`}
                   draggable={false}
                   href={`/product/${product.id}`}
-                                   className="group/card relative ml-5 w-[180px] flex-shrink-0 overflow-hidden rounded-xl border border-theme bg-theme-card transition-colors duration-300 hover:border-accent/50 md:w-[200px] lg:w-[228px]"
+                  className="group/card relative ml-2.5 w-[130px] flex-shrink-0 overflow-hidden rounded-lg border border-theme bg-theme-card transition-colors duration-300 hover:border-accent/50 sm:w-[150px] sm:ml-3 md:ml-5 md:w-[200px] lg:w-[228px] md:rounded-xl"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-zinc-950">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -274,37 +270,37 @@ export default function DiscountProducts() {
                     />
 
                     {hasDiscount && discount > 0 && (
-                      <span className="absolute right-1.5 top-1.5 rounded bg-[#E84C4C] px-1.5 py-0.5 text-[9px] font-black text-white shadow-lg">
+                      <span className="absolute right-1 top-1 rounded bg-[#E84C4C] px-1 py-0.5 text-[8px] font-black text-white shadow-lg md:right-1.5 md:top-1.5 md:px-1.5 md:text-[9px]">
                         {discount}٪
                       </span>
                     )}
 
                     {!hasDiscount && (
-                      <span className="absolute right-1.5 top-1.5 rounded bg-zinc-700/90 px-1.5 py-0.5 text-[9px] font-black text-white backdrop-blur-sm">
+                      <span className="absolute right-1 top-1 rounded bg-zinc-700/90 px-1 py-0.5 text-[8px] font-black text-white backdrop-blur-sm md:right-1.5 md:top-1.5 md:px-1.5 md:text-[9px]">
                         جدید
                       </span>
                     )}
 
                     {!product.inStock && (
-                      <span className="absolute inset-0 flex items-center justify-center bg-black/70 text-xs font-bold text-white">
+                      <span className="absolute inset-0 flex items-center justify-center bg-black/70 text-[10px] font-bold text-white md:text-xs">
                         ناموجود
                       </span>
                     )}
                   </div>
 
-                  <div className="p-2.5">
-                                        <h3 className="line-clamp-1 text-[11px] font-bold text-theme transition group-hover/card:text-accent md:text-xs">
+                  <div className="p-1.5 md:p-2.5">
+                    <h3 className="line-clamp-1 text-[10px] font-bold text-theme transition group-hover/card:text-accent md:text-xs">
                       {product.name}
                     </h3>
 
-                    <div className="mt-2 flex items-center justify-between gap-1.5">
-                      <div className="flex flex-col">
+                    <div className="mt-1.5 flex items-center justify-between gap-1 md:mt-2 md:gap-1.5">
+                      <div className="flex min-w-0 flex-col">
                         {product.oldPrice && (
-                          <span className="text-[9px] text-zinc-500 line-through">
+                          <span className="text-[8px] text-zinc-500 line-through md:text-[9px]">
                             {formatPrice(product.oldPrice)}
                           </span>
                         )}
-                        <span className="text-xs font-black text-[#E84C4C] md:text-sm">
+                        <span className="text-[10px] font-black text-[#E84C4C] md:text-sm">
                           {formatPrice(product.price)}
                         </span>
                       </div>
@@ -313,8 +309,8 @@ export default function DiscountProducts() {
                         type="button"
                         onClick={(e) => handleAddToCart(e, product)}
                         disabled={!product.inStock}
-                        aria-label="افزودن به سبد"
-                        className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded border border-[#E84C4C] bg-transparent text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white disabled:cursor-not-allowed disabled:border-zinc-700 disabled:text-zinc-600"
+                        aria-label="افزودن به کوله"
+                        className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded border border-[#E84C4C] bg-transparent text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white disabled:cursor-not-allowed disabled:border-zinc-700 disabled:text-zinc-600 md:h-7 md:w-7"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -322,12 +318,12 @@ export default function DiscountProducts() {
                           viewBox="0 0 24 24"
                           strokeWidth={2}
                           stroke="currentColor"
-                          className="h-3 w-3"
+                          className="h-2.5 w-2.5 md:h-3 md:w-3"
                         >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                            d="M12 4.5v15m7.5-7.5h-15"
                           />
                         </svg>
                       </button>
@@ -341,10 +337,10 @@ export default function DiscountProducts() {
       </div>
 
       {/* CTA */}
-      <div className="mt-10 text-center">
+      <div className="mt-6 text-center md:mt-10">
         <a
           href="/products?sort=discount"
-          className="group inline-flex items-center gap-2 border border-[#E84C4C] bg-transparent px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white md:text-sm"
+          className="group inline-flex items-center gap-2 border border-[#E84C4C] bg-transparent px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white md:px-6 md:py-2.5 md:text-sm"
         >
           <span>مشاهده همه تخفیف‌ها</span>
           <svg
@@ -353,7 +349,7 @@ export default function DiscountProducts() {
             viewBox="0 0 24 24"
             strokeWidth={2.5}
             stroke="currentColor"
-            className="h-3.5 w-3.5 transition group-hover:-translate-x-1"
+            className="h-3 w-3 transition group-hover:-translate-x-1 md:h-3.5 md:w-3.5"
           >
             <path
               strokeLinecap="round"
@@ -366,4 +362,3 @@ export default function DiscountProducts() {
     </section>
   );
 }
-
