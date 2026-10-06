@@ -49,7 +49,7 @@ export default function RouteMap({ from, to }: RouteMapProps) {
       showAlternatives: false,
       createMarker: () => null,
       lineOptions: {
-        styles: [{ color: "#6ECB9E", weight: 5, opacity: 0.8 }],
+        styles: [{ color: "#E84C4C", weight: 5, opacity: 0.8 }],
       },
     }).addTo(map);
 
@@ -71,3 +71,4 @@ export default function RouteMap({ from, to }: RouteMapProps) {
     />
   );
 }
+

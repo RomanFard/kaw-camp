@@ -25,7 +25,7 @@ export default function ThemeToggle() {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "حالت روشن" : "حالت تاریک"}
       title={isDark ? "حالت روشن" : "حالت تاریک"}
-      className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-transparent text-zinc-300 transition hover:border-[#6ECB9E] hover:bg-[#6ECB9E] hover:text-white"
+      className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-transparent text-zinc-300 transition hover:border-[#E84C4C] hover:bg-[#E84C4C] hover:text-white"
     >
       {isDark ? (
         // آیکون خورشید (برای رفتن به light)

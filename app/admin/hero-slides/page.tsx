@@ -199,7 +199,7 @@ export default function HeroSlidesPage() {
           <div>
             <a
               href="/admin"
-              className="text-sm text-zinc-500 hover:text-[#6ECB9E]"
+              className="text-sm text-zinc-500 hover:text-[#E84C4C]"
             >
               ← بازگشت به داشبورد
             </a>
@@ -212,7 +212,7 @@ export default function HeroSlidesPage() {
           </div>
           <button
             onClick={openAddModal}
-            className="rounded-lg bg-[#6ECB9E] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#5AB88A]"
+            className="rounded-lg bg-[#E84C4C] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#D63F3F]"
           >
             ➕ اسلاید جدید
           </button>
@@ -250,7 +250,7 @@ export default function HeroSlidesPage() {
                     <span className="text-[10px] font-black text-zinc-600">
                       #{idx + 1}
                     </span>
-                    <span className="text-[10px] font-bold text-[#6ECB9E]">
+                    <span className="text-[10px] font-bold text-[#E84C4C]">
                       {slide.eyebrow}
                     </span>
                   </div>
@@ -298,7 +298,7 @@ export default function HeroSlidesPage() {
 
                   <button
                     onClick={() => openEditModal(slide)}
-                    className="rounded-lg border border-[#6ECB9E]/40 bg-[#6ECB9E]/10 px-3 py-1.5 text-xs font-bold text-[#6ECB9E] transition hover:bg-[#6ECB9E] hover:text-white"
+                    className="rounded-lg border border-[#E84C4C]/40 bg-[#E84C4C]/10 px-3 py-1.5 text-xs font-bold text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white"
                   >
                     ✏️ ویرایش
                   </button>
@@ -345,7 +345,7 @@ export default function HeroSlidesPage() {
                       setForm({ ...form, eyebrow: e.target.value })
                     }
                     placeholder="KAW CAMP — فروشگاه تخصصی"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
                 <div>
@@ -358,7 +358,7 @@ export default function HeroSlidesPage() {
                     onChange={(e) =>
                       setForm({ ...form, order_index: e.target.value })
                     }
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
               </div>
@@ -377,7 +377,7 @@ export default function HeroSlidesPage() {
                       setForm({ ...form, title_line1: e.target.value })
                     }
                     placeholder="تجهیزات"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
                 <div>
@@ -392,7 +392,7 @@ export default function HeroSlidesPage() {
                       setForm({ ...form, title_line2: e.target.value })
                     }
                     placeholder="کوهنوردی حرفه‌ای"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
               </div>
@@ -408,7 +408,7 @@ export default function HeroSlidesPage() {
                   onChange={(e) =>
                     setForm({ ...form, description: e.target.value })
                   }
-                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                 />
               </div>
 
@@ -426,7 +426,7 @@ export default function HeroSlidesPage() {
                       setForm({ ...form, primary_label: e.target.value })
                     }
                     placeholder="شروع خرید"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
                 <div>
@@ -442,7 +442,7 @@ export default function HeroSlidesPage() {
                       setForm({ ...form, primary_href: e.target.value })
                     }
                     placeholder="/products"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-left font-mono text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-left font-mono text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
               </div>
@@ -460,7 +460,7 @@ export default function HeroSlidesPage() {
                       setForm({ ...form, secondary_label: e.target.value })
                     }
                     placeholder="آفرود و تور"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
                 <div>
@@ -475,7 +475,7 @@ export default function HeroSlidesPage() {
                       setForm({ ...form, secondary_href: e.target.value })
                     }
                     placeholder="/explore"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-left font-mono text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-left font-mono text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
               </div>
@@ -501,7 +501,7 @@ export default function HeroSlidesPage() {
                     setForm({ ...form, video: e.target.value })
                   }
                   placeholder="/videos/hero.mp4"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-left font-mono text-xs text-white outline-none focus:border-[#6ECB9E]"
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-left font-mono text-xs text-white outline-none focus:border-[#E84C4C]"
                 />
               </div>
 
@@ -513,7 +513,7 @@ export default function HeroSlidesPage() {
                   onChange={(e) =>
                     setForm({ ...form, is_active: e.target.checked })
                   }
-                  className="h-4 w-4 accent-[#6ECB9E]"
+                  className="h-4 w-4 accent-[#E84C4C]"
                 />
                 <span className="text-sm font-bold text-white">
                   اسلاید فعال باشد
@@ -530,7 +530,7 @@ export default function HeroSlidesPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 rounded-lg bg-[#6ECB9E] py-3 text-sm font-black text-white transition hover:bg-[#5AB88A] disabled:opacity-50"
+                  className="flex-1 rounded-lg bg-[#E84C4C] py-3 text-sm font-black text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
                 >
                   {saving ? "در حال ذخیره..." : editingId ? "ذخیره تغییرات" : "افزودن اسلاید"}
                 </button>
@@ -549,3 +549,4 @@ export default function HeroSlidesPage() {
     </main>
   );
 }
+

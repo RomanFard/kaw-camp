@@ -9,8 +9,8 @@
   --surface: #EEEEEE;
   --muted: #6B7280;
   --muted-light: #9CA3AF;
-  --accent: #6ECB9E;
-  --accent-hover: #5AB88A;
+  --accent: #E84C4C;
+  --accent-hover: #D63F3F;
 }
 /* ═══ Dark Theme ═══ */
 .dark {
@@ -21,8 +21,8 @@
   --surface: #18181B;
   --muted: #A1A1AA;
   --muted-light: #71717A;
-  --accent: #6ECB9E;
-  --accent-hover: #5AB88A;
+  --accent: #E84C4C;
+  --accent-hover: #D63F3F;
 }
 
 @theme inline {
@@ -62,7 +62,7 @@
   width: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #6ECB9E;
+  background: #E84C4C;
   border-radius: 4px;
 }
 
@@ -165,3 +165,4 @@
 .bg-accent-hover { background-color: var(--accent-hover); }
 .text-accent { color: var(--accent); }
 .border-accent { border-color: var(--accent); }
+

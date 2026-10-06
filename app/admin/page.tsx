@@ -111,6 +111,13 @@ export default function AdminPage() {
 
   const quickLinks = [
     {
+      title: "تنظیمات تم",
+      icon: "🎨",
+      href: "/admin/theme",
+      description: "رنگ اصلی و بک‌گراند لایو",
+      active: true,
+    },
+    {
       title: "کدهای تخفیف",
       icon: "🎟️",
       href: "/admin/discounts",
@@ -124,13 +131,13 @@ export default function AdminPage() {
       description: "مدیریت اسلایدهای صفحه اصلی",
       active: true,
     },
-      {
-    title: "بخش درباره ما",
-    icon: "📄",
-    href: "/admin/about",
-    description: "ویرایش متن و تصویر بخش درباره ما",
-    active: true,
-  },
+    {
+      title: "بخش درباره ما",
+      icon: "📄",
+      href: "/admin/about",
+      description: "ویرایش متن و تصویر بخش درباره ما",
+      active: true,
+    },
     {
       title: "برندها",
       icon: "🏷️",
@@ -181,12 +188,18 @@ export default function AdminPage() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <a
+              href="/admin/theme"
+              className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
+            >
+              🎨 تنظیمات تم
+            </a>
+            <a
               href="/admin/hero-slides"
               className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
             >
               🎬 مدیریت بنر
             </a>
-                        <a
+            <a
               href="/admin/about"
               className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
             >

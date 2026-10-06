@@ -74,8 +74,8 @@ export default function LoadingScreen() {
     >
       {/* گرادیان نارنجی گوشه */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -right-40 top-20 h-80 w-80 rounded-full bg-[#6ECB9E]/10 blur-[120px]" />
-        <div className="absolute -left-40 bottom-20 h-80 w-80 rounded-full bg-[#6ECB9E]/5 blur-[120px]" />
+        <div className="absolute -right-40 top-20 h-80 w-80 rounded-full bg-[#E84C4C]/10 blur-[120px]" />
+        <div className="absolute -left-40 bottom-20 h-80 w-80 rounded-full bg-[#E84C4C]/5 blur-[120px]" />
       </div>
 
       {/* دایره + لوگو */}
@@ -117,8 +117,8 @@ export default function LoadingScreen() {
               x2="100%"
               y2="100%"
             >
-              <stop offset="0%" stopColor="#6ECB9E" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#6ECB9E" stopOpacity="1" />
+              <stop offset="0%" stopColor="#E84C4C" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#E84C4C" stopOpacity="1" />
             </linearGradient>
           </defs>
           <circle
@@ -140,7 +140,7 @@ export default function LoadingScreen() {
 
         {/* نقطه درخشان روی progress */}
         <div
-          className="absolute left-1/2 top-1/2 h-3 w-3 rounded-full bg-[#6ECB9E] shadow-[0_0_16px_6px_rgba(232,144,112,0.8)]"
+          className="absolute left-1/2 top-1/2 h-3 w-3 rounded-full bg-[#E84C4C] shadow-[0_0_16px_6px_rgba(232,144,112,0.8)]"
           style={{
             transform: `rotate(${(progress / 100) * 360 - 90}deg) translateX(${
               progress * 0.46
@@ -167,7 +167,7 @@ export default function LoadingScreen() {
 
       {/* درصد */}
       <div className="relative mt-8 flex flex-col items-center">
-        <p className="text-3xl font-black text-[#6ECB9E] md:text-4xl">
+        <p className="text-3xl font-black text-[#E84C4C] md:text-4xl">
           {progressText}
         </p>
         <p
@@ -181,7 +181,7 @@ export default function LoadingScreen() {
       {/* نوار پیشرفت پایین */}
       <div className="mt-8 w-56 overflow-hidden rounded-full bg-zinc-900 md:w-72">
         <div
-          className="h-[3px] rounded-full bg-gradient-to-l from-[#6ECB9E] to-[#5AB88A] shadow-[0_0_10px_rgba(232,144,112,0.6)]"
+          className="h-[3px] rounded-full bg-gradient-to-l from-[#E84C4C] to-[#D63F3F] shadow-[0_0_10px_rgba(232,144,112,0.6)]"
           style={{
             width: `${progress}%`,
             transition: "width 300ms ease-out",
@@ -214,3 +214,4 @@ export default function LoadingScreen() {
     </div>
   );
 }
+

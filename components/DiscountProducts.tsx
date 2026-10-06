@@ -160,8 +160,8 @@ export default function DiscountProducts() {
     <section className="relative py-16 md:py-20">
       {/* Header */}
             <div className="mx-auto max-w-[1400px] px-6 text-center md:px-12 lg:px-16">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#6ECB9E]/30 bg-[#6ECB9E]/5 px-4 py-1.5 backdrop-blur-sm">
-          <span className="text-[11px] font-bold tracking-[0.15em] text-[#6ECB9E] md:text-xs">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-4 py-1.5 backdrop-blur-sm">
+          <span className="text-[11px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
             SHOP
           </span>
         </div>
@@ -170,7 +170,7 @@ export default function DiscountProducts() {
           تخفیف‌های <span className="text-accent">ویژه</span>
         </h2>
 
-        <div className="mx-auto mt-4 h-[2px] w-16 bg-[#6ECB9E]" />
+        <div className="mx-auto mt-4 h-[2px] w-16 bg-[#E84C4C]" />
       </div>
 
       {/* Slider: باریک و وسط‌چین */}
@@ -180,7 +180,7 @@ export default function DiscountProducts() {
           type="button"
           onClick={() => scrollBy("left")}
           aria-label="قبلی"
-          className="absolute -left-14 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A]/95 text-white backdrop-blur-sm transition hover:border-[#6ECB9E] hover:bg-[#6ECB9E] xl:flex"
+          className="absolute -left-14 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A]/95 text-white backdrop-blur-sm transition hover:border-[#E84C4C] hover:bg-[#E84C4C] xl:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -203,7 +203,7 @@ export default function DiscountProducts() {
           type="button"
           onClick={() => scrollBy("right")}
           aria-label="بعدی"
-          className="absolute -right-14 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A]/95 text-white backdrop-blur-sm transition hover:border-[#6ECB9E] hover:bg-[#6ECB9E] xl:flex"
+          className="absolute -right-14 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A]/95 text-white backdrop-blur-sm transition hover:border-[#E84C4C] hover:bg-[#E84C4C] xl:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -274,7 +274,7 @@ export default function DiscountProducts() {
                     />
 
                     {hasDiscount && discount > 0 && (
-                      <span className="absolute right-1.5 top-1.5 rounded bg-[#6ECB9E] px-1.5 py-0.5 text-[9px] font-black text-white shadow-lg">
+                      <span className="absolute right-1.5 top-1.5 rounded bg-[#E84C4C] px-1.5 py-0.5 text-[9px] font-black text-white shadow-lg">
                         {discount}٪
                       </span>
                     )}
@@ -304,7 +304,7 @@ export default function DiscountProducts() {
                             {formatPrice(product.oldPrice)}
                           </span>
                         )}
-                        <span className="text-xs font-black text-[#6ECB9E] md:text-sm">
+                        <span className="text-xs font-black text-[#E84C4C] md:text-sm">
                           {formatPrice(product.price)}
                         </span>
                       </div>
@@ -314,7 +314,7 @@ export default function DiscountProducts() {
                         onClick={(e) => handleAddToCart(e, product)}
                         disabled={!product.inStock}
                         aria-label="افزودن به سبد"
-                        className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded border border-[#6ECB9E] bg-transparent text-[#6ECB9E] transition hover:bg-[#6ECB9E] hover:text-white disabled:cursor-not-allowed disabled:border-zinc-700 disabled:text-zinc-600"
+                        className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded border border-[#E84C4C] bg-transparent text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white disabled:cursor-not-allowed disabled:border-zinc-700 disabled:text-zinc-600"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -344,7 +344,7 @@ export default function DiscountProducts() {
       <div className="mt-10 text-center">
         <a
           href="/products?sort=discount"
-          className="group inline-flex items-center gap-2 border border-[#6ECB9E] bg-transparent px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#6ECB9E] transition hover:bg-[#6ECB9E] hover:text-white md:text-sm"
+          className="group inline-flex items-center gap-2 border border-[#E84C4C] bg-transparent px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white md:text-sm"
         >
           <span>مشاهده همه تخفیف‌ها</span>
           <svg
@@ -366,3 +366,4 @@ export default function DiscountProducts() {
     </section>
   );
 }
+

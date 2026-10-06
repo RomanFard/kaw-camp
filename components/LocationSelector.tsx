@@ -85,7 +85,7 @@ export default function LocationSelector() {
             type="button"
             onClick={refresh}
             disabled={loading}
-            className="rounded-xl border border-[#E8DFC8] bg-white px-3 py-2 text-xs font-bold text-gray-700 transition hover:border-[#6ECB9E] hover:text-amber-600 disabled:opacity-50"
+            className="rounded-xl border border-[#E8DFC8] bg-white px-3 py-2 text-xs font-bold text-gray-700 transition hover:border-[#E84C4C] hover:text-amber-600 disabled:opacity-50"
             title="آپدیت موقعیت GPS"
           >
             🔄 آپدیت موقعیت
@@ -93,7 +93,7 @@ export default function LocationSelector() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="rounded-xl bg-[#6ECB9E] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#5AB88A]"
+            className="rounded-xl bg-[#E84C4C] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#D63F3F]"
           >
             🔍 جستجوی شهر
           </button>
@@ -115,7 +115,7 @@ export default function LocationSelector() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="مثلاً: تهران، اصفهان، کرج..."
-              className="flex-1 rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#6ECB9E]"
+              className="flex-1 rounded-xl border border-[#E8DFC8] bg-[#F7F1E3] px-4 py-2.5 text-sm outline-none focus:border-[#E84C4C]"
             />
             <button
               type="submit"
@@ -134,7 +134,7 @@ export default function LocationSelector() {
                   <button
                     type="button"
                     onClick={() => pickResult(r)}
-                    className="w-full rounded-xl border border-[#E8DFC8] bg-white px-3 py-2 text-right text-xs text-gray-700 transition hover:border-[#6ECB9E] hover:bg-amber-50"
+                    className="w-full rounded-xl border border-[#E8DFC8] bg-white px-3 py-2 text-right text-xs text-gray-700 transition hover:border-[#E84C4C] hover:bg-amber-50"
                   >
                     📍 {r.display_name}
                   </button>
@@ -153,3 +153,4 @@ export default function LocationSelector() {
     </div>
   );
 }
+

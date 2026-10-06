@@ -107,17 +107,17 @@ export default function ContactSection() {
         {/* محتوا — هم‌عرض بقیه سایت */}
         <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div className="mb-10 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#6ECB9E]/30 bg-[#6ECB9E]/5 px-3.5 py-1.5 backdrop-blur-sm">
-              <span className="text-[11px] font-bold tracking-[0.15em] text-[#6ECB9E] md:text-xs">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-3.5 py-1.5 backdrop-blur-sm">
+              <span className="text-[11px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
                 CONTACT
               </span>
             </div>
 
             <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl lg:text-4xl">
-              درخواست <span className="text-[#6ECB9E]">مشاوره</span>
+              درخواست <span className="text-[#E84C4C]">مشاوره</span>
             </h2>
 
-            <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-[#6ECB9E]" />
+            <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-[#E84C4C]" />
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2 lg:gap-6">
@@ -149,14 +149,14 @@ export default function ContactSection() {
                     }
                     className="group flex items-center gap-4"
                   >
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[#6ECB9E]/30 bg-[#6ECB9E]/10 text-[#6ECB9E] transition group-hover:border-[#6ECB9E] group-hover:bg-[#6ECB9E] group-hover:text-white">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/10 text-[#E84C4C] transition group-hover:border-[#E84C4C] group-hover:bg-[#E84C4C] group-hover:text-white">
                       {info.icon}
                     </span>
                     <div className="flex-1">
                       <p className="text-[10px] font-bold text-zinc-500 md:text-xs">
                         {info.label}
                       </p>
-                      <p className="mt-0.5 text-xs font-bold text-white transition group-hover:text-[#6ECB9E] md:text-sm">
+                      <p className="mt-0.5 text-xs font-bold text-white transition group-hover:text-[#E84C4C] md:text-sm">
                         {info.value}
                       </p>
                     </div>
@@ -190,7 +190,7 @@ export default function ContactSection() {
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="نام و نام خانوادگی"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#E84C4C]"
                   />
 
                   <input
@@ -200,7 +200,7 @@ export default function ContactSection() {
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     placeholder="شماره تماس"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#E84C4C]"
                   />
 
                   <input
@@ -209,7 +209,7 @@ export default function ContactSection() {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="ایمیل (اختیاری)"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#E84C4C]"
                   />
 
                   <select
@@ -218,7 +218,7 @@ export default function ContactSection() {
                     onChange={(e) =>
                       setForm({ ...form, service: e.target.value })
                     }
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#E84C4C]"
                   >
                     <option value="" className="bg-zinc-900">
                       انتخاب خدمت
@@ -237,12 +237,12 @@ export default function ContactSection() {
                       setForm({ ...form, message: e.target.value })
                     }
                     placeholder="توضیحات..."
-                    className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#6ECB9E]"
+                    className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#E84C4C]"
                   />
 
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-[#6ECB9E] py-3 text-sm font-black text-white transition hover:bg-[#5AB88A]"
+                    className="w-full rounded-lg bg-[#E84C4C] py-3 text-sm font-black text-white transition hover:bg-[#D63F3F]"
                   >
                     ارسال درخواست
                   </button>

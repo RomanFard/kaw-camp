@@ -66,7 +66,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
 
           {/* Badge تخفیف */}
           {discount > 0 && (
-            <span className="absolute right-4 top-4 rounded bg-[#6ECB9E] px-3 py-1 text-xs font-black text-white">
+            <span className="absolute right-4 top-4 rounded bg-[#E84C4C] px-3 py-1 text-xs font-black text-white">
               {discount}٪ تخفیف
             </span>
           )}
@@ -89,7 +89,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 onClick={() => setActiveImageIndex(i)}
                 className={`overflow-hidden rounded-lg border-2 bg-zinc-950 transition ${
                   i === activeImageIndex
-                    ? "border-[#6ECB9E]"
+                    ? "border-[#E84C4C]"
                     : "border-zinc-800 hover:border-zinc-600"
                 }`}
               >
@@ -124,7 +124,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
           </span>
 
           <div className="flex items-center gap-1">
-            <span className="text-[#6ECB9E]">
+            <span className="text-[#E84C4C]">
               {"★".repeat(Math.round(product.rating))}
               <span className="text-zinc-700">
                 {"★".repeat(5 - Math.round(product.rating))}
@@ -138,7 +138,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
 
         {/* قیمت */}
         <div className="flex items-baseline gap-3">
-          <span className="text-2xl font-black text-[#6ECB9E] md:text-3xl">
+          <span className="text-2xl font-black text-[#E84C4C] md:text-3xl">
             {formatPrice(product.price)}
           </span>
           {product.oldPrice && (
@@ -159,7 +159,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 key={f}
                 className="flex items-start gap-2 text-xs text-zinc-400"
               >
-                <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-[#6ECB9E]" />
+                <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-[#E84C4C]" />
                 <span>{f}</span>
               </li>
             ))}
@@ -180,7 +180,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                   onClick={() => setSelectedColor(c.label)}
                   className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
                     selectedColor === c.label
-                      ? "border-[#6ECB9E] bg-[#6ECB9E]/10 text-[#6ECB9E]"
+                      ? "border-[#E84C4C] bg-[#E84C4C]/10 text-[#E84C4C]"
                       : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
                   }`}
                 >
@@ -216,7 +216,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                   onClick={() => setSelectedSize(s.label)}
                   className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
                     selectedSize === s.label
-                      ? "border-[#6ECB9E] bg-[#6ECB9E]/10 text-[#6ECB9E]"
+                      ? "border-[#E84C4C] bg-[#E84C4C]/10 text-[#E84C4C]"
                       : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
                   }`}
                 >
@@ -269,7 +269,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
               className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-black transition ${
                 added
                   ? "bg-green-600 text-white"
-                  : "bg-[#6ECB9E] text-white hover:bg-[#5AB88A] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600"
+                  : "bg-[#E84C4C] text-white hover:bg-[#D63F3F] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600"
               }`}
             >
               <svg
@@ -337,7 +337,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
               key={i}
               className="flex items-center gap-2 text-xs text-zinc-400"
             >
-              <span className="text-[#6ECB9E]">{item.icon}</span>
+              <span className="text-[#E84C4C]">{item.icon}</span>
               <span>{item.text}</span>
             </div>
           ))}
@@ -346,3 +346,4 @@ export default function ProductPageClient({ product }: { product: Product }) {
     </div>
   );
 }
+

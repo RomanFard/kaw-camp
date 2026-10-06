@@ -147,7 +147,7 @@ function ProductsContent() {
           <select
             value={sort}
             onChange={(e) => handleSortChange(e.target.value)}
-            className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-xs text-white outline-none transition focus:border-[#6ECB9E] md:text-sm"
+            className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-xs text-white outline-none transition focus:border-[#E84C4C] md:text-sm"
           >
             <option value="popular" className="bg-zinc-900">
               محبوب‌ترین
@@ -197,7 +197,7 @@ function ProductsContent() {
                 <p className="mt-3 font-bold text-white">محصولی یافت نشد</p>
                 <button
                   onClick={handleReset}
-                  className="mt-4 rounded-lg bg-[#6ECB9E] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#5AB88A]"
+                  className="mt-4 rounded-lg bg-[#E84C4C] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#D63F3F]"
                 >
                   حذف فیلترها
                 </button>
@@ -216,7 +216,7 @@ function ProductsContent() {
                     <button
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-400 transition hover:border-[#6ECB9E] hover:text-[#6ECB9E] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-400 transition hover:border-[#E84C4C] hover:text-[#E84C4C] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       ‹
                     </button>
@@ -228,8 +228,8 @@ function ProductsContent() {
                           onClick={() => setPage(p)}
                           className={`h-9 min-w-[36px] rounded-lg border px-3 text-xs font-bold transition ${
                             p === page
-                              ? "border-[#6ECB9E] bg-[#6ECB9E] text-white"
-                              : "border-zinc-800 text-zinc-400 hover:border-[#6ECB9E] hover:text-[#6ECB9E]"
+                              ? "border-[#E84C4C] bg-[#E84C4C] text-white"
+                              : "border-zinc-800 text-zinc-400 hover:border-[#E84C4C] hover:text-[#E84C4C]"
                           }`}
                         >
                           {p.toLocaleString("fa-IR")}
@@ -242,7 +242,7 @@ function ProductsContent() {
                         setPage((p) => Math.min(totalPages, p + 1))
                       }
                       disabled={page === totalPages}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-400 transition hover:border-[#6ECB9E] hover:text-[#6ECB9E] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-400 transition hover:border-[#E84C4C] hover:text-[#E84C4C] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       ›
                     </button>
@@ -275,3 +275,4 @@ export default function ProductsPage() {
     </Suspense>
   );
 }
+

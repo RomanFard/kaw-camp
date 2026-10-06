@@ -193,7 +193,7 @@ export default function CheckoutPage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
                 href="/products"
-                className="flex-1 rounded-lg bg-[#6ECB9E] py-3 text-sm font-bold text-white transition hover:bg-[#5AB88A]"
+                className="flex-1 rounded-lg bg-[#E84C4C] py-3 text-sm font-bold text-white transition hover:bg-[#D63F3F]"
               >
                 بازگشت به فروشگاه
               </a>
@@ -661,3 +661,4 @@ export default function CheckoutPage() {
     </main>
   );
 }
+

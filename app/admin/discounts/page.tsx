@@ -232,7 +232,7 @@ export default function DiscountsPage() {
           <button
             type="button"
             onClick={openAddModal}
-            className="rounded-lg bg-[#6ECB9E] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#5AB88A]"
+            className="rounded-lg bg-[#E84C4C] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#D63F3F]"
           >
             ➕ کد جدید
           </button>
@@ -544,7 +544,7 @@ export default function DiscountsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 rounded-lg bg-[#6ECB9E] py-3 text-sm font-bold text-white transition hover:bg-[#5AB88A] disabled:opacity-50"
+                  className="flex-1 rounded-lg bg-[#E84C4C] py-3 text-sm font-bold text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
                 >
                   {saving
                     ? "در حال ذخیره..."
@@ -567,3 +567,4 @@ export default function DiscountsPage() {
     </main>
   );
 }
+

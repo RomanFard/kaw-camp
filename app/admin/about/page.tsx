@@ -75,7 +75,7 @@ export default function AboutAdminPage() {
         </p>
         <a
           href="/admin"
-          className="mt-4 inline-block rounded-lg bg-[#6ECB9E] px-5 py-2 text-white"
+          className="mt-4 inline-block rounded-lg bg-[#E84C4C] px-5 py-2 text-white"
         >
           بازگشت
         </a>
@@ -91,7 +91,7 @@ export default function AboutAdminPage() {
           <div>
             <a
               href="/admin"
-              className="text-sm text-zinc-500 hover:text-[#6ECB9E]"
+              className="text-sm text-zinc-500 hover:text-[#E84C4C]"
             >
               ← بازگشت به داشبورد
             </a>
@@ -106,7 +106,7 @@ export default function AboutAdminPage() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="rounded-lg bg-[#6ECB9E] px-6 py-2.5 text-sm font-black text-white transition hover:bg-[#5AB88A] disabled:opacity-50"
+            className="rounded-lg bg-[#E84C4C] px-6 py-2.5 text-sm font-black text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
           >
             {saving ? "در حال ذخیره..." : "💾 ذخیره تغییرات"}
           </button>
@@ -130,7 +130,7 @@ export default function AboutAdminPage() {
                   value={data.badge}
                   onChange={(e) => update("badge", e.target.value)}
                   placeholder="از سال ۱۳۸۹"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                 />
               </div>
 
@@ -146,7 +146,7 @@ export default function AboutAdminPage() {
                     value={data.title_line1}
                     onChange={(e) => update("title_line1", e.target.value)}
                     placeholder="ساخته شده با"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
                 <div>
@@ -159,7 +159,7 @@ export default function AboutAdminPage() {
                     value={data.title_line2}
                     onChange={(e) => update("title_line2", e.target.value)}
                     placeholder="عشق به طبیعت"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function AboutAdminPage() {
                   rows={3}
                   value={data.paragraph_1}
                   onChange={(e) => update("paragraph_1", e.target.value)}
-                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm leading-7 text-white outline-none focus:border-[#6ECB9E]"
+                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm leading-7 text-white outline-none focus:border-[#E84C4C]"
                 />
               </div>
 
@@ -186,7 +186,7 @@ export default function AboutAdminPage() {
                   rows={2}
                   value={data.paragraph_2}
                   onChange={(e) => update("paragraph_2", e.target.value)}
-                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm leading-7 text-white outline-none focus:border-[#6ECB9E]"
+                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm leading-7 text-white outline-none focus:border-[#E84C4C]"
                 />
               </div>
             </div>
@@ -233,7 +233,7 @@ export default function AboutAdminPage() {
                         )
                       }
                       placeholder="۱۵"
-                      className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-center text-lg font-black text-[#6ECB9E] outline-none focus:border-[#6ECB9E]"
+                      className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-center text-lg font-black text-[#E84C4C] outline-none focus:border-[#E84C4C]"
                     />
                   </div>
                   <div>
@@ -250,7 +250,7 @@ export default function AboutAdminPage() {
                         )
                       }
                       placeholder="سال تجربه"
-                      className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-center text-xs text-white outline-none focus:border-[#6ECB9E]"
+                      className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-center text-xs text-white outline-none focus:border-[#E84C4C]"
                     />
                   </div>
                 </div>
@@ -266,7 +266,7 @@ export default function AboutAdminPage() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
-                <p className="text-[10px] font-black uppercase text-[#6ECB9E]">
+                <p className="text-[10px] font-black uppercase text-[#E84C4C]">
                   دکمه اصلی
                 </p>
                 <div>
@@ -278,7 +278,7 @@ export default function AboutAdminPage() {
                     value={data.primary_label}
                     onChange={(e) => update("primary_label", e.target.value)}
                     placeholder="درباره ما"
-                    className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
                 <div>
@@ -291,7 +291,7 @@ export default function AboutAdminPage() {
                     value={data.primary_href}
                     onChange={(e) => update("primary_href", e.target.value)}
                     placeholder="/about"
-                    className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-left font-mono text-xs text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-left font-mono text-xs text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function AboutAdminPage() {
                     value={data.secondary_label}
                     onChange={(e) => update("secondary_label", e.target.value)}
                     placeholder="تماس با ما"
-                    className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-sm text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-sm text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
                 <div>
@@ -322,7 +322,7 @@ export default function AboutAdminPage() {
                     value={data.secondary_href}
                     onChange={(e) => update("secondary_href", e.target.value)}
                     placeholder="/contact"
-                    className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-left font-mono text-xs text-white outline-none focus:border-[#6ECB9E]"
+                    className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] px-3 py-2 text-left font-mono text-xs text-white outline-none focus:border-[#E84C4C]"
                   />
                 </div>
               </div>
@@ -340,7 +340,7 @@ export default function AboutAdminPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-[#6ECB9E] px-8 py-3 text-sm font-black text-white transition hover:bg-[#5AB88A] disabled:opacity-50"
+              className="rounded-lg bg-[#E84C4C] px-8 py-3 text-sm font-black text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
             >
               {saving ? "در حال ذخیره..." : "💾 ذخیره تغییرات"}
             </button>
@@ -350,3 +350,4 @@ export default function AboutAdminPage() {
     </main>
   );
 }
+

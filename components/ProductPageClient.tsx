@@ -112,7 +112,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
             />
 
             {discount > 0 && (
-              <span className="absolute right-3 top-3 rounded-md bg-[#6ECB9E] px-3 py-1.5 text-sm font-black text-white shadow-lg">
+              <span className="absolute right-3 top-3 rounded-md bg-[#E84C4C] px-3 py-1.5 text-sm font-black text-white shadow-lg">
                 -{discount}٪ OFF
               </span>
             )}
@@ -130,7 +130,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 type="button"
                 onClick={prevImage}
                 aria-label="قبلی"
-                className="absolute -left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A] text-white shadow-lg transition hover:border-[#6ECB9E] hover:bg-[#6ECB9E]"
+                className="absolute -left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A] text-white shadow-lg transition hover:border-[#E84C4C] hover:bg-[#E84C4C]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -141,7 +141,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 type="button"
                 onClick={nextImage}
                 aria-label="بعدی"
-                className="absolute -right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A] text-white shadow-lg transition hover:border-[#6ECB9E] hover:bg-[#6ECB9E]"
+                className="absolute -right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A] text-white shadow-lg transition hover:border-[#E84C4C] hover:bg-[#E84C4C]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -156,7 +156,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                     onClick={() => setActiveImageIndex(i)}
                     className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-zinc-950 transition ${
                       i === activeImageIndex
-                        ? "border-[#6ECB9E]"
+                        ? "border-[#E84C4C]"
                         : "border-zinc-800 hover:border-zinc-600"
                     }`}
                   >
@@ -176,7 +176,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
         {/* ═══ ستون راست: اطلاعات ═══ */}
         <div className="flex flex-col rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6">
           {discount > 0 && (
-            <span className="mb-4 inline-flex w-fit rounded-md bg-[#6ECB9E] px-3 py-1.5 text-sm font-black text-white">
+            <span className="mb-4 inline-flex w-fit rounded-md bg-[#E84C4C] px-3 py-1.5 text-sm font-black text-white">
               -{discount}٪ OFF
             </span>
           )}
@@ -195,7 +195,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
           </p>
 
           <div className="mt-2 flex items-center gap-2 text-base">
-            <span className="text-[#6ECB9E]">
+            <span className="text-[#E84C4C]">
               {"★".repeat(Math.round(product.rating))}
               <span className="text-zinc-700">
                 {"★".repeat(5 - Math.round(product.rating))}
@@ -207,7 +207,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
           </div>
 
           <div className="mt-4 flex items-baseline gap-4">
-            <span className="text-3xl font-black text-[#6ECB9E] md:text-4xl">
+            <span className="text-3xl font-black text-[#E84C4C] md:text-4xl">
               {formatPrice(product.price)}
             </span>
             {product.oldPrice && (
@@ -235,7 +235,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                       onClick={() => setSelectedColor(c.label)}
                       className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold transition ${
                         selectedColor === c.label
-                          ? "border-[#6ECB9E] bg-[#6ECB9E]/10 text-[#6ECB9E]"
+                          ? "border-[#E84C4C] bg-[#E84C4C]/10 text-[#E84C4C]"
                           : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
                       }`}
                     >
@@ -269,7 +269,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                       onClick={() => setSelectedSize(s.label)}
                       className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold transition ${
                         selectedSize === s.label
-                          ? "border-[#6ECB9E] bg-[#6ECB9E]/10 text-[#6ECB9E]"
+                          ? "border-[#E84C4C] bg-[#E84C4C]/10 text-[#E84C4C]"
                           : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
                       }`}
                     >
@@ -316,7 +316,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 type="button"
                 onClick={() => product.inStock && addItem(product, quantity)}
                 disabled={!product.inStock}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#6ECB9E] px-10 py-3.5 text-base font-black text-white transition hover:bg-[#5AB88A] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600 md:text-lg"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#E84C4C] px-10 py-3.5 text-base font-black text-white transition hover:bg-[#D63F3F] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600 md:text-lg"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
@@ -358,7 +358,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 key={i}
                 className="flex items-center gap-3 text-sm text-zinc-400"
               >
-                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border border-[#6ECB9E]/40 text-[#6ECB9E]">
+                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border border-[#E84C4C]/40 text-[#E84C4C]">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="h-3 w-3">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
@@ -387,7 +387,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                   key={f}
                   className="flex items-start gap-3 text-sm text-zinc-400 md:text-base"
                 >
-                  <span className="mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#6ECB9E]" />
+                  <span className="mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#E84C4C]" />
                   <span>{f}</span>
                 </li>
               ))}
@@ -402,7 +402,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
           <div className="space-y-5">
             {whyUsItems.map((item, i) => (
               <div key={i} className="flex items-start gap-3">
-                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#6ECB9E]/30 text-[#6ECB9E]">
+                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#E84C4C]/30 text-[#E84C4C]">
                   {item.icon}
                 </span>
                 <div>
@@ -468,3 +468,4 @@ export default function ProductPageClient({ product }: { product: Product }) {
     </div>
   );
 }
+

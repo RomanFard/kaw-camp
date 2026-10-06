@@ -5,10 +5,10 @@ import {
   getActiveHeroSlides,
   type HeroSlide,
 } from "@/lib/supabase/heroSlides";
+import { useHeroSlide } from "@/components/context/HeroSlideContext";
 
 const AUTOPLAY_MS = 4000;
 
-// ─── Fallback: اگه Supabase خالی بود ───
 const FALLBACK_SLIDES: HeroSlide[] = [
   {
     id: "fallback-1",
@@ -35,6 +35,14 @@ export default function HeroVideo() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const [textKey, setTextKey] = useState(0);
+  const { setSlideState } = useHeroSlide();
+
+  // ─── آپدیت context ───
+  useEffect(() => {
+    if (slides.length > 0) {
+      setSlideState(current, slides.length);
+    }
+  }, [current, slides.length, setSlideState]);
 
   // ─── لود اسلایدها از Supabase ───
   useEffect(() => {
@@ -73,7 +81,6 @@ export default function HeroVideo() {
     setCurrent((c) => (c - 1 + slides.length) % slides.length);
   }
 
-  // ─── حالت لودینگ ───
   if (loading) {
     return (
       <section
@@ -90,7 +97,7 @@ export default function HeroVideo() {
       dir="rtl"
       className="relative h-[600px] w-full overflow-hidden bg-black md:h-[700px] lg:h-screen lg:max-h-[900px]"
     >
-      {/* ─── تصاویر: fade آرام ─── */}
+      {/* ─── تصاویر ─── */}
       {slides.map((s, i) => {
         const isActive = i === current;
         return (
@@ -126,10 +133,10 @@ export default function HeroVideo() {
         );
       })}
 
-      {/* ─── Overlay تیره ─── */}
+      {/* ─── Overlay ─── */}
       <div className="absolute inset-0 bg-gradient-to-l from-black via-black/70 to-black/30" />
 
-      {/* ─── محتوای اصلی ─── */}
+      {/* ─── محتوا ─── */}
       <div className="relative z-10 flex h-full items-center overflow-hidden">
         <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div
@@ -140,9 +147,9 @@ export default function HeroVideo() {
             <div key={textKey}>
               {/* Eyebrow */}
               {slide.eyebrow && (
-                <div className="animate-hero-1 mb-4 flex items-center justify-center gap-3">
-                  <span className="h-[2px] w-10 bg-[#6ECB9E]" />
-                  <span className="text-xs font-bold tracking-wider text-[#6ECB9E] md:text-sm">
+                <div className="animate-hero-1 mb-4 flex items-center justify-start gap-3">
+                  <span className="h-[2px] w-10 bg-accent" />
+                  <span className="text-xs font-bold tracking-wider text-accent md:text-sm">
                     {slide.eyebrow}
                   </span>
                 </div>
@@ -154,7 +161,7 @@ export default function HeroVideo() {
               </h1>
 
               {/* خط دوم عنوان */}
-              <h1 className="animate-hero-3 mb-5 text-4xl font-black leading-[1.15] text-[#6ECB9E] drop-shadow-2xl md:text-6xl lg:text-7xl">
+              <h1 className="animate-hero-3 mb-5 text-4xl font-black leading-[1.15] text-accent drop-shadow-2xl md:text-6xl lg:text-7xl">
                 {slide.title_line2}
               </h1>
 
@@ -166,11 +173,11 @@ export default function HeroVideo() {
               )}
 
               {/* دکمه‌ها */}
-                    <div className="animate-hero-5 flex flex-wrap items-center justify-start gap-3">
+              <div className="animate-hero-5 flex flex-wrap items-center justify-start gap-3">
                 {slide.primary_label && slide.primary_href && (
                   <a
                     href={slide.primary_href}
-                    className="group inline-flex items-center gap-2 rounded-lg bg-[#6ECB9E] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-[#6ECB9E]/30 transition hover:bg-[#5AB88A] hover:shadow-[#6ECB9E]/50 md:px-8 md:text-base"
+                    className="group inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-accent/30 transition hover:bg-accent-hover md:px-8 md:text-base"
                   >
                     <span>{slide.primary_label}</span>
                     <svg
@@ -210,7 +217,7 @@ export default function HeroVideo() {
           type="button"
           onClick={goNext}
           aria-label="اسلاید بعدی"
-          className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#6ECB9E] lg:flex"
+          className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-accent lg:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -235,7 +242,7 @@ export default function HeroVideo() {
           type="button"
           onClick={goPrev}
           aria-label="اسلاید قبلی"
-          className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-[#6ECB9E] lg:flex"
+          className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-accent lg:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -254,7 +261,7 @@ export default function HeroVideo() {
         </button>
       )}
 
-      {/* ─── نقطه‌های پایین ─── */}
+      {/* ─── نقطه‌ها ─── */}
       {slides.length > 1 && (
         <div className="absolute bottom-6 right-1/2 z-20 flex translate-x-1/2 items-center gap-3 md:bottom-8">
           {slides.map((_, i) => (
@@ -269,14 +276,14 @@ export default function HeroVideo() {
               {i === current && !paused && (
                 <span
                   key={current}
-                  className="absolute inset-y-0 right-0 bg-[#6ECB9E]"
+                  className="absolute inset-y-0 right-0 bg-accent"
                   style={{
                     animation: `heroProgress ${AUTOPLAY_MS}ms linear forwards`,
                   }}
                 />
               )}
               {i === current && paused && (
-                <span className="absolute inset-0 bg-[#6ECB9E]" />
+                <span className="absolute inset-0 bg-accent" />
               )}
             </button>
           ))}
@@ -285,13 +292,12 @@ export default function HeroVideo() {
 
       {/* ─── دایره تزئینی ─── */}
       <div className="pointer-events-none absolute right-8 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center lg:flex xl:right-16">
-        <div className="absolute inset-0 animate-ping rounded-full border-2 border-[#6ECB9E]/40" />
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#6ECB9E]">
-          <div className="h-2 w-2 rounded-full bg-[#6ECB9E]" />
+        <div className="absolute inset-0 animate-ping rounded-full border-2 border-accent/40" />
+        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-accent">
+          <div className="h-2 w-2 rounded-full bg-accent" />
         </div>
       </div>
 
-      {/* ─── انیمیشن‌ها ─── */}
       <style jsx global>{`
         @keyframes heroProgress {
           from {

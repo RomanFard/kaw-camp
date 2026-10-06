@@ -8,6 +8,8 @@ import { WishlistProvider } from "@/components/context/WishlistContext";
 import { ToastProvider } from "@/components/context/ToastContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import { ProductsProvider } from "@/components/context/ProductsContext";
+import { SiteSettingsProvider } from "@/components/context/SiteSettingsContext";
+import { HeroSlideProvider } from "@/components/context/HeroSlideContext";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import ToastContainer from "@/components/ToastContainer";
 
@@ -31,19 +33,23 @@ export default function RootLayout({
       </head>
       <body className="font-[IranYekan] bg-[#050505]">
         <ThemeProvider>
-          <LoadingScreen />
-          <ToastProvider>
-            <ProductsProvider>
-              <CartProvider>
-                <WishlistProvider>
-                  {children}
-                  <MobileBottomNav />
-                  <FloatingButtons />
-                  <ToastContainer />
-                </WishlistProvider>
-              </CartProvider>
-            </ProductsProvider>
-          </ToastProvider>
+          <SiteSettingsProvider>
+            <HeroSlideProvider>
+            <LoadingScreen />
+            <ToastProvider>
+              <ProductsProvider>
+                <CartProvider>
+                  <WishlistProvider>
+                    {children}
+                    <MobileBottomNav />
+                    <FloatingButtons />
+                    <ToastContainer />
+                  </WishlistProvider>
+                </CartProvider>
+              </ProductsProvider>
+            </ToastProvider>
+            </HeroSlideProvider>
+          </SiteSettingsProvider>
         </ThemeProvider>
       </body>
     </html>
