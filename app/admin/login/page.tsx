@@ -4,6 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+const inputStyle: React.CSSProperties = {
+  color: "#111827",
+  backgroundColor: "#ffffff",
+  WebkitTextFillColor: "#111827",
+  caretColor: "#111827",
+  colorScheme: "light",
+};
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -34,20 +42,22 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#F7F1E3] px-4">
-      <div className="w-full max-w-md rounded-2xl border border-[#D4C5A0] bg-white p-8 shadow-lg">
-        {/* لوگو / عنوان */}
+    <main
+      className="flex min-h-screen items-center justify-center bg-[#F7F1E3] px-4"
+      style={{ colorScheme: "light" }}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl border border-[#D4C5A0] bg-white p-8 shadow-lg"
+        style={{ colorScheme: "light" }}
+      >
         <div className="mb-8 text-center">
           <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#E84C4C] text-3xl">
             🔐
           </div>
           <h1 className="text-2xl font-black text-gray-900">ورود ادمین</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            پنل مدیریت KAW CAMP
-          </p>
+          <p className="mt-1 text-sm text-gray-500">پنل مدیریت KAW CAMP</p>
         </div>
 
-        {/* فرم */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1.5 block text-sm font-bold text-gray-700">
@@ -60,7 +70,9 @@ export default function AdminLoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@kawcamp.com"
-              className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-left text-sm outline-none focus:border-amber-500"
+              autoComplete="email"
+              style={inputStyle}
+              className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-left text-sm outline-none focus:border-amber-500"
             />
           </div>
 
@@ -75,7 +87,9 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-left text-sm outline-none focus:border-amber-500"
+              autoComplete="current-password"
+              style={inputStyle}
+              className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-left text-sm outline-none focus:border-amber-500"
             />
           </div>
 
@@ -101,4 +115,3 @@ export default function AdminLoginPage() {
     </main>
   );
 }
-
