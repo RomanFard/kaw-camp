@@ -2,14 +2,13 @@ import Link from "next/link";
 
 export default function TopBar() {
   return (
-    <div className="hidden border-b border-zinc-800 bg-[#0A0A0A] text-zinc-300 lg:block">
-            <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-6 py-2 text-[13px] md:px-12 lg:px-16">
-        {/* ─── سمت راست (RTL): ایمیل + ساعت ─── */}
+    <div className="hidden border-b border-theme bg-theme text-theme-muted lg:block">
+      <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-6 py-2 text-[13px] md:px-12 lg:px-16">
+        {/* سمت راست: ایمیل + ساعت */}
         <div className="flex items-center gap-5">
-          {/* ایمیل */}
           <a
             href="mailto:info@kawcamp.com"
-            className="flex items-center gap-2 transition hover:text-amber-400"
+            className="flex items-center gap-2 transition hover:text-accent"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -28,9 +27,8 @@ export default function TopBar() {
             <span dir="ltr">info@kawcamp.com</span>
           </a>
 
-          <span className="text-zinc-700">|</span>
+          <span className="opacity-40">|</span>
 
-          {/* ساعت کاری */}
           <span className="flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -50,12 +48,11 @@ export default function TopBar() {
           </span>
         </div>
 
-        {/* ─── وسط: تلفن + آدرس ─── */}
+        {/* وسط: تلفن + آدرس */}
         <div className="flex items-center gap-5">
-          {/* تلفن */}
           <a
             href="tel:09180540019"
-            className="flex items-center gap-2 transition hover:text-amber-400"
+            className="flex items-center gap-2 transition hover:text-accent"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -74,9 +71,8 @@ export default function TopBar() {
             <span dir="ltr">+98 918 054 0019</span>
           </a>
 
-          <span className="text-zinc-700">|</span>
+          <span className="opacity-40">|</span>
 
-          {/* آدرس */}
           <span className="flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -101,15 +97,14 @@ export default function TopBar() {
           </span>
         </div>
 
-        {/* ─── سمت چپ: شبکه‌های اجتماعی ─── */}
+        {/* سمت چپ: شبکه‌های اجتماعی */}
         <div className="flex items-center gap-2">
-          {/* اینستاگرام */}
           <a
             href="https://www.instagram.com/kawcamp"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="اینستاگرام"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 transition hover:border-amber-500 hover:bg-amber-500 hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-theme text-theme-muted transition hover:border-accent hover:bg-accent hover:text-white"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -121,13 +116,12 @@ export default function TopBar() {
             </svg>
           </a>
 
-          {/* یوتیوب */}
           <a
             href="https://youtube.com/@kawcamp"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="یوتیوب"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 transition hover:border-red-500 hover:bg-red-600 hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-theme text-theme-muted transition hover:border-red-500 hover:bg-red-600 hover:text-white"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -139,13 +133,12 @@ export default function TopBar() {
             </svg>
           </a>
 
-          {/* واتساپ */}
           <a
             href="https://wa.me/989180540019"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="واتساپ"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 transition hover:border-green-500 hover:bg-green-600 hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-theme text-theme-muted transition hover:border-green-500 hover:bg-green-600 hover:text-white"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

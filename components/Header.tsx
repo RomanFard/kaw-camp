@@ -7,6 +7,7 @@ import SearchPanel from "./SearchPanel";
 import MobileMenuDrawer from "./MobileMenuDrawer";
 import TopBar from "./TopBar";
 import { useWishlist } from "@/components/context/WishlistContext";
+import ThemeToggle from "./ThemeToggle";
 
 type MenuItem = {
   label: string;
@@ -15,10 +16,7 @@ type MenuItem = {
 };
 
 const menuItems: MenuItem[] = [
-  {
-    label: "صفحه اصلی",
-    href: "/",
-  },
+  { label: "صفحه اصلی", href: "/" },
   {
     label: "محصولات",
     href: "/products",
@@ -58,10 +56,7 @@ const menuItems: MenuItem[] = [
       { label: "حساب کاربری", href: "/account" },
     ],
   },
-  {
-    label: "مقالات",
-    href: "/blog",
-  },
+  { label: "مقالات", href: "/blog" },
 ];
 
 export default function Header() {
@@ -92,18 +87,17 @@ export default function Header() {
   return (
     <>
       <header dir="rtl" className="w-full">
-        {/* TopBar */}
         <TopBar />
 
         {/* ═══ موبایل ═══ */}
-        <div className="fixed top-0 left-0 right-0 z-[100] border-b border-zinc-800 bg-[#0A0A0A] md:hidden">
-          <div className="mx-auto max-w-[1400px] px-6 py-2.5 md:px-12 lg:px-16">
-            <div className="flex items-center gap-1.5">
+        <div className="fixed top-0 left-0 right-0 z-[100] border-b border-theme bg-theme md:hidden">
+          <div className="mx-auto max-w-[1400px] px-3 py-2.5 sm:px-6">
+            <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
                 aria-label="دسته‌بندی محصولات"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-[#6ECB9E] hover:text-white"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-theme-surface text-theme transition hover:bg-accent hover:text-white"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +121,7 @@ export default function Header() {
                   alt="کو کمپ"
                   width={60}
                   height={60}
-                  className="h-8 w-auto brightness-0 invert"
+                  className="h-8 w-auto dark:brightness-0 dark:invert"
                 />
               </a>
 
@@ -138,7 +132,7 @@ export default function Header() {
               <a
                 href="/login"
                 aria-label="حساب کاربری"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-[#6ECB9E] hover:text-white"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-theme-surface text-theme transition hover:bg-accent hover:text-white"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -156,11 +150,15 @@ export default function Header() {
                 </svg>
               </a>
 
+              <div className="flex-shrink-0 [&_button]:h-9 [&_button]:w-9">
+                <ThemeToggle />
+              </div>
+
               <a
                 href="/wishlist"
                 aria-label="علاقه‌مندی"
                 data-wishlist-icon-mobile
-                className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:bg-red-500 hover:text-white"
+                className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-theme-surface text-theme transition hover:bg-red-500 hover:text-white"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +174,6 @@ export default function Header() {
                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                   />
                 </svg>
-
                 {wishlistCount > 0 && (
                   <span className="absolute -left-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow">
                     {wishlistCount}
@@ -188,7 +185,7 @@ export default function Header() {
         </div>
 
         {/* ═══ دسکتاپ ═══ */}
-        <div className="relative hidden border-b border-zinc-800 bg-[#0A0A0A] md:block">
+        <div className="relative hidden border-b border-theme bg-theme md:block">
           <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
             <div className="flex items-center justify-between gap-8 py-4">
               <a href="/" className="flex flex-shrink-0 items-center">
@@ -198,7 +195,7 @@ export default function Header() {
                   width={300}
                   height={300}
                   priority
-                  className="h-16 w-auto brightness-0 invert md:h-20"
+                  className="h-16 w-auto dark:brightness-0 dark:invert md:h-20"
                 />
               </a>
 
@@ -222,8 +219,8 @@ export default function Header() {
                           className={
                             "group relative flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-bold transition lg:text-[15px] " +
                             (isOpen
-                              ? "text-[#6ECB9E]"
-                              : "text-zinc-300 hover:text-white")
+                              ? "text-accent"
+                              : "text-theme-muted hover:text-theme")
                           }
                         >
                           <span>{item.label}</span>
@@ -236,7 +233,7 @@ export default function Header() {
                               stroke="currentColor"
                               className={
                                 "h-3.5 w-3.5 transition-transform duration-200 " +
-                                (isOpen ? "rotate-180 text-[#6ECB9E]" : "")
+                                (isOpen ? "rotate-180 text-accent" : "")
                               }
                             >
                               <path
@@ -248,7 +245,7 @@ export default function Header() {
                           )}
                           <span
                             className={
-                              "absolute bottom-1 right-1/2 h-[2px] translate-x-1/2 bg-[#6ECB9E] transition-all duration-300 " +
+                              "absolute bottom-1 right-1/2 h-[2px] translate-x-1/2 bg-accent transition-all duration-300 " +
                               (isOpen ? "w-8" : "w-0 group-hover:w-8")
                             }
                           />
@@ -263,12 +260,12 @@ export default function Header() {
                                 : "invisible -translate-y-2 opacity-0")
                             }
                           >
-                            <div className="min-w-[220px] overflow-hidden rounded-xl border border-zinc-800 bg-[#0A0A0A] py-2 shadow-2xl shadow-black/50">
+                            <div className="min-w-[220px] overflow-hidden rounded-xl border border-theme bg-theme-card py-2 shadow-2xl shadow-black/20">
                               {item.children!.map((child) => (
                                 <a
                                   key={child.label}
                                   href={child.href}
-                                  className="block border-r-2 border-transparent px-4 py-2.5 text-sm text-zinc-300 transition hover:border-[#6ECB9E] hover:bg-zinc-900 hover:text-[#6ECB9E]"
+                                  className="block border-r-2 border-transparent px-4 py-2.5 text-sm text-theme-muted transition hover:border-accent hover:bg-theme-surface hover:text-accent"
                                 >
                                   {child.label}
                                 </a>
@@ -289,7 +286,7 @@ export default function Header() {
                   href="/wishlist"
                   aria-label="علاقه‌مندی"
                   data-wishlist-icon
-                  className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 text-zinc-300 transition hover:border-[#6ECB9E] hover:bg-[#6ECB9E] hover:text-white"
+                  className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-theme text-theme-muted transition hover:border-accent hover:bg-accent hover:text-white"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -314,9 +311,11 @@ export default function Header() {
 
                 <CartDropdown />
 
+                <ThemeToggle />
+
                 <a
                   href="/contact"
-                  className="ml-2 hidden items-center gap-2 rounded-lg bg-[#6ECB9E] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#6ECB9E]/20 transition hover:bg-[#5AB88A] hover:shadow-[#6ECB9E]/40 lg:flex"
+                  className="ml-2 hidden items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-hover lg:flex"
                 >
                   <span>💬</span>
                   <span>مشاوره رایگان</span>
@@ -343,7 +342,7 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-400 transition hover:border-[#6ECB9E]"
+        className="flex w-full items-center gap-1.5 rounded-full border border-theme bg-theme-surface px-3 py-2 text-xs text-theme-muted transition hover:border-accent"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -351,7 +350,7 @@ function SearchButton() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-4 w-4 flex-shrink-0 text-[#6ECB9E]"
+          className="h-4 w-4 flex-shrink-0 text-accent"
         >
           <path
             strokeLinecap="round"

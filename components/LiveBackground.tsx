@@ -33,6 +33,20 @@ export default function LiveBackground({
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+        // ─── تشخیص تم فعلی ───
+    let isLight = false;
+    function checkTheme() {
+      isLight = document.documentElement.classList.contains("light") ||
+        !document.documentElement.classList.contains("dark");
+    }
+    checkTheme();
+
+    // ─── Observer برای تغییر تم ───
+    const themeObserver = new MutationObserver(checkTheme);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
 
     let width = 0;
     let height = 0;
@@ -147,7 +161,7 @@ export default function LiveBackground({
             p.y,
             p.radius * 6
           );
-          gradient.addColorStop(0, hexToRgba(color, 0.35));
+          gradient.addColorStop(0, hexToRgba(color, isLight ? 0.25 : 0.35));
           gradient.addColorStop(1, hexToRgba(color, 0));
           ctx.fillStyle = gradient;
           ctx.beginPath();
@@ -156,7 +170,7 @@ export default function LiveBackground({
         }
 
         // نقطه مرکزی
-        ctx.fillStyle = hexToRgba(color, 0.6);
+            ctx.fillStyle = hexToRgba(color, isLight ? 0.5 : 0.6);
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -199,6 +213,7 @@ export default function LiveBackground({
       window.removeEventListener("resize", resize);
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
+      themeObserver.disconnect();
     };
   }, [color, particleCount, connectionDistance, quality]);
 

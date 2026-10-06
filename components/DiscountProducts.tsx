@@ -166,8 +166,8 @@ export default function DiscountProducts() {
           </span>
         </div>
 
-        <h2 className="text-2xl font-black tracking-tight text-white md:text-4xl lg:text-5xl">
-          تخفیف‌های <span className="text-[#6ECB9E]">ویژه</span>
+        <h2 className="text-2xl font-black tracking-tight text-theme md:text-4xl lg:text-5xl">
+          تخفیف‌های <span className="text-accent">ویژه</span>
         </h2>
 
         <div className="mx-auto mt-4 h-[2px] w-16 bg-[#6ECB9E]" />
@@ -261,7 +261,7 @@ export default function DiscountProducts() {
                   key={`${product.id}-${idx}`}
                   draggable={false}
                   href={`/product/${product.id}`}
-                  className="group/card relative ml-5 w-[180px] flex-shrink-0 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 transition-colors duration-300 hover:border-[#6ECB9E]/50 md:w-[200px] lg:w-[228px]"
+                                   className="group/card relative ml-5 w-[180px] flex-shrink-0 overflow-hidden rounded-xl border border-theme bg-theme-card transition-colors duration-300 hover:border-accent/50 md:w-[200px] lg:w-[228px]"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-zinc-950">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -293,7 +293,7 @@ export default function DiscountProducts() {
                   </div>
 
                   <div className="p-2.5">
-                    <h3 className="line-clamp-1 text-[11px] font-bold text-white transition group-hover/card:text-[#6ECB9E] md:text-xs">
+                                        <h3 className="line-clamp-1 text-[11px] font-bold text-theme transition group-hover/card:text-accent md:text-xs">
                       {product.name}
                     </h3>
 

@@ -3,6 +3,7 @@ import FloatingButtons from "@/components/FloatingButtons";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { CartProvider } from "@/components/context/CartContext";
+import { ThemeProvider } from "@/components/context/ThemeProvider";
 import { WishlistProvider } from "@/components/context/WishlistContext";
 import { ToastProvider } from "@/components/context/ToastContext";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -21,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -29,19 +30,21 @@ export default function RootLayout({
         />
       </head>
       <body className="font-[IranYekan] bg-[#050505]">
-        <LoadingScreen />
-        <ToastProvider>
-          <ProductsProvider>
-            <CartProvider>
-              <WishlistProvider>
-                {children}
-               <MobileBottomNav />
-<FloatingButtons />
-<ToastContainer />
-              </WishlistProvider>
-            </CartProvider>
-          </ProductsProvider>
-        </ToastProvider>
+        <ThemeProvider>
+          <LoadingScreen />
+          <ToastProvider>
+            <ProductsProvider>
+              <CartProvider>
+                <WishlistProvider>
+                  {children}
+                  <MobileBottomNav />
+                  <FloatingButtons />
+                  <ToastContainer />
+                </WishlistProvider>
+              </CartProvider>
+            </ProductsProvider>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

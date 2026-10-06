@@ -1,3 +1,41 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ═══ Light Theme (پیش‌فرض) ═══ */
+:root {
+  --background: #E8E8E8;
+  --foreground: #0A0A0A;
+  --card: #FFFFFF;
+  --card-border: #E5E7EB;
+  --surface: #EEEEEE;
+  --muted: #6B7280;
+  --muted-light: #9CA3AF;
+  --accent: #6ECB9E;
+  --accent-hover: #5AB88A;
+}
+/* ═══ Dark Theme ═══ */
+.dark {
+  --background: #050505;
+  --foreground: #FFFFFF;
+  --card: #0A0A0A;
+  --card-border: #27272A;
+  --surface: #18181B;
+  --muted: #A1A1AA;
+  --muted-light: #71717A;
+  --accent: #6ECB9E;
+  --accent-hover: #5AB88A;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+}
 @import "tailwindcss";
 
 @layer base {
@@ -14,8 +52,9 @@
     overflow-x: hidden;
     max-width: 100vw;
     font-family: 'IranYekan', sans-serif;
-    background-color: #050505;
-    color: #FFFFFF;
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
@@ -102,3 +141,27 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+/* ═══════════════════════════════════════════
+   Utility Classes برای Theme
+   ═══════════════════════════════════════════ */
+
+/* پس‌زمینه‌ها */
+.bg-theme { background-color: var(--background); }
+.bg-theme-card { background-color: var(--card); }
+.bg-theme-surface { background-color: var(--surface); }
+.bg-theme-bg { background-color: var(--background); }
+
+/* متن‌ها */
+.text-theme { color: var(--foreground); }
+.text-theme-muted { color: var(--muted); }
+.text-theme-muted-light { color: var(--muted-light); }
+
+/* حاشیه‌ها */
+.border-theme { border-color: var(--card-border); }
+.border-theme-card { border-color: var(--card-border); }
+
+/* Accent (همیشه سبز، ولی متغیر) */
+.bg-accent { background-color: var(--accent); }
+.bg-accent-hover { background-color: var(--accent-hover); }
+.text-accent { color: var(--accent); }
+.border-accent { border-color: var(--accent); }

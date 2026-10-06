@@ -103,7 +103,7 @@ export default function ContactSection() {
   return (
     <section className="relative py-12 md:py-16">
       {/* ═══ کادر مشکی تمامعرض — از لبه تا لبه ═══ */}
-      <div className="relative w-full bg-black py-12 md:py-16">
+          <div className="relative w-full bg-theme py-12 md:py-16">
         {/* محتوا — هم‌عرض بقیه سایت */}
         <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div className="mb-10 text-center">
@@ -113,16 +113,16 @@ export default function ContactSection() {
               </span>
             </div>
 
-            <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl lg:text-4xl">
-              درخواست <span className="text-[#6ECB9E]">مشاوره</span>
-            </h2>
+          <h2 className="text-2xl font-black tracking-tight text-theme md:text-3xl lg:text-4xl">
+            درخواست <span className="text-accent">مشاوره</span>
+          </h2>
 
             <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-[#6ECB9E]" />
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2 lg:gap-6">
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 backdrop-blur-sm md:p-6">
-              <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+            <div className="rounded-2xl border border-theme bg-theme-card p-5 md:p-6">
+              <div className="overflow-hidden rounded-xl border border-theme bg-theme-surface">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3237.8847837777436!2d45.88517831526225!3d35.998384980118556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDU5JzU0LjIiTiA0NcKwNTMnMTQuNSJF!5e0!3m2!1sen!2s!4v1234567890"
                   width="100%"
