@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useToast } from "@/components/context/ToastContext";
+import { createClient } from "@/lib/supabase/client";
+import PopularTab from "@/components/admin/categories/PopularTab";
+import SpecialTab from "@/components/admin/categories/SpecialTab";
+import MobileTab from "@/components/admin/categories/MobileTab";
 import ImageUploader from "@/components/admin/ImageUploader";
 import { categories } from "@/data/products";
 import {
@@ -11,16 +14,94 @@ import {
   type CategoryPhoto,
 } from "@/lib/supabase/categoryPhotos";
 
-export default function CategoriesPage() {
-  const toast = useToast();
+type Tab = "products" | "photos" | "special" | "popular" | "mobile";
+
+export default function AdminCategoriesPage() {
+  const [tab, setTab] = useState<Tab>("popular");
+
+  const tabs: { key: Tab; label: string }[] = [
+    { key: "popular", label: "🔥 محبوب" },
+    { key: "special", label: "⭐ ویژه" },
+    { key: "mobile", label: "📱 موبایل" },
+    { key: "photos", label: "🖼 عکس‌ها" },
+    { key: "products", label: "📦 محصولات" },
+  ];
+
+  return (
+    <main className="min-h-screen bg-[#F7F1E3]">
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
+        <div className="mb-6">
+          <a
+            href="/admin"
+            className="text-sm text-gray-500 hover:text-amber-600"
+          >
+            ← بازگشت به داشبورد
+          </a>
+          <h1 className="mt-2 text-3xl font-black text-gray-900">
+            🗂 مدیریت دسته‌بندی‌ها
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            مدیریت کامل دسته‌بندی‌های محبوب، ویژه، منوی موبایل و عکس‌ها
+          </p>
+        </div>
+
+        {/* تب‌ها */}
+        <div className="mb-6 flex flex-wrap gap-2 border-b border-[#D4C5A0] pb-3">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              className={
+                "rounded-lg px-4 py-2 text-sm font-bold transition " +
+                (tab === t.key
+                  ? "bg-[#E84C4C] text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-100")
+              }
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* محتوای تب */}
+        <div className="rounded-2xl border border-[#D4C5A0] bg-white p-5">
+          {tab === "popular" && <PopularTab />}
+          {tab === "special" && <SpecialTab />}
+          {tab === "mobile" && <MobileTab />}
+          {tab === "photos" && <PhotosTab />}
+          {tab === "products" && (
+            <div className="p-8 text-center">
+              <p className="mb-4 text-gray-500">
+                برای مدیریت محصولات به صفحه محصولات برو
+              </p>
+              <a
+                href="/admin/products"
+                className="inline-block rounded-lg bg-[#E84C4C] px-6 py-3 text-sm font-bold text-white hover:bg-[#D63F3F]"
+              >
+                📦 رفتن به مدیریت محصولات
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+/* ═══════════════════════════════════
+   تب عکس‌ها (محتوای صفحه قبلی)
+   ═══════════════════════════════════ */
+function PhotosTab() {
+  const supabase = createClient();
   const [photos, setPhotos] = useState<CategoryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingKey, setEditingKey] = useState<string | null>(null);
-  const [photoUrl, setPhotoUrl] = useState("");
-  const [isActive, setIsActive] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [formError, setFormError] = useState("");
+  const [saving, setSaving] = useState<string | null>(null);
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function load() {
     setLoading(true);
@@ -29,220 +110,96 @@ export default function CategoriesPage() {
     setLoading(false);
   }
 
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function getPhotoForCategory(key: string) {
+  function getPhoto(key: string) {
     return photos.find((p) => p.category_key === key);
   }
 
-  function openModal(categoryKey: string) {
-    const existing = getPhotoForCategory(categoryKey);
-    setEditingKey(categoryKey);
-    setPhotoUrl(existing?.photo || "");
-    setIsActive(existing?.is_active ?? true);
-    setFormError("");
-    setModalOpen(true);
-  }
-
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault();
-    if (!editingKey) return;
-    if (!photoUrl.trim()) return setFormError("تصویر الزامی است");
-
-    setSaving(true);
-    const catIndex = categories.findIndex((c) => c.key === editingKey);
-
+  async function handleChange(key: string, url: string) {
+    setSaving(key);
+    const existing = getPhoto(key);
     const { error } = await upsertCategoryPhoto({
-      category_key: editingKey,
-      photo: photoUrl.trim(),
-      order_index: catIndex,
-      is_active: isActive,
+      category_key: key,
+      photo: url,
+      order_index: existing?.order_index ?? 0,
+      is_active: true,
     });
-
-    if (error) {
-      setFormError("خطا: " + error.message);
-      setSaving(false);
-      return;
-    }
-
-    setSaving(false);
-    setModalOpen(false);
-    toast.success("تصویر ذخیره شد");
-    load();
+    setSaving(null);
+    if (!error) load();
   }
 
-  async function handleDelete(categoryKey: string) {
-    const existing = getPhotoForCategory(categoryKey);
+  async function handleRemove(key: string) {
+    const existing = getPhoto(key);
     if (!existing) return;
-    if (!confirm("حذف تصویر این دسته‌بندی؟")) return;
-    const { error } = await deleteCategoryPhoto(existing.id);
-    if (error) return toast.error("خطا: " + error.message);
-    toast.success("تصویر حذف شد");
+    if (!confirm("حذف این عکس؟")) return;
+    setSaving(key);
+    await deleteCategoryPhoto(existing.id);
+    setSaving(null);
     load();
   }
 
-  const editingCategory = categories.find((c) => c.key === editingKey);
+  if (loading)
+    return (
+      <div className="p-12 text-center text-gray-500">در حال بارگذاری...</div>
+    );
 
   return (
-    <main className="min-h-screen bg-[#050505]">
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        {/* Header */}
-        <div className="mb-6">
-          <a
-            href="/admin"
-            className="text-sm text-zinc-500 hover:text-[#E84C4C]"
-          >
-            ← بازگشت به داشبورد
-          </a>
-          <h1 className="mt-2 text-3xl font-black text-white">
-            🖼️ مدیریت تصاویر دسته‌بندی
-          </h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            تصاویر این بخش در گرید «دسته‌بندی‌های محبوب» صفحه اصلی نمایش داده
-            می‌شوند
-          </p>
-        </div>
+    <div className="space-y-4">
+      <p className="text-sm text-gray-600">
+        عکس هر دسته که در بخش «محبوب» صفحه اصلی استفاده می‌شه رو اینجا آپلود کن
+      </p>
 
-        {/* Grid */}
-        {loading ? (
-          <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-12 text-center text-zinc-500">
-            در حال بارگذاری...
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {categories.map((cat) => {
-              const photo = getPhotoForCategory(cat.key);
-              return (
-                <div
-                  key={cat.key}
-                  className="group overflow-hidden rounded-2xl border border-zinc-800 bg-[#0A0A0A]"
-                >
-                  {/* Photo */}
-                  <div className="relative aspect-square overflow-hidden bg-zinc-950">
-                    {photo?.photo ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={photo.photo}
-                        alt={cat.label}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-zinc-600">
-                        <span className="text-4xl">{cat.emoji}</span>
-                        <span className="text-[10px]">بدون تصویر</span>
-                      </div>
-                    )}
-
-                    {!photo?.is_active && photo && (
-                      <span className="absolute right-2 top-2 rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-black text-zinc-400">
-                        غیرفعال
-                      </span>
-                    )}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {categories.map((cat) => {
+          const existing = getPhoto(cat.key);
+          return (
+            <div
+              key={cat.key}
+              className="rounded-xl border border-[#D4C5A0] bg-white p-4"
+            >
+              <div className="mb-3 flex items-center gap-2">
+                <span className="text-2xl">{cat.emoji}</span>
+                <div>
+                  <div className="text-sm font-bold text-gray-900">
+                    {cat.label}
                   </div>
-
-                  {/* Info */}
-                  <div className="p-3">
-                    <p className="text-sm font-black text-white">
-                      {cat.label}
-                    </p>
-                    <p className="mt-0.5 text-[10px] text-zinc-500" dir="ltr">
-                      {cat.key}
-                    </p>
-
-                    <div className="mt-3 flex gap-1.5">
-                      <button
-                        onClick={() => openModal(cat.key)}
-                        className="flex-1 rounded-lg border border-[#E84C4C]/40 bg-[#E84C4C]/10 px-2 py-1.5 text-[11px] font-bold text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white"
-                      >
-                        {photo ? "✏️ ویرایش" : "➕ افزودن"}
-                      </button>
-                      {photo && (
-                        <button
-                          onClick={() => handleDelete(cat.key)}
-                          className="rounded-lg border border-red-500/40 bg-red-500/10 px-2 py-1.5 text-[11px] font-bold text-red-500 transition hover:bg-red-500 hover:text-white"
-                        >
-                          🗑️
-                        </button>
-                      )}
-                    </div>
+                  <div className="font-mono text-[10px] text-gray-400">
+                    {cat.key}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Modal */}
-      {modalOpen && editingCategory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6">
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-black text-white">
-                  {editingCategory.emoji} {editingCategory.label}
-                </h2>
-                <p className="mt-0.5 text-xs text-zinc-500">
-                  {getPhotoForCategory(editingKey!) ? "ویرایش تصویر" : "افزودن تصویر"}
-                </p>
               </div>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800"
-              >
-                ✕
-              </button>
-            </div>
 
-            <form onSubmit={handleSave} className="space-y-4">
-              <ImageUploader
-                value={photoUrl}
-                onChange={setPhotoUrl}
-                label="تصویر دسته‌بندی *"
-              />
-
-              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-800 p-3">
-                <input
-                  type="checkbox"
-                  checked={isActive}
-                  onChange={(e) => setIsActive(e.target.checked)}
-                  className="h-4 w-4 accent-[#E84C4C]"
-                />
-                <span className="text-sm font-bold text-white">
-                  نمایش در صفحه اصلی
-                </span>
-              </label>
-
-              {formError && (
-                <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm font-bold text-red-500">
-                  ⚠️ {formError}
+              {existing?.photo ? (
+                <div className="relative mb-2 aspect-[4/3] overflow-hidden rounded-lg border border-[#EDE4CE]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={existing.photo}
+                    alt={cat.label}
+                    className="h-full w-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemove(cat.key)}
+                    disabled={saving === cat.key}
+                    className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-xs text-white shadow-lg hover:bg-red-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div className="mb-2 flex aspect-[4/3] items-center justify-center rounded-lg border-2 border-dashed border-[#D4C5A0] bg-gray-50 text-xs text-gray-400">
+                  بدون تصویر
                 </div>
               )}
 
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 rounded-lg bg-[#E84C4C] py-3 text-sm font-black text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
-                >
-                  {saving ? "در حال ذخیره..." : "ذخیره"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="rounded-lg border border-zinc-800 px-6 py-3 text-sm font-bold text-zinc-400 transition hover:bg-zinc-900"
-                >
-                  انصراف
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </main>
+              <ImageUploader
+                value={existing?.photo ?? ""}
+                onChange={(url) => handleChange(cat.key, url)}
+                label={saving === cat.key ? "در حال ذخیره..." : "آپلود عکس"}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
-

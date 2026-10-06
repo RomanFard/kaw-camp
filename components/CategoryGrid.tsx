@@ -1,6 +1,19 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { getAppContent } from "@/lib/supabase/appContent";
 import { categories } from "@/data/products";
+import type { PopularCategory } from "@/lib/contentTypes";
+
+function getFallbackItems(): PopularCategory[] {
+  return categories.slice(0, 6).map((c) => ({
+    key: c.key,
+    label: c.label,
+    emoji: c.emoji,
+    image: "",
+    href: `/products?cat=${c.key}`,
+  }));
+}
 
 function getPhotoName(key: string): string {
   const map: Record<string, string> = {
@@ -25,14 +38,29 @@ function getPhotoName(key: string): string {
 }
 
 export default function CategoryGrid() {
-  const displayCategories = categories.slice(0, 6);
+  const [items, setItems] = useState<PopularCategory[]>(getFallbackItems);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const data = await getAppContent<PopularCategory[]>("popular_categories");
+      if (!cancelled) {
+        if (data && data.length > 0) setItems(data);
+        setLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const displayCategories = items;
 
   return (
     <section className="relative py-12 md:py-16">
-      {/* کادر تمام‌عرض — در لایت سفید، در دارک مشکی */}
       <div className="relative w-full bg-theme py-12 md:py-16">
         <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
-          {/* Header */}
           <div className="mb-8 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3.5 py-1.5 backdrop-blur-sm">
               <span className="text-[11px] font-bold tracking-[0.15em] text-accent md:text-xs">
@@ -47,7 +75,6 @@ export default function CategoryGrid() {
             <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-accent" />
           </div>
 
-          {/* فیلترها */}
           <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
             <a
               href="/products"
@@ -58,7 +85,7 @@ export default function CategoryGrid() {
             {displayCategories.map((cat) => (
               <a
                 key={cat.key}
-                href={`/products?cat=${cat.key}`}
+                href={cat.href}
                 className="rounded-full border border-theme bg-transparent px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-theme-muted transition hover:border-accent/50 hover:text-accent md:text-xs"
               >
                 {cat.label}
@@ -66,15 +93,15 @@ export default function CategoryGrid() {
             ))}
           </div>
 
-          {/* گرید */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
             {displayCategories.map((cat) => {
-              const imageSrc = `/images/categories/photos/${getPhotoName(cat.key)}.jpg`;
+              const imageSrc =
+                cat.image || `/images/categories/photos/${getPhotoName(cat.key)}.jpg`;
 
               return (
                 <a
                   key={cat.key}
-                  href={`/products?cat=${cat.key}`}
+                  href={cat.href}
                   className="group relative block aspect-[4/3] overflow-hidden rounded-lg bg-theme-card transition duration-500"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}

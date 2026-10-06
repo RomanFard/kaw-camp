@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { megaMenu } from "@/lib/megaMenu";
 import { useCart } from "@/components/context/CartContext";
+import { getAppContent } from "@/lib/supabase/appContent";
+import { megaMenu as defaultMenu } from "@/lib/megaMenu";
+import type { MobileMenuCategory } from "@/lib/contentTypes";
 
 type View = { type: "main" } | { type: "category"; key: string };
 
@@ -24,11 +26,25 @@ export default function MobileMenuDrawer({
 }) {
   const [view, setView] = useState<View>({ type: "main" });
   const [openGroups, setOpenGroups] = useState<number[]>([0]);
+  const [menuItems, setMenuItems] = useState<MobileMenuCategory[]>(
+    defaultMenu as MobileMenuCategory[]
+  );
   const { totalItems } = useCart();
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const data = await getAppContent<MobileMenuCategory[]>("mobile_menu");
+      if (!cancelled && data && data.length > 0) setMenuItems(data);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const currentCategory =
     view.type === "category"
-      ? (megaMenu.find((c) => c.key === view.key) as
+      ? (menuItems.find((c) => c.key === view.key) as
           | MegaMenuCategory
           | undefined) || null
       : null;
@@ -64,7 +80,6 @@ export default function MobileMenuDrawer({
         (isOpen ? "translate-x-0" : "translate-x-full")
       }
     >
-      {/* هدر بالای drawer */}
       <header className="flex flex-shrink-0 items-center justify-between border-b border-theme bg-theme-card px-3 py-2.5">
         <button
           type="button"
@@ -187,10 +202,13 @@ export default function MobileMenuDrawer({
         </div>
       </header>
 
-      {/* محتوا */}
       <div className="flex-1 overflow-y-auto">
         {view.type === "main" ? (
-          <MainView onCategory={goToCategory} onClose={closeAll} />
+          <MainView
+            menuItems={menuItems}
+            onCategory={goToCategory}
+            onClose={closeAll}
+          />
         ) : currentCategory ? (
           <CategoryView
             category={currentCategory}
@@ -206,16 +224,18 @@ export default function MobileMenuDrawer({
 }
 
 function MainView({
+  menuItems,
   onCategory,
   onClose,
 }: {
+  menuItems: MobileMenuCategory[];
   onCategory: (key: string) => void;
   onClose: () => void;
 }) {
   return (
     <div className="pb-6">
       <ul>
-        {megaMenu.map((cat) => (
+        {menuItems.map((cat) => (
           <li key={cat.key}>
             <button
               type="button"
@@ -457,17 +477,20 @@ function CategoryView({
   onBack: () => void;
   onClose: () => void;
 }) {
-  // حذف گروه‌های «برند» و «ظرفیت»
   const filteredGroups = category.groups.filter(
     (g) => !g.title.includes("برند") && !g.title.includes("ظرفیت")
   );
 
-  // گروه «براساس استفاده» اول لیست
   const sortedGroups = [...filteredGroups].sort((a, b) => {
     const aUse = a.title.includes("استفاده") ? 0 : 1;
     const bUse = b.title.includes("استفاده") ? 0 : 1;
     return aUse - bUse;
   });
+
+  // ⬇️ فقط و فقط اگه key دقیقاً "tent" باشه
+const isTentCategory = category.groups.some((g) =>
+  g.title.includes("ظرفیت")
+);
 
   return (
     <div className="pb-6">
@@ -546,7 +569,9 @@ function CategoryView({
         );
       })}
 
-      <CapacityFilter categoryKey={category.key} onApply={onClose} />
+      {isTentCategory && (
+        <CapacityFilter categoryKey={category.key} onApply={onClose} />
+      )}
 
       {category.photo && (
         <div className="mt-6 flex flex-col items-center px-6">

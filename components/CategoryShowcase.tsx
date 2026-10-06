@@ -1,19 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-
-type CategoryItem = {
-  key: string;
-  label: string;
-  subtitle: string;
-  icon: ReactNode;
-  href: string;
-};
+import { getAppContent } from "@/lib/supabase/appContent";
+import type { SpecialCategory } from "@/lib/contentTypes";
 
 const iconCls = "h-6 w-6 md:h-8 md:w-8";
 
-const ICONS: Record<string, ReactNode> = {
+const DEFAULT_ICONS: Record<string, ReactNode> = {
   tent: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={iconCls}>
       <path d="M3.5 21L12 3l8.5 18" />
@@ -60,70 +55,77 @@ const ICONS: Record<string, ReactNode> = {
   ),
 };
 
-const CATEGORIES: CategoryItem[] = [
-  { key: "tent", label: "چادر و کمپینگ", subtitle: "چادر، برزنت، آفتابگیر", icon: ICONS.tent, href: "/products?cat=tent" },
-  { key: "sleeping-bag", label: "کیسه خواب", subtitle: "سه فصل و زمستانی", icon: ICONS.sleepingBag, href: "/products?cat=sleep" },
-  { key: "backpack", label: "کوله پشتی", subtitle: "کوهنوردی و سفر", icon: ICONS.backpack, href: "/products?cat=backpack" },
-  { key: "lighting", label: "روشنایی و چراغ", subtitle: "فانوس، چراغ قوه، هدلامپ", icon: ICONS.lighting, href: "/products?cat=lighting" },
-  { key: "cooking", label: "پخت و پز", subtitle: "اجاق، ظروف، قهوه‌ساز", icon: ICONS.cooking, href: "/products?cat=cooking" },
-  { key: "tools", label: "ابزار و تجهیزات", subtitle: "ابزار، چاقو، چندکاره", icon: ICONS.tools, href: "/products?cat=tools" },
+const DEFAULT_ITEMS: SpecialCategory[] = [
+  { key: "tent", label: "چادر و کمپینگ", subtitle: "چادر، برزنت، آفتابگیر", iconKey: "tent", href: "/products?cat=tent" },
+  { key: "sleeping-bag", label: "کیسه خواب", subtitle: "سه فصل و زمستانی", iconKey: "sleepingBag", href: "/products?cat=sleep" },
+  { key: "backpack", label: "کوله پشتی", subtitle: "کوهنوردی و سفر", iconKey: "backpack", href: "/products?cat=backpack" },
+  { key: "lighting", label: "روشنایی و چراغ", subtitle: "فانوس، چراغ قوه، هدلامپ", iconKey: "lighting", href: "/products?cat=lighting" },
+  { key: "cooking", label: "پخت و پز", subtitle: "اجاق، ظروف، قهوه‌ساز", iconKey: "cooking", href: "/products?cat=cooking" },
+  { key: "tools", label: "ابزار و تجهیزات", subtitle: "ابزار، چاقو، چندکاره", iconKey: "tools", href: "/products?cat=tools" },
 ];
 
 export default function CategoryShowcase() {
+  const [items, setItems] = useState<SpecialCategory[]>(DEFAULT_ITEMS);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const data = await getAppContent<SpecialCategory[]>("special_categories");
+      if (!cancelled && data && data.length > 0) setItems(data);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section dir="rtl" className="py-12 md:py-24">
       <div className="mx-auto max-w-[1200px] px-4 md:px-8">
-        {/* بج بالا */}
         <div className="flex justify-center">
           <span className="rounded-full border border-accent/40 bg-accent/5 px-5 py-1.5 text-xs font-bold uppercase tracking-wider text-accent">
             دسته‌بندی محصولات
           </span>
         </div>
 
-        {/* تیتر */}
-        <h2
-          dir="rtl"
-          className="mt-5 text-center text-3xl font-black md:text-5xl"
-        >
+        <h2 dir="rtl" className="mt-5 text-center text-3xl font-black md:text-5xl">
           دسته <span className="text-accent">بندی</span> ویژه
         </h2>
 
-        {/* خط زیر تیتر */}
         <div className="mx-auto mt-5 h-1 w-16 rounded-full bg-accent" />
 
-{/* ─── موبایل: ۲ ردیف عمودی + اسکرول افقی ─── */}
-<div
-  className="mt-10 -mx-4 overflow-x-auto px-4 pb-2 md:hidden"
-  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
->
-  <div className="grid grid-flow-col grid-rows-2 gap-3">
-    {CATEGORIES.map((cat) => (
-      <Link
-        key={cat.key}
-        href={cat.href}
-        className="group flex w-[104px] flex-col items-center rounded-2xl border border-theme bg-theme-card px-2 py-4 text-center transition active:scale-95"
-      >
-        <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-white shadow-md shadow-accent/30">
-          {cat.icon}
+        {/* موبایل: ۲ ردیفی افقی */}
+        <div
+          className="mt-10 -mx-4 overflow-x-auto px-4 pb-2 md:hidden"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          <div className="grid grid-flow-col grid-rows-2 gap-3">
+            {items.map((cat) => (
+              <Link
+                key={cat.key}
+                href={cat.href}
+                className="group flex w-[104px] flex-col items-center rounded-2xl border border-theme bg-theme-card px-2 py-4 text-center transition active:scale-95"
+              >
+                <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-white shadow-md shadow-accent/30">
+                  {DEFAULT_ICONS[cat.iconKey] ?? DEFAULT_ICONS.tent}
+                </div>
+                <span className="text-[10px] font-bold leading-tight text-theme">
+                  {cat.label}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
-        <span className="text-[10px] font-bold leading-tight text-theme">
-          {cat.label}
-        </span>
-      </Link>
-    ))}
-  </div>
-</div>
 
-        {/* ─── دسکتاپ: گرید ۳ ستونی ─── */}
+        {/* دسکتاپ: گرید */}
         <div className="mt-14 hidden grid-cols-1 gap-5 md:grid md:grid-cols-2 lg:grid-cols-3">
-          {CATEGORIES.map((cat) => (
+          {items.map((cat) => (
             <Link
               key={cat.key}
               href={cat.href}
               className="group relative flex flex-col items-center rounded-2xl border border-theme bg-theme-card px-6 py-9 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-xl hover:shadow-accent/10"
             >
               <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-white shadow-lg shadow-accent/30 transition-transform duration-300 group-hover:scale-110">
-                {cat.icon}
+                {DEFAULT_ICONS[cat.iconKey] ?? DEFAULT_ICONS.tent}
               </div>
               <h3 className="text-base font-bold text-theme md:text-lg">
                 {cat.label}
