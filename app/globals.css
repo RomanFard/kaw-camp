@@ -1,6 +1,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ═══ Light Theme (پیش‌فرض) ═══ */
+/* ═══ Light Theme ═══ */
 :root {
   --background: #E8E8E8;
   --foreground: #0A0A0A;
@@ -36,10 +36,10 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
 }
+
 @import "tailwindcss";
 
 @layer base {
-
   * {
     box-sizing: border-box;
     min-width: 0;
@@ -58,6 +58,41 @@
   }
 }
 
+/* ═══════════════════════════════════════════
+   🔴 حل قطعی: رنگ متن input/textarea/select
+   این قانون روی همه‌ی inputهای سایت اعمال می‌شه
+   ═══════════════════════════════════════════ */
+input,
+textarea,
+select {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+  -webkit-text-fill-color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  color: #6b7280 !important;
+  -webkit-text-fill-color: #6b7280 !important;
+  background-color: #f3f4f6 !important;
+}
+
+/* برای inputهایی که داخل پس‌زمینه تیره هستن (مثل جستجوی هدر) */
+input.bg-transparent,
+input.dark-input {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* ═══ Scrollbar ═══ */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -66,74 +101,57 @@
   border-radius: 4px;
 }
 
-/* برای گوشی‌های با نوار پایین (iPhone Home Indicator) */
+/* برای گوشی‌های با نوار پایین */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* تنظیم padding بدنه صفحه */
 @media (max-width: 767px) {
   body {
     padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-/* ===== استایل‌های لیفلت ===== */
+/* ═══ Leaflet ═══ */
 .leaflet-container {
   width: 100%;
   height: 100%;
   border-radius: 1rem;
   z-index: 0;
 }
-
-/* مخفی کردن پنل راهنمای مسیر */
 .leaflet-routing-alternatives-container {
   display: none;
 }
-/* ===== استایل مارکرهای نقشه ===== */
+
 @keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.5); }
   70% { box-shadow: 0 0 0 12px rgba(30, 64, 175, 0); }
   100% { box-shadow: 0 0 0 0 rgba(30, 64, 175, 0); }
 }
-
 .custom-camping-icon,
 .custom-user-icon,
 .custom-click-icon {
   background: transparent !important;
   border: none !important;
 }
-/* ===== Toast Animation ===== */
+
+/* ═══ Toast ═══ */
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-/* ═══ Marquee Animation ═══ */
-@keyframes marquee-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+/* ═══ Marquee ═══ */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
 .marquee-track {
   animation: marquee-scroll 60s linear infinite;
 }
-
-/* توقف روی hover کل ناحیه */
 .marquee-wrapper:hover .marquee-track {
   animation-play-state: paused;
 }
-
-/* اسکرول‌بار مخفی */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -141,28 +159,93 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-/* ═══════════════════════════════════════════
-   Utility Classes برای Theme
-   ═══════════════════════════════════════════ */
 
-/* پس‌زمینه‌ها */
+/* ═══ Utility Classes ═══ */
 .bg-theme { background-color: var(--background); }
 .bg-theme-card { background-color: var(--card); }
 .bg-theme-surface { background-color: var(--surface); }
 .bg-theme-bg { background-color: var(--background); }
 
-/* متن‌ها */
 .text-theme { color: var(--foreground); }
 .text-theme-muted { color: var(--muted); }
 .text-theme-muted-light { color: var(--muted-light); }
 
-/* حاشیه‌ها */
 .border-theme { border-color: var(--card-border); }
 .border-theme-card { border-color: var(--card-border); }
 
-/* Accent (همیشه سبز، ولی متغیر) */
 .bg-accent { background-color: var(--accent); }
 .bg-accent-hover { background-color: var(--accent-hover); }
 .text-accent { color: var(--accent); }
 .border-accent { border-color: var(--accent); }
 
+/* ═══ اسلایدر ظرفیت ═══ */
+input[type="range"].kaw-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent, #E84C4C);
+  cursor: pointer;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #E84C4C) 25%, transparent);
+}
+input[type="range"].kaw-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent, #E84C4C);
+  border: none;
+  cursor: pointer;
+}
+/* ═══ حل قطعی: متن مشکی روی inputهای سفید (حتی در دارک مود) ═══ */
+html input,
+html textarea,
+html select,
+html .dark input,
+html .dark textarea,
+html .dark select,
+.dark input,
+.dark textarea,
+.dark select {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827 !important;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+html input::placeholder,
+html textarea::placeholder,
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af !important;
+  -webkit-text-fill-color: #9ca3af !important;
+  opacity: 1 !important;
+}
+/* ═══ حل نهایی: مرورگر input رو در حالت light رندر کن ═══ */
+input,
+textarea,
+select {
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
+  -webkit-text-fill-color: #111827 !important;
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  background-clip: padding-box !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  -webkit-text-fill-color: #9ca3af !important;
+  color: #9ca3af !important;
+}
+
+/* مودال رو از تم دارک جدا کن */
+.admin-modal {
+  color-scheme: light !important;
+  isolation: isolate !important;
+}

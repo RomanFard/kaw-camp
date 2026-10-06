@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ProductModal, { type ProductFormData } from "@/components/admin/ProductModal";
 import { formatPrice } from "@/lib/utils";
 import { useToast } from "@/components/context/ToastContext";
 import {
@@ -17,34 +18,8 @@ import {
   type Product,
   type Category,
 } from "@/data/products";
-import ImageUploader from "@/components/admin/ImageUploader";
-import GalleryManager from "@/components/admin/GalleryManager";
-import ColorManager, { type ColorItem } from "@/components/admin/ColorManager";
-import SizeManager, { type SizeItem } from "@/components/admin/SizeManager";
 
-// ─── فرم ───
-type FormData = {
-  id: string;
-  name: string;
-  slug: string;
-  englishName: string;
-  price: string;
-  oldPrice: string;
-  category: Category;
-  image: string;
-  images: string[];
-  rating: string;
-  reviews: string;
-  inStock: boolean;
-  shortDesc: string;
-  description: string;
-  features: string;
-  brand: string;
-  colors: ColorItem[];
-  sizes: SizeItem[];
-};
-
-const EMPTY_FORM: FormData = {
+const EMPTY_FORM: ProductFormData = {
   id: "",
   name: "",
   slug: "",
@@ -77,11 +52,10 @@ export default function ProductsAdminPage() {
   // مودال
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<FormData>(EMPTY_FORM);
+  const [formData, setFormData] = useState<ProductFormData>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
-  // ─── لود ───
   async function load() {
     setLoading(true);
     const data = await getAllProducts();
@@ -94,7 +68,6 @@ export default function ProductsAdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── فیلتر ───
   const filtered = products.filter((p) => {
     if (categoryFilter !== "all" && p.category !== categoryFilter) return false;
     if (!search.trim()) return true;
@@ -107,19 +80,17 @@ export default function ProductsAdminPage() {
     );
   });
 
-  // ─── باز کردن مودال افزودن ───
   async function openAddModal() {
     const newId = await generateNextProductId();
     setEditingId(null);
-    setForm({ ...EMPTY_FORM, id: newId });
+    setFormData({ ...EMPTY_FORM, id: newId });
     setFormError("");
     setModalOpen(true);
   }
 
-  // ─── باز کردن مودال ویرایش ───
   function openEditModal(p: Product) {
     setEditingId(p.id);
-    setForm({
+    setFormData({
       id: p.id,
       name: p.name,
       slug: p.slug,
@@ -151,32 +122,24 @@ export default function ProductsAdminPage() {
     setModalOpen(true);
   }
 
-  // ─── ذخیره ───
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSave(form: ProductFormData) {
     setFormError("");
 
-    // اعتبارسنجی
     if (!form.name.trim()) return setFormError("نام محصول الزامی است");
     if (!form.slug.trim()) return setFormError("slug الزامی است");
     if (!form.price.trim() || Number(form.price) <= 0)
       return setFormError("قیمت باید بزرگتر از صفر باشد");
     if (!form.image.trim()) return setFormError("عکس اصلی الزامی است");
 
-    // اعتبارسنجی رنگ‌ها
     const invalidColor = form.colors.find((c) => !c.label.trim());
     if (invalidColor) return setFormError("همه رنگ‌ها باید نام داشته باشن");
 
-    // اعتبارسنجی سایزها
     const invalidSize = form.sizes.find((s) => !s.label.trim());
     if (invalidSize) return setFormError("همه سایزها باید نام داشته باشن");
 
     setSaving(true);
 
-    // آماده‌سازی عکس‌های گالری (حذف خالی‌ها)
-    const cleanImages = form.images
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const cleanImages = form.images.map((s) => s.trim()).filter(Boolean);
 
     const productData: Product = {
       id: form.id,
@@ -225,7 +188,6 @@ export default function ProductsAdminPage() {
     load();
   }
 
-  // ─── حذف ───
   async function handleDelete(id: string, name: string) {
     if (!confirm(`آیا از حذف محصول "${name}" مطمئنی؟`)) return;
 
@@ -238,7 +200,6 @@ export default function ProductsAdminPage() {
     load();
   }
 
-  // ─── Toggle موجودی ───
   async function handleToggleStock(p: Product) {
     const updated = { ...p, inStock: !p.inStock };
     const { error } = await updateProduct(p.id, updated);
@@ -252,7 +213,6 @@ export default function ProductsAdminPage() {
     toast.success(p.inStock ? "محصول ناموجود شد" : "محصول موجود شد");
   }
 
-  // ─── ریست به داده‌های اولیه ───
   async function handleReset() {
     if (
       !confirm(
@@ -503,302 +463,17 @@ export default function ProductsAdminPage() {
         </div>
       </div>
 
-      {/* ─── مودال ─── */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-black text-gray-900">
-                {editingId ? "✏️ ویرایش محصول" : "➕ محصول جدید"}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSave} className="space-y-4">
-              {/* ID + slug */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    ID *
-                  </label>
-                  <input
-                    type="text"
-                    value={form.id}
-                    onChange={(e) => setForm({ ...form, id: e.target.value })}
-                    disabled={!!editingId}
-                    dir="ltr"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 font-mono text-left text-sm outline-none focus:border-amber-500 disabled:bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    Slug *
-                  </label>
-                  <input
-                    type="text"
-                    value={form.slug}
-                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                    dir="ltr"
-                    placeholder="tent-3person"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 font-mono text-left text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-              </div>
-
-              {/* نام + نام انگلیسی */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    نام محصول (فارسی) *
-                  </label>
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="چادر کوهنوردی ۳ نفره"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    نام انگلیسی
-                  </label>
-                  <input
-                    type="text"
-                    value={form.englishName}
-                    onChange={(e) =>
-                      setForm({ ...form, englishName: e.target.value })
-                    }
-                    dir="ltr"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-left text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-              </div>
-
-              {/* قیمت + تخفیف */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    قیمت (تومان) *
-                  </label>
-                  <input
-                    type="number"
-                    value={form.price}
-                    onChange={(e) => setForm({ ...form, price: e.target.value })}
-                    min="0"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    قیمت قبل از تخفیف
-                  </label>
-                  <input
-                    type="number"
-                    value={form.oldPrice}
-                    onChange={(e) =>
-                      setForm({ ...form, oldPrice: e.target.value })
-                    }
-                    min="0"
-                    placeholder="اختیاری"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-              </div>
-
-              {/* دسته + برند */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    دسته‌بندی *
-                  </label>
-                  <select
-                    value={form.category}
-                    onChange={(e) =>
-                      setForm({ ...form, category: e.target.value as Category })
-                    }
-                    className="w-full rounded-lg border border-[#D4C5A0] bg-white px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  >
-                    {categories.map((c) => (
-                      <option key={c.key} value={c.key}>
-                        {c.emoji} {c.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    برند
-                  </label>
-                  <input
-                    type="text"
-                    value={form.brand}
-                    onChange={(e) => setForm({ ...form, brand: e.target.value })}
-                    dir="ltr"
-                    placeholder="Naturehike"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-left text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-              </div>
-
-              {/* عکس اصلی */}
-              <ImageUploader
-                value={form.image}
-                onChange={(url) => setForm({ ...form, image: url })}
-                label="آدرس تصویر اصلی *"
-              />
-
-              {/* گالری */}
-              <GalleryManager
-                images={form.images}
-                onChange={(images) => setForm({ ...form, images })}
-              />
-
-              {/* رنگ‌بندی */}
-              <ColorManager
-                colors={form.colors}
-                onChange={(colors) => setForm({ ...form, colors })}
-              />
-
-              {/* سایزبندی */}
-              <SizeManager
-                sizes={form.sizes}
-                onChange={(sizes) => setForm({ ...form, sizes })}
-              />
-
-              {/* توضیح کوتاه */}
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                  توضیح کوتاه
-                </label>
-                <input
-                  type="text"
-                  value={form.shortDesc}
-                  onChange={(e) =>
-                    setForm({ ...form, shortDesc: e.target.value })
-                  }
-                  className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                />
-              </div>
-
-              {/* توضیحات کامل */}
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                  توضیحات کامل
-                </label>
-                <textarea
-                  rows={4}
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
-                  className="w-full resize-none rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                />
-              </div>
-
-              {/* ویژگی‌ها */}
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                  ویژگی‌ها (هر خط یکی)
-                </label>
-                <textarea
-                  rows={4}
-                  value={form.features}
-                  onChange={(e) =>
-                    setForm({ ...form, features: e.target.value })
-                  }
-                  placeholder="پارچه ضدآب ۵۰۰۰mm&#10;اسکلت آلومینیومی"
-                  className="w-full resize-none rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                />
-              </div>
-
-              {/* امتیاز + نظرات */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    امتیاز (۰-۵)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="5"
-                    value={form.rating}
-                    onChange={(e) =>
-                      setForm({ ...form, rating: e.target.value })
-                    }
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    تعداد نظرات
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.reviews}
-                    onChange={(e) =>
-                      setForm({ ...form, reviews: e.target.value })
-                    }
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-              </div>
-
-              {/* موجودی */}
-              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#D4C5A0] p-3">
-                <input
-                  type="checkbox"
-                  checked={form.inStock}
-                  onChange={(e) =>
-                    setForm({ ...form, inStock: e.target.checked })
-                  }
-                  className="h-4 w-4 accent-amber-500"
-                />
-                <span className="text-sm font-bold text-gray-700">
-                  محصول موجود است
-                </span>
-              </label>
-
-              {/* خطا */}
-              {formError && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
-                  ⚠️ {formError}
-                </div>
-              )}
-
-              {/* دکمه‌ها */}
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 rounded-lg bg-[#E84C4C] py-3 text-sm font-bold text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
-                >
-                  {saving
-                    ? "در حال ذخیره..."
-                    : editingId
-                    ? "ذخیره تغییرات"
-                    : "افزودن محصول"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="rounded-lg border border-[#D4C5A0] px-6 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
-                >
-                  انصراف
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* ─── مودال جدا ─── */}
+      <ProductModal
+        open={modalOpen}
+        editingId={editingId}
+        initialData={formData}
+        categories={categories}
+        saving={saving}
+        error={formError}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+      />
     </main>
   );
 }
@@ -834,4 +509,3 @@ function StatCard({
     </div>
   );
 }
-
