@@ -24,7 +24,7 @@ export default function ContactSection() {
   const contactInfo = [
     {
       label: "آدرس",
-      value: "کردستان، بانه — پاساژ ارغوانی، بلوک ۲",
+      value: "کردستان، بانه، کوچه پاساژ نور، بلوک ۲",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -71,7 +71,7 @@ export default function ContactSection() {
     },
     {
       label: "ایمیل",
-      value: "info@kawcamp.com",
+      value: "mohamadxanzadeh@gmail.com",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +88,7 @@ export default function ContactSection() {
           />
         </svg>
       ),
-      href: "mailto:info@kawcamp.com",
+      href: "mailto:mohamadxanzadeh@gmail.com",
     },
   ];
 
@@ -100,27 +100,29 @@ export default function ContactSection() {
     "سایر موارد",
   ];
 
+  const inputCls =
+    "w-full rounded-lg border border-theme bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent";
+
   return (
     <section className="relative py-12 md:py-16">
-      {/* ═══ کادر مشکی تمامعرض — از لبه تا لبه ═══ */}
-          <div className="relative w-full bg-theme py-12 md:py-16">
-        {/* محتوا — هم‌عرض بقیه سایت */}
+      <div className="relative w-full bg-theme py-12 md:py-16">
         <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div className="mb-10 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-3.5 py-1.5 backdrop-blur-sm">
-              <span className="text-[11px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3.5 py-1.5 backdrop-blur-sm">
+              <span className="text-[11px] font-bold tracking-[0.15em] text-accent md:text-xs">
                 CONTACT
               </span>
             </div>
 
-          <h2 className="text-2xl font-black tracking-tight text-theme md:text-3xl lg:text-4xl">
-            درخواست <span className="text-accent">مشاوره</span>
-          </h2>
+            <h2 className="text-2xl font-black tracking-tight text-theme md:text-3xl lg:text-4xl">
+              درخواست <span className="text-accent">مشاوره</span>
+            </h2>
 
-            <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-[#E84C4C]" />
+            <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-accent" />
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2 lg:gap-6">
+            {/* ستون چپ: نقشه + اطلاعات تماس */}
             <div className="rounded-2xl border border-theme bg-theme-card p-5 md:p-6">
               <div className="overflow-hidden rounded-xl border border-theme bg-theme-surface">
                 <iframe
@@ -149,14 +151,17 @@ export default function ContactSection() {
                     }
                     className="group flex items-center gap-4"
                   >
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/10 text-[#E84C4C] transition group-hover:border-[#E84C4C] group-hover:bg-[#E84C4C] group-hover:text-white">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent transition group-hover:border-accent group-hover:bg-accent group-hover:text-white">
                       {info.icon}
                     </span>
-                    <div className="flex-1">
-                      <p className="text-[10px] font-bold text-zinc-500 md:text-xs">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] font-bold text-theme-muted md:text-xs">
                         {info.label}
                       </p>
-                      <p className="mt-0.5 text-xs font-bold text-white transition group-hover:text-[#E84C4C] md:text-sm">
+                      <p
+                        className="mt-0.5 truncate text-xs font-bold text-theme transition group-hover:text-accent md:text-sm"
+                        dir={info.label === "ایمیل" ? "ltr" : undefined}
+                      >
                         {info.value}
                       </p>
                     </div>
@@ -165,8 +170,9 @@ export default function ContactSection() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 backdrop-blur-sm md:p-6">
-              <h3 className="mb-5 text-center text-base font-black text-white md:text-lg">
+            {/* ستون راست: فرم */}
+            <div className="rounded-2xl border border-theme bg-theme-surface p-5 backdrop-blur-sm md:p-6">
+              <h3 className="mb-5 text-center text-base font-black text-theme md:text-lg">
                 فرم درخواست
               </h3>
 
@@ -175,10 +181,10 @@ export default function ContactSection() {
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20 text-3xl">
                     ✅
                   </div>
-                  <p className="text-base font-black text-white">
+                  <p className="text-base font-black text-theme">
                     درخواست شما ثبت شد!
                   </p>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-theme-muted">
                     به‌زودی با شما تماس می‌گیریم
                   </p>
                 </div>
@@ -190,7 +196,13 @@ export default function ContactSection() {
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="نام و نام خانوادگی"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#E84C4C]"
+                    style={{
+                      color: "#111827",
+                      backgroundColor: "#ffffff",
+                      WebkitTextFillColor: "#111827",
+                      colorScheme: "light",
+                    }}
+                    className={inputCls}
                   />
 
                   <input
@@ -200,7 +212,13 @@ export default function ContactSection() {
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     placeholder="شماره تماس"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#E84C4C]"
+                    style={{
+                      color: "#111827",
+                      backgroundColor: "#ffffff",
+                      WebkitTextFillColor: "#111827",
+                      colorScheme: "light",
+                    }}
+                    className={`${inputCls} text-right placeholder:text-right`}
                   />
 
                   <input
@@ -209,7 +227,13 @@ export default function ContactSection() {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="ایمیل (اختیاری)"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-right text-sm text-white outline-none transition placeholder:text-right placeholder:text-zinc-600 focus:border-[#E84C4C]"
+                    style={{
+                      color: "#111827",
+                      backgroundColor: "#ffffff",
+                      WebkitTextFillColor: "#111827",
+                      colorScheme: "light",
+                    }}
+                    className={`${inputCls} text-right placeholder:text-right`}
                   />
 
                   <select
@@ -218,13 +242,17 @@ export default function ContactSection() {
                     onChange={(e) =>
                       setForm({ ...form, service: e.target.value })
                     }
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#E84C4C]"
+                    style={{
+                      color: "#111827",
+                      backgroundColor: "#ffffff",
+                      WebkitTextFillColor: "#111827",
+                      colorScheme: "light",
+                    }}
+                    className={`${inputCls} cursor-pointer`}
                   >
-                    <option value="" className="bg-zinc-900">
-                      انتخاب خدمت
-                    </option>
+                    <option value="">انتخاب خدمت</option>
                     {services.map((s) => (
-                      <option key={s} value={s} className="bg-zinc-900">
+                      <option key={s} value={s}>
                         {s}
                       </option>
                     ))}
@@ -237,12 +265,18 @@ export default function ContactSection() {
                       setForm({ ...form, message: e.target.value })
                     }
                     placeholder="توضیحات..."
-                    className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-[#E84C4C]"
+                    style={{
+                      color: "#111827",
+                      backgroundColor: "#ffffff",
+                      WebkitTextFillColor: "#111827",
+                      colorScheme: "light",
+                    }}
+                    className={`${inputCls} resize-none`}
                   />
 
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-[#E84C4C] py-3 text-sm font-black text-white transition hover:bg-[#D63F3F]"
+                    className="w-full rounded-lg bg-accent py-3 text-sm font-black text-white transition hover:bg-accent-hover"
                   >
                     ارسال درخواست
                   </button>

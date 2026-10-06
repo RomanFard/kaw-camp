@@ -4,29 +4,35 @@ export default function Footer() {
   return (
     <footer
       dir="rtl"
-      className="relative overflow-hidden border-t border-zinc-800 bg-[#050505]"
+      className="relative overflow-hidden border-t border-theme bg-theme"
     >
-      {/* تزئینات نارنجی */}
+      {/* تزئینات accent */}
       <div className="pointer-events-none absolute inset-0 opacity-20">
-        <div className="absolute -right-40 top-10 h-64 w-64 rounded-full bg-[#E84C4C]/20 blur-[100px]" />
-        <div className="absolute -left-40 bottom-10 h-64 w-64 rounded-full bg-[#E84C4C]/10 blur-[100px]" />
+        <div
+          className="absolute -right-40 top-10 h-64 w-64 rounded-full blur-[100px]"
+          style={{ backgroundColor: "var(--accent)", opacity: 0.2 }}
+        />
+        <div
+          className="absolute -left-40 bottom-10 h-64 w-64 rounded-full blur-[100px]"
+          style={{ backgroundColor: "var(--accent)", opacity: 0.1 }}
+        />
       </div>
 
       <div className="relative mx-auto w-full max-w-[1400px] px-6 py-12 md:px-12 md:py-16 lg:px-16">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+       <div className="grid grid-cols-2 gap-6 md:gap-10 lg:grid-cols-4 lg:gap-8">
           {/* ─── ستون ۱: برند + درباره ─── */}
           <div className="lg:col-span-1">
-            <h3 className="mb-3 text-xl font-black text-white">
-              کو کمپ <span className="text-[#E84C4C]">KAW CAMP</span>
+            <h3 className="mb-3 text-xl font-black text-theme">
+              کو کمپ <span className="text-accent">KAW CAMP</span>
             </h3>
-            <p className="text-xs leading-6 text-zinc-400 md:text-sm md:leading-7">
+            <p className="text-xs leading-6 text-theme-muted md:text-sm md:leading-7">
               کو کمپ مرجع تخصصی تجهیزات کمپینگ، طبیعت‌گردی و کوهنوردی است. تلاش
               می‌کنیم انتخاب و خرید تجهیزات را برای شما سریع‌تر، مطمئن‌تر و
               حرفه‌ای‌تر کنیم.
             </p>
 
             {/* آدرس */}
-            <div className="mt-5 space-y-2 text-[11px] text-zinc-400 md:text-xs">
+            <div className="mt-5 space-y-2 text-[11px] text-theme-muted md:text-xs">
               <div className="flex items-start gap-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +40,7 @@ export default function Footer() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.8}
                   stroke="currentColor"
-                  className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#E84C4C]"
+                  className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-accent"
                 >
                   <path
                     strokeLinecap="round"
@@ -54,9 +60,9 @@ export default function Footer() {
 
           {/* ─── ستون ۲: دسترسی سریع ─── */}
           <div>
-            <h4 className="relative mb-5 inline-block text-sm font-black text-white md:text-base">
+            <h4 className="relative mb-5 inline-block text-sm font-black text-theme md:text-base">
               دسترسی سریع
-              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#E84C4C]" />
+              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-accent" />
             </h4>
             <ul className="space-y-2.5 text-xs md:text-sm">
               {[
@@ -70,9 +76,9 @@ export default function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="group flex items-center gap-2 text-zinc-400 transition hover:text-[#E84C4C]"
+                    className="group flex items-center gap-2 text-theme-muted transition hover:text-accent"
                   >
-                    <span className="h-1 w-1 rounded-full bg-zinc-600 transition group-hover:bg-[#E84C4C]" />
+                    <span className="h-1 w-1 rounded-full bg-theme-muted transition group-hover:bg-accent" />
                     <span>{item.label}</span>
                   </Link>
                 </li>
@@ -82,9 +88,9 @@ export default function Footer() {
 
           {/* ─── ستون ۳: خدمات مشتریان ─── */}
           <div>
-            <h4 className="relative mb-5 inline-block text-sm font-black text-white md:text-base">
+            <h4 className="relative mb-5 inline-block text-sm font-black text-theme md:text-base">
               خدمات مشتریان
-              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#E84C4C]" />
+              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-accent" />
             </h4>
             <ul className="space-y-2.5 text-xs md:text-sm">
               {[
@@ -98,9 +104,9 @@ export default function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="group flex items-center gap-2 text-zinc-400 transition hover:text-[#E84C4C]"
+                    className="group flex items-center gap-2 text-theme-muted transition hover:text-accent"
                   >
-                    <span className="h-1 w-1 rounded-full bg-zinc-600 transition group-hover:bg-[#E84C4C]" />
+                    <span className="h-1 w-1 rounded-full bg-theme-muted transition group-hover:bg-accent" />
                     <span>{item.label}</span>
                   </Link>
                 </li>
@@ -110,16 +116,16 @@ export default function Footer() {
 
           {/* ─── ستون ۴: ارتباط با ما ─── */}
           <div>
-            <h4 className="relative mb-5 inline-block text-sm font-black text-white md:text-base">
+            <h4 className="relative mb-5 inline-block text-sm font-black text-theme md:text-base">
               ارتباط با ما
-              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-[#E84C4C]" />
+              <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-accent" />
             </h4>
 
             <ul className="space-y-2.5 text-xs md:text-sm">
               <li>
                 <a
                   href="tel:09180540019"
-                  className="flex items-center gap-2 text-zinc-400 transition hover:text-[#E84C4C]"
+                  className="flex items-center gap-2 text-theme-muted transition hover:text-accent"
                   dir="ltr"
                 >
                   <svg
@@ -128,7 +134,7 @@ export default function Footer() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.8}
                     stroke="currentColor"
-                    className="h-3.5 w-3.5 flex-shrink-0 text-[#E84C4C]"
+                    className="h-3.5 w-3.5 flex-shrink-0 text-accent"
                   >
                     <path
                       strokeLinecap="round"
@@ -142,7 +148,7 @@ export default function Footer() {
               <li>
                 <a
                   href="mailto:mohamadxanzadeh@gmail.com"
-                  className="flex items-center gap-2 text-zinc-400 transition hover:text-[#E84C4C]"
+                  className="flex items-center gap-2 text-theme-muted transition hover:text-accent"
                   dir="ltr"
                 >
                   <svg
@@ -151,7 +157,7 @@ export default function Footer() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.8}
                     stroke="currentColor"
-                    className="h-3.5 w-3.5 flex-shrink-0 text-[#E84C4C]"
+                    className="h-3.5 w-3.5 flex-shrink-0 text-accent"
                   >
                     <path
                       strokeLinecap="round"
@@ -166,7 +172,7 @@ export default function Footer() {
 
             {/* شبکه‌های اجتماعی */}
             <div className="mt-5">
-              <p className="mb-3 text-[11px] font-bold text-zinc-500 md:text-xs">
+              <p className="mb-3 text-[11px] font-bold text-theme-muted md:text-xs">
                 ما را در شبکه‌های اجتماعی دنبال کنید
               </p>
               <div className="flex flex-wrap gap-2">
@@ -176,7 +182,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="اینستاگرام"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 transition hover:border-[#E84C4C] hover:bg-[#E84C4C] hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-theme bg-theme-surface text-theme-muted transition hover:border-accent hover:bg-accent hover:text-white"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -194,7 +200,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="واتساپ"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 transition hover:border-green-500 hover:bg-green-600 hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-theme bg-theme-surface text-theme-muted transition hover:border-green-500 hover:bg-green-600 hover:text-white"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -212,7 +218,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="تلگرام"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 transition hover:border-sky-500 hover:bg-sky-500 hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-theme bg-theme-surface text-theme-muted transition hover:border-sky-500 hover:bg-sky-500 hover:text-white"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -229,21 +235,20 @@ export default function Footer() {
         </div>
 
         {/* ═══ نوار پایین ═══ */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-6 md:flex-row">
-          <p className="text-[11px] text-zinc-500 md:text-xs">
-            تمامی حقوق برای{" "}
-            <span className="font-bold text-[#E84C4C]">KAW CAMP</span> محفوظ
-            است © ۱۴۰۴
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-theme pt-6 md:flex-row">
+          <p className="text-[11px] text-theme-muted md:text-xs">
+            تمامی حقوق برای <span className="font-bold text-accent">KAW CAMP</span>{" "}
+            محفوظ است © ۱۴۰۴
           </p>
 
-          <div className="flex items-center gap-5 text-[11px] text-zinc-400 md:text-xs">
-            <Link href="/rules" className="transition hover:text-[#E84C4C]">
+          <div className="flex items-center gap-5 text-[11px] text-theme-muted md:text-xs">
+            <Link href="/rules" className="transition hover:text-accent">
               قوانین و مقررات
             </Link>
-            <Link href="/returns" className="transition hover:text-[#E84C4C]">
+            <Link href="/returns" className="transition hover:text-accent">
               بازگشت کالا
             </Link>
-            <Link href="/warranty" className="transition hover:text-[#E84C4C]">
+            <Link href="/warranty" className="transition hover:text-accent">
               گارانتی
             </Link>
           </div>

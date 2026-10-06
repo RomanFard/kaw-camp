@@ -77,7 +77,7 @@ export default function MobileMenuDrawer({
       dir="rtl"
       className={
         "fixed inset-0 z-[210] flex h-screen w-full flex-col bg-theme-card transition-transform duration-300 md:hidden " +
-        (isOpen ? "translate-x-0" : "translate-x-full")
+        (isOpen ? "visible translate-x-0" : "invisible translate-x-full")
       }
     >
       <header className="flex flex-shrink-0 items-center justify-between border-b border-theme bg-theme-card px-3 py-2.5">
@@ -287,7 +287,7 @@ function MainView({
         </h4>
         <div className="space-y-2">
           <a
-            href="mailto:info@kawcamp.com"
+            href="mailto:mohamadxanzadeh@gmail.com"
             className="flex items-center gap-2 text-sm text-theme"
           >
             <svg
@@ -304,10 +304,10 @@ function MainView({
                 d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
               />
             </svg>
-            info@kawcamp.com
+            mohamadxanzadeh@gmail.com
           </a>
           <a
-            href="tel:+982112345678"
+            href="tel:09180540019"
             className="flex items-center gap-2 text-sm text-theme"
           >
             <svg
@@ -324,7 +324,7 @@ function MainView({
                 d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
               />
             </svg>
-            ۰۲۱-۱۲۳۴۵۶۷۸
+            ۰۹۱۸ ۰۵۴ ۰۰۱۹
           </a>
         </div>
       </div>
@@ -335,7 +335,7 @@ function MainView({
         </h4>
         <div className="flex gap-3">
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/kawcamp"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="اینستاگرام"
@@ -346,7 +346,7 @@ function MainView({
             </svg>
           </a>
           <a
-            href="https://t.me"
+            href="https://t.me/kawcamp"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="تلگرام"
@@ -357,7 +357,7 @@ function MainView({
             </svg>
           </a>
           <a
-            href="https://wa.me/"
+            href="https://wa.me/message/MCT6GUT5QAVCE1"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="واتساپ"
@@ -487,10 +487,9 @@ function CategoryView({
     return aUse - bUse;
   });
 
-  // ⬇️ فقط و فقط اگه key دقیقاً "tent" باشه
-const isTentCategory = category.groups.some((g) =>
-  g.title.includes("ظرفیت")
-);
+  const isTentCategory = category.groups.some((g) =>
+    g.title.includes("ظرفیت")
+  );
 
   return (
     <div className="pb-6">

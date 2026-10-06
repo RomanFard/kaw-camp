@@ -26,28 +26,34 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <head>
+        {/* ⬇️ اسکریپت ضد فلش: تم رو قبل از هر paint اعمال می‌کنه */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme')||'dark';if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})();`,
+          }}
+        />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/AmirAbbasVafaee/persian-fonts-cdn@main/css/iran-yekan.css"
         />
       </head>
-      <body className="font-[IranYekan] bg-[#050505]">
+      <body className="font-[IranYekan] bg-theme">
         <ThemeProvider>
           <SiteSettingsProvider>
             <HeroSlideProvider>
-            <LoadingScreen />
-            <ToastProvider>
-              <ProductsProvider>
-                <CartProvider>
-                  <WishlistProvider>
-                    {children}
-                    <MobileBottomNav />
-                    <FloatingButtons />
-                    <ToastContainer />
-                  </WishlistProvider>
-                </CartProvider>
-              </ProductsProvider>
-            </ToastProvider>
+              <LoadingScreen />
+              <ToastProvider>
+                <ProductsProvider>
+                  <CartProvider>
+                    <WishlistProvider>
+                      {children}
+                      <MobileBottomNav />
+                      <FloatingButtons />
+                      <ToastContainer />
+                    </WishlistProvider>
+                  </CartProvider>
+                </ProductsProvider>
+              </ToastProvider>
             </HeroSlideProvider>
           </SiteSettingsProvider>
         </ThemeProvider>

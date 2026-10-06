@@ -80,7 +80,7 @@ export default function CategoryShowcase() {
 
   return (
     <section dir="rtl" className="py-12 md:py-24">
-      <div className="mx-auto max-w-[1200px] px-4 md:px-8">
+      <div className="mx-auto max-w-[1400px] px-4 md:px-12 lg:px-16">
         <div className="flex justify-center">
           <span className="rounded-full border border-accent/40 bg-accent/5 px-5 py-1.5 text-xs font-bold uppercase tracking-wider text-accent">
             دسته‌بندی محصولات
@@ -95,7 +95,7 @@ export default function CategoryShowcase() {
 
         {/* موبایل: ۲ ردیفی افقی */}
         <div
-          className="mt-10 -mx-4 overflow-x-auto px-4 pb-2 md:hidden"
+          className="mt-10 overflow-x-auto pb-2 md:hidden"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <div className="grid grid-flow-col grid-rows-2 gap-3">
