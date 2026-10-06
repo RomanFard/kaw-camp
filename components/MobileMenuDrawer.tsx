@@ -64,7 +64,7 @@ export default function MobileMenuDrawer({
         (isOpen ? "translate-x-0" : "translate-x-full")
       }
     >
-      {/* ─── هدر بالای drawer ─── */}
+      {/* هدر بالای drawer */}
       <header className="flex flex-shrink-0 items-center justify-between border-b border-theme bg-theme-card px-3 py-2.5">
         <button
           type="button"
@@ -187,7 +187,7 @@ export default function MobileMenuDrawer({
         </div>
       </header>
 
-      {/* ─── محتوا ─── */}
+      {/* محتوا */}
       <div className="flex-1 overflow-y-auto">
         {view.type === "main" ? (
           <MainView onCategory={goToCategory} onClose={closeAll} />
@@ -205,9 +205,6 @@ export default function MobileMenuDrawer({
   );
 }
 
-/* ═══════════════════════════════════
-   نمای اصلی منو
-   ═══════════════════════════════════ */
 function MainView({
   onCategory,
   onClose,
@@ -217,7 +214,6 @@ function MainView({
 }) {
   return (
     <div className="pb-6">
-      {/* دسته‌بندی‌ها */}
       <ul>
         {megaMenu.map((cat) => (
           <li key={cat.key}>
@@ -265,7 +261,6 @@ function MainView({
         </li>
       </ul>
 
-      {/* NEED HELP */}
       <div className="mt-5 px-5">
         <h4 className="mb-3 text-[11px] font-black tracking-widest text-theme-muted">
           پشتیبانی
@@ -314,7 +309,6 @@ function MainView({
         </div>
       </div>
 
-      {/* FOLLOW US */}
       <div className="mt-6 border-t border-theme/40 px-5 pt-5">
         <h4 className="mb-3 text-[11px] font-black tracking-widest text-theme-muted">
           ما را دنبال کنید
@@ -359,9 +353,97 @@ function MainView({
   );
 }
 
-/* ═══════════════════════════════════
-   نمای زیرمنوی یک دسته
-   ═══════════════════════════════════ */
+function CapacityFilter({
+  categoryKey,
+  onApply,
+}: {
+  categoryKey: string;
+  onApply: () => void;
+}) {
+  const CAPACITIES = [
+    "۱ نفره",
+    "۲ نفره",
+    "۳ نفره",
+    "۴ نفره",
+    "۵ نفره",
+    "۶ نفره",
+    "۷ نفره",
+    "۸ نفره",
+    "۱۰ نفره",
+    "۱۲ نفره و بالاتر",
+  ];
+  const [index, setIndex] = useState(CAPACITIES.length - 1);
+  const MAX = CAPACITIES.length - 1;
+  const percent = (index / MAX) * 100;
+  const isAll = index === MAX;
+
+  return (
+    <div className="border-b border-theme/40 px-5 py-5">
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-base font-bold text-theme">ظرفیت</span>
+        <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-black text-accent">
+          {isAll ? "همه ظرفیت‌ها" : `تا ${CAPACITIES[index]}`}
+        </span>
+      </div>
+
+      <div dir="ltr" className="px-1">
+        <input
+          type="range"
+          min={0}
+          max={MAX}
+          step={1}
+          value={index}
+          onChange={(e) => setIndex(Number(e.target.value))}
+          className="kaw-range h-1.5 w-full cursor-pointer appearance-none rounded-full"
+          style={{
+            background: `linear-gradient(to right, var(--accent, #E84C4C) 0%, var(--accent, #E84C4C) ${percent}%, var(--theme-surface, #27272A) ${percent}%, var(--theme-surface, #27272A) 100%)`,
+          }}
+        />
+      </div>
+
+      <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-theme-muted">
+        <span>۱ نفره</span>
+        <span>۱۲+ نفره</span>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {CAPACITIES.slice(0, -1).map((cap, i) => {
+          const active = i === index;
+          return (
+            <button
+              key={cap}
+              type="button"
+              onClick={() => setIndex(i)}
+              className={
+                "rounded-full border px-2.5 py-1 text-[10px] font-bold transition " +
+                (active
+                  ? "border-accent bg-accent text-white"
+                  : "border-theme/50 bg-theme-surface text-theme-muted hover:border-accent hover:text-accent")
+              }
+            >
+              {cap}
+            </button>
+          );
+        })}
+      </div>
+
+      <Link
+        href={
+          isAll
+            ? `/products?cat=${categoryKey}`
+            : `/products?cat=${categoryKey}&capacity=${encodeURIComponent(
+                CAPACITIES[index]
+              )}`
+        }
+        onClick={onApply}
+        className="mt-4 flex items-center justify-center rounded-lg bg-accent py-2.5 text-sm font-bold text-white transition hover:bg-accent-hover"
+      >
+        اعمال فیلتر
+      </Link>
+    </div>
+  );
+}
+
 function CategoryView({
   category,
   openGroups,
@@ -375,9 +457,20 @@ function CategoryView({
   onBack: () => void;
   onClose: () => void;
 }) {
+  // حذف گروه‌های «برند» و «ظرفیت»
+  const filteredGroups = category.groups.filter(
+    (g) => !g.title.includes("برند") && !g.title.includes("ظرفیت")
+  );
+
+  // گروه «براساس استفاده» اول لیست
+  const sortedGroups = [...filteredGroups].sort((a, b) => {
+    const aUse = a.title.includes("استفاده") ? 0 : 1;
+    const bUse = b.title.includes("استفاده") ? 0 : 1;
+    return aUse - bUse;
+  });
+
   return (
     <div className="pb-6">
-      {/* دکمه بازگشت */}
       <button
         type="button"
         onClick={onBack}
@@ -400,8 +493,7 @@ function CategoryView({
         <span>بازگشت</span>
       </button>
 
-      {/* گروه‌ها به‌صورت آکاردئونی */}
-      {category.groups.map((group, i) => {
+      {sortedGroups.map((group, i) => {
         const isOpen = openGroups.includes(i);
         return (
           <div key={i} className="border-b border-theme/40">
@@ -433,16 +525,16 @@ function CategoryView({
             <div
               className={
                 "overflow-hidden transition-[max-height] duration-300 " +
-                (isOpen ? "max-h-[500px]" : "max-h-0")
+                (isOpen ? "max-h-[900px]" : "max-h-0")
               }
             >
-              <ul className="pb-3">
+              <ul className="grid grid-cols-2 gap-2 px-4 pb-4">
                 {group.items.map((item) => (
                   <li key={item.label}>
                     <Link
                       href={item.href}
                       onClick={onClose}
-                      className="block px-8 py-2.5 text-sm text-theme-muted transition hover:text-accent"
+                      className="flex h-full items-center justify-center rounded-lg border border-theme/50 bg-theme-surface px-3 py-2.5 text-center text-xs font-semibold text-theme transition hover:border-accent hover:bg-accent/10 hover:text-accent"
                     >
                       {item.label}
                     </Link>
@@ -454,7 +546,8 @@ function CategoryView({
         );
       })}
 
-      {/* ─── عکس + دکمه پایین ─── */}
+      <CapacityFilter categoryKey={category.key} onApply={onClose} />
+
       {category.photo && (
         <div className="mt-6 flex flex-col items-center px-6">
           <div className="w-full max-w-[240px] overflow-hidden rounded-xl border border-theme">
