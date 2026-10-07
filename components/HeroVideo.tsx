@@ -29,8 +29,8 @@ const FALLBACK_SLIDES: HeroSlide[] = [
 ];
 
 // ارتفاع یکسان برای اسکلت لود و اسلایدر تا هنگام لود پرش نداشته باشیم
-const SECTION_SIZE =
-  "h-[72svh] min-h-[440px] max-h-[620px] md:h-[700px] md:max-h-none lg:h-screen lg:max-h-[900px]";
+// موبایل: ارتفاع خودکار (عکس کامل بالا، متن زیرش). دسکتاپ: ارتفاع ثابت با متن روی عکس
+const SECTION_SIZE = "md:h-[700px] lg:h-screen lg:max-h-[900px]";
 
 export default function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -118,7 +118,7 @@ export default function HeroVideo() {
     return (
       <section
         dir="rtl"
-        className={`relative w-full overflow-hidden bg-black ${SECTION_SIZE}`}
+        className={`relative h-[480px] w-full overflow-hidden bg-black ${SECTION_SIZE}`}
       >
         <div className="h-full w-full animate-pulse bg-zinc-900" />
       </section>
@@ -132,7 +132,10 @@ export default function HeroVideo() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* ─── تصاویر ─── */}
+      {/* ─── تصاویر ───
+          موبایل: قاب با نسبت ثابت بالای صفحه تا عکس کم بریده شود
+          دسکتاپ: تمام‌قد پشت متن */}
+      <div className="relative aspect-[16/10] w-full md:absolute md:inset-0 md:aspect-auto md:h-full">
       {slides.map((s, i) => {
         const isActive = i === current;
         return (
@@ -171,10 +174,11 @@ export default function HeroVideo() {
       {/* ─── Overlay ───
           موبایل: تیره‌شدن از پایین، تا عکس در بالا دیده شود و متن پایین بنشیند
           دسکتاپ: تیره‌شدن از سمت راست مثل قبل */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/5 md:bg-gradient-to-l md:from-black md:via-black/70 md:to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent md:bg-gradient-to-l md:from-black md:via-black/70 md:to-black/30" />
+      </div>
 
       {/* ─── محتوا ─── */}
-      <div className="relative z-10 flex h-full items-end overflow-hidden pb-14 md:items-center md:pb-0">
+      <div className="relative z-10 -mt-12 flex items-end pb-14 md:absolute md:inset-0 md:mt-0 md:h-full md:items-center md:overflow-hidden md:pb-0">
         <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div
             onMouseEnter={() => setPaused(true)}
