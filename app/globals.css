@@ -218,3 +218,26 @@ body.menu-drawer-open nav[dir="rtl"].pb-safe {
 body.menu-drawer-open {
   overflow: hidden !important;
 }
+/* ═══ Override: متن input پیرو تم ═══ */
+input,
+textarea,
+select {
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted) !important;
+  -webkit-text-fill-color: var(--muted) !important;
+  opacity: 1 !important;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  color: var(--muted) !important;
+  -webkit-text-fill-color: var(--muted) !important;
+  opacity: 0.6 !important;
+}

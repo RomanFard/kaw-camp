@@ -38,12 +38,10 @@ export default function CheckoutPage() {
   const [shipping, setShipping] = useState("post");
   const [payment, setPayment] = useState("online");
 
-  // ─── کد تخفیف ───
   const [codeInput, setCodeInput] = useState("");
   const [codeError, setCodeError] = useState("");
   const [codeSuccess, setCodeSuccess] = useState("");
 
-  // ─── ثبت سفارش ───
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
@@ -56,6 +54,9 @@ export default function CheckoutPage() {
     discountAmount === 0 &&
     appliedCode.minPurchase !== undefined &&
     totalPrice < appliedCode.minPurchase;
+
+  const inputCls =
+    "w-full rounded-lg border border-theme bg-theme-surface px-4 py-2.5 text-sm outline-none transition focus:border-accent";
 
   function updateField(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -82,11 +83,9 @@ export default function CheckoutPage() {
     setCodeSuccess("");
   }
 
-  // ─── ثبت نهایی سفارش ───
   async function handleSubmitOrder() {
     setSubmitError("");
 
-    // اعتبارسنجی
     if (!form.firstName.trim() || !form.lastName.trim()) {
       toast.error("نام و نام خانوادگی الزامی است");
       return;
@@ -104,7 +103,6 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
 
-    // اطلاعات سبد برای ذخیره
     const orderItems = items.map((item) => ({
       id: item.id,
       name: item.name,
@@ -113,7 +111,6 @@ export default function CheckoutPage() {
       image: item.image,
     }));
 
-    // دریافت شماره پیگیری از تابع Supabase
     const { data: numData, error: numError } = await supabase.rpc(
       "generate_order_number"
     );
@@ -124,7 +121,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    // ثبت سفارش
     const { error: insertError } = await supabase.from("orders").insert({
       order_number: numData,
       first_name: form.firstName.trim(),
@@ -154,38 +150,37 @@ export default function CheckoutPage() {
       return;
     }
 
-    // موفقیت
     toast.success(`سفارش ${numData} با موفقیت ثبت شد!`);
     setOrderNumber(numData);
     clearCart();
     setSubmitting(false);
   }
 
-  // ─── صفحه موفقیت ───
+  /* ─── صفحه موفقیت ─── */
   if (orderNumber) {
     return (
-      <main className="min-h-screen bg-[#F7F1E3]">
+      <main className="min-h-screen bg-theme">
         <Header />
         <div className="mx-auto max-w-2xl px-6 py-16">
-          <div className="rounded-3xl border border-[#D4C5A0] bg-white p-8 text-center shadow-lg">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-5xl">
+          <div className="rounded-3xl border border-theme bg-theme-card p-8 text-center shadow-lg">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10 text-5xl">
               ✅
             </div>
-            <h1 className="text-2xl font-black text-gray-900">
+            <h1 className="text-2xl font-black text-theme">
               سفارش شما با موفقیت ثبت شد!
             </h1>
-            <p className="mt-3 text-sm text-gray-600">
+            <p className="mt-3 text-sm text-theme-muted">
               به‌زودی با شما تماس می‌گیریم تا سفارش را تأیید کنیم.
             </p>
 
-            <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-              <p className="text-xs font-bold text-amber-700">
+            <div className="mt-8 rounded-2xl border border-accent/30 bg-accent/5 p-5">
+              <p className="text-xs font-bold text-accent">
                 شماره پیگیری سفارش
               </p>
-              <p className="mt-2 font-mono text-2xl font-black text-amber-800">
+              <p className="mt-2 font-mono text-2xl font-black text-accent">
                 {orderNumber}
               </p>
-              <p className="mt-2 text-xs text-amber-600">
+              <p className="mt-2 text-xs text-theme-muted">
                 این شماره را برای پیگیری سفارش نزد خود نگه دارید.
               </p>
             </div>
@@ -193,13 +188,13 @@ export default function CheckoutPage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
                 href="/products"
-                className="flex-1 rounded-lg bg-[#E84C4C] py-3 text-sm font-bold text-white transition hover:bg-[#D63F3F]"
+                className="flex-1 rounded-lg bg-accent py-3 text-sm font-bold text-white transition hover:bg-accent-hover"
               >
                 بازگشت به فروشگاه
               </a>
               <a
                 href="/"
-                className="flex-1 rounded-lg border border-[#D4C5A0] py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
+                className="flex-1 rounded-lg border border-theme py-3 text-sm font-bold text-theme transition hover:bg-theme-surface"
               >
                 صفحه اصلی
               </a>
@@ -212,35 +207,37 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E3]">
+    <main className="min-h-screen bg-theme">
       <Header />
 
       <div className="mx-auto max-w-[1600px] px-6 py-8">
         {/* مسیر ناوبری */}
-        <nav className="mb-6 text-sm text-gray-500">
-          <a href="/" className="hover:text-amber-600">خانه</a>
+        <nav className="mb-6 text-sm text-theme-muted">
+          <a href="/" className="transition hover:text-accent">
+            خانه
+          </a>
           <span className="mx-2">/</span>
-          <a href="/cart" className="hover:text-amber-600">سبد خرید</a>
+          <a href="/cart" className="transition hover:text-accent">
+            سبد خرید
+          </a>
           <span className="mx-2">/</span>
-          <span className="text-gray-800">تسویه حساب</span>
+          <span className="text-theme">تسویه حساب</span>
         </nav>
 
-        <h1 className="mb-6 text-2xl font-bold text-gray-900">
-          تسویه حساب
-        </h1>
+        <h1 className="mb-6 text-2xl font-bold text-theme">تسویه حساب</h1>
 
         {items.length === 0 ? (
-          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-12 text-center">
+          <div className="rounded-2xl border border-theme bg-theme-card p-12 text-center">
             <p className="text-6xl">🛒</p>
-            <p className="mt-4 text-lg font-bold text-gray-800">
+            <p className="mt-4 text-lg font-bold text-theme">
               سبد خرید شما خالی است
             </p>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-theme-muted">
               برای تسویه حساب ابتدا محصولی به سبد اضافه کنید.
             </p>
             <a
               href="/products"
-              className="mt-6 inline-block rounded-lg bg-amber-500 px-6 py-3 text-base font-bold text-white transition hover:bg-amber-600"
+              className="mt-6 inline-block rounded-lg bg-accent px-6 py-3 text-base font-bold text-white transition hover:bg-accent-hover"
             >
               مشاهده محصولات
             </a>
@@ -250,38 +247,46 @@ export default function CheckoutPage() {
             {/* فرم */}
             <div className="space-y-4">
               {/* اطلاعات گیرنده */}
-              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
-                <h2 className="mb-5 text-lg font-bold text-gray-800">
+              <div className="rounded-xl border border-theme bg-theme-card p-6">
+                <h2 className="mb-5 text-lg font-bold text-theme">
                   اطلاعات گیرنده
                 </h2>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      نام
-                    </label>
-                    <input
-                      type="text"
-                      value={form.firstName}
-                      onChange={(e) => updateField("firstName", e.target.value)}
-                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                    />
+                <div className="space-y-4">
+                  {/* نام + نام خانوادگی — کنار هم */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
+                        نام
+                      </label>
+                      <input
+                        type="text"
+                        value={form.firstName}
+                        onChange={(e) =>
+                          updateField("firstName", e.target.value)
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
+                        نام خانوادگی
+                      </label>
+                      <input
+                        type="text"
+                        value={form.lastName}
+                        onChange={(e) =>
+                          updateField("lastName", e.target.value)
+                        }
+                        className={inputCls}
+                      />
+                    </div>
                   </div>
 
+                  {/* شماره تماس — تمام عرض */}
                   <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      نام خانوادگی
-                    </label>
-                    <input
-                      type="text"
-                      value={form.lastName}
-                      onChange={(e) => updateField("lastName", e.target.value)}
-                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                    <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
                       شماره تماس
                     </label>
                     <input
@@ -289,12 +294,13 @@ export default function CheckoutPage() {
                       dir="ltr"
                       value={form.phone}
                       onChange={(e) => updateField("phone", e.target.value)}
-                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                      className={`${inputCls} text-right`}
                     />
                   </div>
 
+                  {/* ایمیل — تمام عرض */}
                   <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                    <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
                       ایمیل (اختیاری)
                     </label>
                     <input
@@ -302,117 +308,138 @@ export default function CheckoutPage() {
                       dir="ltr"
                       value={form.email}
                       onChange={(e) => updateField("email", e.target.value)}
-                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                      className={`${inputCls} text-right`}
                     />
                   </div>
                 </div>
               </div>
 
-              {/* آدرس */}
-              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
-                <h2 className="mb-5 text-lg font-bold text-gray-800">
+              {/* آدرس تحویل */}
+              <div className="rounded-xl border border-theme bg-theme-card p-6">
+                <h2 className="mb-5 text-lg font-bold text-theme">
                   آدرس تحویل
                 </h2>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      استان
-                    </label>
-                    <input
-                      type="text"
-                      value={form.province}
-                      onChange={(e) => updateField("province", e.target.value)}
-                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                    />
+                <div className="space-y-4">
+                  {/* استان + شهر — کنار هم */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
+                        استان
+                      </label>
+                      <input
+                        type="text"
+                        value={form.province}
+                        onChange={(e) =>
+                          updateField("province", e.target.value)
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
+                        شهر
+                      </label>
+                      <input
+                        type="text"
+                        value={form.city}
+                        onChange={(e) => updateField("city", e.target.value)}
+                        className={inputCls}
+                      />
+                    </div>
                   </div>
 
+                  {/* آدرس کامل — تمام عرض */}
                   <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      شهر
-                    </label>
-                    <input
-                      type="text"
-                      value={form.city}
-                      onChange={(e) => updateField("city", e.target.value)}
-                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                    <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
                       آدرس کامل
                     </label>
                     <textarea
                       rows={3}
                       value={form.address}
                       onChange={(e) => updateField("address", e.target.value)}
-                      className="w-full resize-none rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                      className={`${inputCls} resize-none`}
                     />
                   </div>
 
+                  {/* کد پستی — تمام عرض */}
                   <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                    <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
                       کد پستی
                     </label>
                     <input
                       type="text"
                       dir="ltr"
                       value={form.postalCode}
-                      onChange={(e) => updateField("postalCode", e.target.value)}
-                      className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-right text-sm outline-none focus:border-amber-500"
+                      onChange={(e) =>
+                        updateField("postalCode", e.target.value)
+                      }
+                      className={`${inputCls} text-right`}
                     />
                   </div>
                 </div>
               </div>
 
               {/* روش ارسال */}
-              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
-                <h2 className="mb-5 text-lg font-bold text-gray-800">
+              <div className="rounded-xl border border-theme bg-theme-card p-6">
+                <h2 className="mb-5 text-lg font-bold text-theme">
                   روش ارسال
                 </h2>
 
                 <div className="space-y-3">
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#D4C5A0] p-4 transition hover:bg-[#F7F1E3]/30">
+                  <label
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition ${
+                      shipping === "post"
+                        ? "border-accent bg-accent/5"
+                        : "border-theme hover:bg-theme-surface"
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="shipping"
                       value="post"
                       checked={shipping === "post"}
                       onChange={() => setShipping("post")}
-                      className="h-4 w-4 accent-amber-500"
+                      className="h-4 w-4 accent-[var(--accent)]"
                     />
                     <div className="flex-1">
-                      <div className="text-sm font-bold text-gray-800">
+                      <div className="text-sm font-bold text-theme">
                         پست پیشتاز
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-theme-muted">
                         ۳ تا ۵ روز کاری
                       </div>
                     </div>
-                    <div className="text-sm font-bold text-gray-900">
+                    <div className="text-sm font-bold text-theme">
                       ۸۰,۰۰۰ تومان
                     </div>
                   </label>
 
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#D4C5A0] p-4 transition hover:bg-[#F7F1E3]/30">
+                  <label
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition ${
+                      shipping === "pickup"
+                        ? "border-accent bg-accent/5"
+                        : "border-theme hover:bg-theme-surface"
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="shipping"
                       value="pickup"
                       checked={shipping === "pickup"}
                       onChange={() => setShipping("pickup")}
-                      className="h-4 w-4 accent-amber-500"
+                      className="h-4 w-4 accent-[var(--accent)]"
                     />
                     <div className="flex-1">
-                      <div className="text-sm font-bold text-gray-800">
+                      <div className="text-sm font-bold text-theme">
                         تحویل حضوری
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-theme-muted">
                         مراجعه به فروشگاه در بانه
                       </div>
                     </div>
-                    <div className="text-sm font-bold text-green-600">
+                    <div className="text-sm font-bold text-green-500">
                       رایگان
                     </div>
                   </label>
@@ -420,46 +447,58 @@ export default function CheckoutPage() {
               </div>
 
               {/* روش پرداخت */}
-              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
-                <h2 className="mb-5 text-lg font-bold text-gray-800">
+              <div className="rounded-xl border border-theme bg-theme-card p-6">
+                <h2 className="mb-5 text-lg font-bold text-theme">
                   روش پرداخت
                 </h2>
 
                 <div className="space-y-3">
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#D4C5A0] p-4 transition hover:bg-[#F7F1E3]/30">
+                  <label
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition ${
+                      payment === "online"
+                        ? "border-accent bg-accent/5"
+                        : "border-theme hover:bg-theme-surface"
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="payment"
                       value="online"
                       checked={payment === "online"}
                       onChange={() => setPayment("online")}
-                      className="h-4 w-4 accent-amber-500"
+                      className="h-4 w-4 accent-[var(--accent)]"
                     />
                     <div className="flex-1">
-                      <div className="text-sm font-bold text-gray-800">
+                      <div className="text-sm font-bold text-theme">
                         پرداخت آنلاین
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-theme-muted">
                         درگاه پرداخت امن
                       </div>
                     </div>
                     <span className="text-xl">💳</span>
                   </label>
 
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#D4C5A0] p-4 transition hover:bg-[#F7F1E3]/30">
+                  <label
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition ${
+                      payment === "cash"
+                        ? "border-accent bg-accent/5"
+                        : "border-theme hover:bg-theme-surface"
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="payment"
                       value="cash"
                       checked={payment === "cash"}
                       onChange={() => setPayment("cash")}
-                      className="h-4 w-4 accent-amber-500"
+                      className="h-4 w-4 accent-[var(--accent)]"
                     />
                     <div className="flex-1">
-                      <div className="text-sm font-bold text-gray-800">
+                      <div className="text-sm font-bold text-theme">
                         پرداخت در محل
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-theme-muted">
                         هنگام تحویل کالا
                       </div>
                     </div>
@@ -469,8 +508,8 @@ export default function CheckoutPage() {
               </div>
 
               {/* توضیحات */}
-              <div className="rounded-xl border border-[#D4C5A0] bg-white p-6">
-                <h2 className="mb-3 text-lg font-bold text-gray-800">
+              <div className="rounded-xl border border-theme bg-theme-card p-6">
+                <h2 className="mb-3 text-lg font-bold text-theme">
                   توضیحات سفارش (اختیاری)
                 </h2>
                 <textarea
@@ -478,7 +517,7 @@ export default function CheckoutPage() {
                   value={form.note}
                   onChange={(e) => updateField("note", e.target.value)}
                   placeholder="مثلاً: لطفاً قبل از ارسال تماس بگیرید"
-                  className="w-full resize-none rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-2.5 text-sm outline-none focus:border-amber-500"
+                  className={`${inputCls} resize-none`}
                 />
               </div>
             </div>
@@ -486,15 +525,15 @@ export default function CheckoutPage() {
             {/* خلاصه سفارش */}
             <aside className="sticky top-4 h-fit space-y-4">
               {/* لیست محصولات */}
-              <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
-                <h2 className="mb-4 border-b border-[#EDE4CE] pb-3 text-lg font-bold text-gray-800">
+              <div className="rounded-xl border border-theme bg-theme-card p-5">
+                <h2 className="mb-4 border-b border-theme pb-3 text-lg font-bold text-theme">
                   سفارش شما ({totalItems} کالا)
                 </h2>
 
                 <div className="max-h-[280px] space-y-3 overflow-y-auto">
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-3">
-                      <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border border-[#EDE4CE] bg-gray-50">
+                      <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border border-theme bg-theme-surface">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -502,14 +541,14 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex flex-1 flex-col">
-                        <div className="line-clamp-1 text-xs font-semibold text-gray-800">
+                        <div className="line-clamp-1 text-xs font-semibold text-theme">
                           {item.name}
                         </div>
                         <div className="mt-1 flex items-center justify-between text-xs">
-                          <span className="text-gray-500">
+                          <span className="text-theme-muted">
                             {item.quantity} عدد
                           </span>
-                          <span className="font-bold text-gray-900">
+                          <span className="font-bold text-theme">
                             {formatPrice(item.price * item.quantity)}
                           </span>
                         </div>
@@ -520,8 +559,8 @@ export default function CheckoutPage() {
               </div>
 
               {/* کد تخفیف */}
-              <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
-                <h2 className="mb-3 text-sm font-bold text-gray-800">
+              <div className="rounded-xl border border-theme bg-theme-card p-5">
+                <h2 className="mb-3 text-sm font-bold text-theme">
                   🎟️ کد تخفیف
                 </h2>
 
@@ -529,8 +568,8 @@ export default function CheckoutPage() {
                   <div
                     className={`rounded-lg border p-3 ${
                       codeInvalid
-                        ? "border-amber-300 bg-amber-50"
-                        : "border-green-300 bg-green-50"
+                        ? "border-accent/40 bg-accent/5"
+                        : "border-green-500/40 bg-green-500/10"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -539,7 +578,7 @@ export default function CheckoutPage() {
                           <span className="text-lg">🎟️</span>
                           <span
                             className={`font-bold ${
-                              codeInvalid ? "text-amber-800" : "text-green-800"
+                              codeInvalid ? "text-accent" : "text-green-500"
                             }`}
                           >
                             {appliedCode.code}
@@ -547,7 +586,7 @@ export default function CheckoutPage() {
                         </div>
                         <p
                           className={`mt-1 text-xs ${
-                            codeInvalid ? "text-amber-700" : "text-green-700"
+                            codeInvalid ? "text-accent" : "text-green-500"
                           }`}
                         >
                           {codeInvalid
@@ -561,7 +600,7 @@ export default function CheckoutPage() {
                         type="button"
                         onClick={handleRemoveCode}
                         aria-label="حذف کد"
-                        className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-white hover:text-red-500"
+                        className="flex h-6 w-6 items-center justify-center rounded-full text-theme-muted transition hover:bg-theme-surface hover:text-red-500"
                       >
                         ✕
                       </button>
@@ -579,12 +618,12 @@ export default function CheckoutPage() {
                           setCodeSuccess("");
                         }}
                         placeholder="مثلاً KAW10"
-                        className="min-w-0 flex-1 rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-sm outline-none transition focus:border-amber-500"
+                        className="min-w-0 flex-1 rounded-lg border border-theme bg-theme-surface px-3 py-2 text-sm outline-none transition focus:border-accent"
                         dir="ltr"
                       />
                       <button
                         type="submit"
-                        className="shrink-0 rounded-lg bg-[#1E40AF] px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-900"
+                        className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white transition hover:bg-accent-hover"
                       >
                         اعمال
                       </button>
@@ -594,17 +633,17 @@ export default function CheckoutPage() {
               </div>
 
               {/* جمع کل */}
-              <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
-                <div className="space-y-3 border-b border-[#EDE4CE] pb-4 text-sm">
-                  <div className="flex justify-between text-gray-600">
+              <div className="rounded-xl border border-theme bg-theme-card p-5">
+                <div className="space-y-3 border-b border-theme pb-4 text-sm">
+                  <div className="flex justify-between text-theme-muted">
                     <span>جمع کالاها</span>
-                    <span className="font-bold text-gray-800">
+                    <span className="font-bold text-theme">
                       {formatPrice(totalPrice)}
                     </span>
                   </div>
 
                   {discountAmount > 0 && (
-                    <div className="flex justify-between text-green-700">
+                    <div className="flex justify-between text-green-500">
                       <span>تخفیف ({appliedCode?.code})</span>
                       <span className="font-bold">
                         − {formatPrice(discountAmount)}
@@ -612,13 +651,13 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-theme-muted">
                     <span>هزینه ارسال</span>
                     <span
                       className={
                         shippingCost === 0
-                          ? "font-bold text-green-600"
-                          : "font-bold text-gray-800"
+                          ? "font-bold text-green-500"
+                          : "font-bold text-theme"
                       }
                     >
                       {shippingCost === 0 ? "رایگان" : formatPrice(shippingCost)}
@@ -627,10 +666,10 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="text-base font-bold text-gray-800">
+                  <span className="text-base font-bold text-theme">
                     مبلغ قابل پرداخت
                   </span>
-                  <span className="text-lg font-black text-gray-900">
+                  <span className="text-lg font-black text-accent">
                     {formatPrice(finalPrice)}
                   </span>
                 </div>
@@ -639,14 +678,14 @@ export default function CheckoutPage() {
                   type="button"
                   onClick={handleSubmitOrder}
                   disabled={submitting}
-                  className="mt-5 w-full rounded-lg bg-green-700 py-3 text-base font-bold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mt-5 w-full rounded-lg bg-accent py-3 text-base font-bold text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? "در حال ثبت سفارش..." : "ثبت نهایی سفارش"}
                 </button>
 
-                <p className="mt-3 text-center text-xs text-gray-500">
+                <p className="mt-3 text-center text-xs text-theme-muted">
                   با ثبت سفارش،{" "}
-                  <a href="/rules" className="text-amber-600 hover:underline">
+                  <a href="/rules" className="text-accent hover:underline">
                     قوانین و مقررات
                   </a>{" "}
                   را می‌پذیرید.
@@ -661,4 +700,3 @@ export default function CheckoutPage() {
     </main>
   );
 }
-
