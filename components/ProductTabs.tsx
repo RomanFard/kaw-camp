@@ -71,7 +71,7 @@ export default function ProductTabs({ product }: { product: Product }) {
               <tr className="border-b border-[#EDE4CE]">
                 <td className="break-words py-3 text-gray-500">برند</td>
                 <td className="py-3 font-semibold text-gray-800">
-                  {product.brand || "کو کمپ"}
+                  {product.brand || "کاو کمپ"}
                 </td>
               </tr>
               <tr className="border-b border-[#EDE4CE]">

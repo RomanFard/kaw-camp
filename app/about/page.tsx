@@ -111,7 +111,7 @@ export default function AboutPage() {
         {/* چرا ما */}
         <section className="mt-8 rounded-2xl border border-theme bg-theme-card p-6 md:p-12">
           <h2 className="text-center text-xl font-bold text-theme md:text-2xl">
-            چرا کو کمپ؟
+            چرا کاو کمپ؟
           </h2>
 
           {/* موبایل: آکاردئون */}

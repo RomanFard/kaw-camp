@@ -94,31 +94,31 @@ export default function Header() {
           <div className="mx-auto max-w-[1400px] px-3 py-2.5 sm:px-6">
             <div className="flex items-center gap-1">
               <button
-                type="button"
-                onClick={() => setMobileOpen(true)}
-                aria-label="دسته‌بندی محصولات"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-theme-surface text-theme transition hover:bg-accent hover:text-white"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.2}
-                  stroke="currentColor"
-                  className="h-5 w-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
-                  />
-                </svg>
-              </button>
+  type="button"
+ onClick={() => setMobileOpen(!mobileOpen)}
+  aria-label="منوی دسته‌بندی‌ها"
+  className="flex h-11 w-16 items-center justify-center rounded-lg border border-accent bg-accent text-white shadow-lg shadow-accent/20 transition hover:bg-accent-hover"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2.2}
+    stroke="currentColor"
+    className="h-5 w-5"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+    />
+  </svg>
+</button>
 
               <a href="/" className="flex-shrink-0">
                 <Image
                   src="/images/logo.png"
-                  alt="کو کمپ"
+                  alt="کاو کمپ"
                   width={60}
                   height={60}
                   className="h-8 w-auto dark:brightness-0 dark:invert"
@@ -188,16 +188,41 @@ export default function Header() {
         <div className="relative hidden border-b border-theme bg-theme md:block">
           <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
             <div className="flex items-center justify-between gap-8 py-4">
-              <a href="/" className="flex flex-shrink-0 items-center">
-                <Image
-                  src="/images/logo.png"
-                  alt="کو کمپ"
-                  width={300}
-                  height={300}
-                  priority
-                  className="h-16 w-auto dark:brightness-0 dark:invert md:h-20"
-                />
-              </a>
+              <div className="flex flex-shrink-0 items-center gap-6">
+  <a href="/" className="flex flex-shrink-0 items-center">
+    <Image
+      src="/images/logo.png"
+      alt="کاو کمپ"
+      width={300}
+      height={300}
+      priority
+      className="h-16 w-auto dark:brightness-0 dark:invert md:h-20"
+    />
+  </a>
+
+  {/* دکمه منوی کناری — نسخه دسکتاپ */}
+  <button
+  type="button"
+  onClick={() => setMobileOpen(true)}
+  aria-label="منوی دسته‌بندی‌ها"
+  className="flex h-11 w-16 items-center justify-center rounded-lg border border-accent bg-accent text-white shadow-lg shadow-accent/20 transition hover:bg-accent-hover"
+>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={2}
+      stroke="currentColor"
+      className="h-5 w-5"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+      />
+    </svg>
+  </button>
+</div>
 
               <nav className="flex flex-1 items-center justify-center">
                 <ul className="flex items-center gap-1">
@@ -279,7 +304,7 @@ export default function Header() {
                 </ul>
               </nav>
 
-              <div className="flex flex-shrink-0 items-center gap-3">
+              <div className="flex flex-shrink-0 items-center gap-6">
                 <SearchPanel />
 
                 <a

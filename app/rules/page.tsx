@@ -82,11 +82,11 @@ export default function RulesPage() {
             قوانین و مقررات
           </span>
           <h1 className="mt-5 text-2xl font-bold text-gray-900 md:text-3xl">
-            شرایط استفاده از خدمات کو کمپ
+            شرایط استفاده از خدمات کاو کمپ
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-gray-600">
             لطفاً قبل از خرید، قوانین و مقررات فروشگاه را مطالعه فرمایید. استفاده
-            از خدمات کو کمپ به معنای پذیرش این قوانین است.
+            از خدمات کاو کمپ به معنای پذیرش این قوانین است.
           </p>
         </div>
 

@@ -66,7 +66,7 @@ export default function ReturnsPage() {
             رویه بازگشت کالا
           </span>
           <h1 className="mt-5 text-2xl font-bold text-gray-900 md:text-3xl">
-            شرایط بازگشت کالا در کو کمپ
+            شرایط بازگشت کالا در کاو کمپ
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-gray-600">
             رضایت شما برای ما اولویت دارد. اگر از خرید خود راضی نیستید،

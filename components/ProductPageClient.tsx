@@ -20,6 +20,8 @@ export default function ProductPageClient({ product }: { product: Product }) {
   );
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showDesc, setShowDesc] = useState(false);
+  const [showSpecs, setShowSpecs] = useState(false);
 
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
@@ -102,8 +104,8 @@ export default function ProductPageClient({ product }: { product: Product }) {
       {/* ═══════ بخش بالا ═══════ */}
       <div className="grid gap-5 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-6">
         {/* ═══ ستون چپ: گالری ═══ */}
-        <div className="flex flex-col rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-2.5">
-          <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+        <div className="flex flex-col rounded-2xl border border-theme bg-theme-card p-2.5">
+          <div className="relative overflow-hidden rounded-xl border border-theme bg-theme-surface">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={activeImage}
@@ -112,13 +114,13 @@ export default function ProductPageClient({ product }: { product: Product }) {
             />
 
             {discount > 0 && (
-              <span className="absolute right-3 top-3 rounded-md bg-[#E84C4C] px-3 py-1.5 text-sm font-black text-white shadow-lg">
+              <span className="absolute right-3 top-3 rounded-md bg-accent px-3 py-1.5 text-sm font-black text-white shadow-lg">
                 -{discount}٪ OFF
               </span>
             )}
 
             {!product.inStock && (
-              <span className="absolute left-3 top-3 rounded-md bg-zinc-700 px-3 py-1.5 text-sm font-black text-white shadow-lg">
+              <span className="absolute left-3 top-3 rounded-md bg-theme-muted px-3 py-1.5 text-sm font-black text-theme-card shadow-lg">
                 ناموجود
               </span>
             )}
@@ -130,7 +132,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 type="button"
                 onClick={prevImage}
                 aria-label="قبلی"
-                className="absolute -left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A] text-white shadow-lg transition hover:border-[#E84C4C] hover:bg-[#E84C4C]"
+                className="absolute -left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-theme bg-theme-card text-theme shadow-lg transition hover:border-accent hover:bg-accent hover:text-white"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -141,7 +143,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 type="button"
                 onClick={nextImage}
                 aria-label="بعدی"
-                className="absolute -right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-[#0A0A0A] text-white shadow-lg transition hover:border-[#E84C4C] hover:bg-[#E84C4C]"
+                className="absolute -right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-theme bg-theme-card text-theme shadow-lg transition hover:border-accent hover:bg-accent hover:text-white"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -154,10 +156,10 @@ export default function ProductPageClient({ product }: { product: Product }) {
                     key={i}
                     type="button"
                     onClick={() => setActiveImageIndex(i)}
-                    className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-zinc-950 transition ${
+                    className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-theme-surface transition ${
                       i === activeImageIndex
-                        ? "border-[#E84C4C]"
-                        : "border-zinc-800 hover:border-zinc-600"
+                        ? "border-accent"
+                        : "border-theme hover:border-theme-muted"
                     }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -174,58 +176,57 @@ export default function ProductPageClient({ product }: { product: Product }) {
         </div>
 
         {/* ═══ ستون راست: اطلاعات ═══ */}
-        <div className="flex flex-col rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6">
+        <div className="flex flex-col rounded-2xl border border-theme bg-theme-card p-6">
           {discount > 0 && (
-            <span className="mb-4 inline-flex w-fit rounded-md bg-[#E84C4C] px-3 py-1.5 text-sm font-black text-white">
+            <span className="mb-4 inline-flex w-fit rounded-md bg-accent px-3 py-1.5 text-sm font-black text-white">
               -{discount}٪ OFF
             </span>
           )}
 
-          <p className="text-sm font-black uppercase tracking-widest text-zinc-500">
+          <p className="text-sm font-black uppercase tracking-widest text-theme-muted">
             {brand}
           </p>
 
-          <h1 className="mt-2 text-2xl font-black leading-9 text-white md:text-3xl md:leading-tight">
+          <h1 className="mt-2 text-2xl font-black leading-9 text-theme md:text-3xl md:leading-tight">
             {product.name}
           </h1>
 
-          <p className="mt-3 text-sm text-zinc-500" dir="ltr">
-            SKU:{" "}
-            <span className="font-mono text-zinc-400">{productCode}</span>
+          <p className="mt-3 text-sm text-theme-muted" dir="ltr">
+            SKU: <span className="font-mono text-theme-muted">{productCode}</span>
           </p>
 
           <div className="mt-2 flex items-center gap-2 text-base">
-            <span className="text-[#E84C4C]">
+            <span className="text-accent">
               {"★".repeat(Math.round(product.rating))}
-              <span className="text-zinc-700">
+              <span className="text-theme-muted/40">
                 {"★".repeat(5 - Math.round(product.rating))}
               </span>
             </span>
-            <span className="text-zinc-500">
+            <span className="text-theme-muted">
               ({product.reviews.toLocaleString("fa-IR")} reviews)
             </span>
           </div>
 
           <div className="mt-4 flex items-baseline gap-4">
-            <span className="text-3xl font-black text-[#E84C4C] md:text-4xl">
+            <span className="text-3xl font-black text-accent md:text-4xl">
               {formatPrice(product.price)}
             </span>
             {product.oldPrice && (
-              <span className="text-base text-zinc-500 line-through">
+              <span className="text-base text-theme-muted line-through">
                 {formatPrice(product.oldPrice)}
               </span>
             )}
           </div>
 
-          <p className="mt-4 text-base leading-8 text-zinc-400">
+          <p className="mt-4 text-base leading-8 text-theme-muted">
             {product.shortDesc}
           </p>
 
           <div className="mt-5 space-y-4">
             {hasColors && (
               <div>
-                <p className="mb-3 text-sm font-bold text-zinc-400">
-                  رنگ: <span className="text-white">{selectedColor}</span>
+                <p className="mb-3 text-sm font-bold text-theme-muted">
+                  رنگ: <span className="text-theme">{selectedColor}</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {colors.map((c) => (
@@ -235,12 +236,12 @@ export default function ProductPageClient({ product }: { product: Product }) {
                       onClick={() => setSelectedColor(c.label)}
                       className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold transition ${
                         selectedColor === c.label
-                          ? "border-[#E84C4C] bg-[#E84C4C]/10 text-[#E84C4C]"
-                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-theme text-theme-muted hover:border-theme-muted hover:text-theme"
                       }`}
                     >
                       {c.image && (
-                        <span className="h-6 w-6 overflow-hidden rounded border border-zinc-700 bg-zinc-950">
+                        <span className="h-6 w-6 overflow-hidden rounded border border-theme bg-theme-surface">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={c.image}
@@ -258,8 +259,8 @@ export default function ProductPageClient({ product }: { product: Product }) {
 
             {hasSizes && (
               <div>
-                <p className="mb-3 text-sm font-bold text-zinc-400">
-                  سایز: <span className="text-white">{selectedSize}</span>
+                <p className="mb-3 text-sm font-bold text-theme-muted">
+                  سایز: <span className="text-theme">{selectedSize}</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {sizes.map((s) => (
@@ -269,12 +270,12 @@ export default function ProductPageClient({ product }: { product: Product }) {
                       onClick={() => setSelectedSize(s.label)}
                       className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold transition ${
                         selectedSize === s.label
-                          ? "border-[#E84C4C] bg-[#E84C4C]/10 text-[#E84C4C]"
-                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-theme text-theme-muted hover:border-theme-muted hover:text-theme"
                       }`}
                     >
                       {s.image && (
-                        <span className="h-6 w-6 overflow-hidden rounded border border-zinc-700 bg-zinc-950">
+                        <span className="h-6 w-6 overflow-hidden rounded border border-theme bg-theme-surface">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={s.image}
@@ -292,21 +293,21 @@ export default function ProductPageClient({ product }: { product: Product }) {
 
             {/* ─── تعداد + دکمه + علاقه‌مندی ─── */}
             <div className="flex flex-wrap items-center gap-2 pt-2">
-              <div className="flex items-center rounded-full border border-zinc-800 bg-zinc-950/50 px-1">
+              <div className="flex items-center rounded-full border border-theme bg-theme-surface px-1">
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="flex h-12 w-9 items-center justify-center text-lg font-bold text-zinc-400 transition hover:text-white"
+                  className="flex h-12 w-9 items-center justify-center text-lg font-bold text-theme-muted transition hover:text-theme"
                 >
                   −
                 </button>
-                <span className="min-w-[32px] text-center text-base font-black text-white">
+                <span className="min-w-[32px] text-center text-base font-black text-theme">
                   {quantity.toLocaleString("fa-IR")}
                 </span>
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => q + 1)}
-                  className="flex h-12 w-9 items-center justify-center text-lg font-bold text-zinc-400 transition hover:text-white"
+                  className="flex h-12 w-9 items-center justify-center text-lg font-bold text-theme-muted transition hover:text-theme"
                 >
                   +
                 </button>
@@ -316,7 +317,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 type="button"
                 onClick={() => product.inStock && addItem(product, quantity)}
                 disabled={!product.inStock}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#E84C4C] px-10 py-3.5 text-base font-black text-white transition hover:bg-[#D63F3F] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600 md:text-lg"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-accent px-10 py-3.5 text-base font-black text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-theme-surface disabled:text-theme-muted md:text-lg"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
@@ -331,7 +332,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 className={`inline-flex h-12 w-12 items-center justify-center rounded-full border transition ${
                   inWishlist
                     ? "border-red-500 bg-red-500/10 text-red-500"
-                    : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                    : "border-theme text-theme-muted hover:border-theme-muted hover:text-theme"
                 }`}
               >
                 <svg
@@ -348,17 +349,14 @@ export default function ProductPageClient({ product }: { product: Product }) {
             </div>
           </div>
 
-          <div className="mt-auto space-y-3 border-t border-zinc-800 pt-4">
+          <div className="mt-auto space-y-3 border-t border-theme pt-4">
             {[
               "موجود در انبار، ارسال فوری",
               "ضمانت اصالت و کیفیت کالا",
               "ارسال رایگان بالای ۲ میلیون",
             ].map((text, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 text-sm text-zinc-400"
-              >
-                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border border-[#E84C4C]/40 text-[#E84C4C]">
+              <div key={i} className="flex items-center gap-3 text-sm text-theme-muted">
+                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border border-accent/40 text-accent">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="h-3 w-3">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
@@ -369,47 +367,121 @@ export default function ProductPageClient({ product }: { product: Product }) {
           </div>
         </div>
       </div>
-
-      {/* ═══════ بخش پایین: توضیحات + چرا ما ═══════ */}
+      {/* ═══════ بخش پایین ═══════ */}
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-        <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6 md:p-7">
-          <h2 className="mb-5 text-lg font-black text-white md:text-xl">
-            توضیحات
-          </h2>
-          <p className="whitespace-pre-line text-sm leading-8 text-zinc-400 md:text-base md:leading-9">
-            {product.description}
-          </p>
+        {/* ستون چپ: تب توضیحات / مشخصات فنی */}
+        <div className="rounded-2xl border border-theme bg-theme-card p-6 md:p-7">
+          {/* تب‌ها */}
+          <div className="mb-6 flex gap-2 border-b border-theme pb-3">
+            <button
+              type="button"
+              onClick={() => setActiveTab("desc")}
+              className={
+                "rounded-lg px-5 py-2.5 text-sm font-bold transition md:text-base " +
+                (activeTab === "desc"
+                  ? "bg-accent text-white shadow-lg shadow-accent/20"
+                  : "bg-theme-surface text-theme-muted hover:text-accent")
+              }
+            >
+              توضیحات
+            </button>
 
-          {product.features.length > 0 && (
-            <ul className="mt-6 space-y-3">
-              {product.features.map((f) => (
-                <li
-                  key={f}
-                  className="flex items-start gap-3 text-sm text-zinc-400 md:text-base"
+            <button
+              type="button"
+              onClick={() => setActiveTab("specs")}
+              className={
+                "rounded-lg px-5 py-2.5 text-sm font-bold transition md:text-base " +
+                (activeTab === "specs"
+                  ? "bg-accent text-white shadow-lg shadow-accent/20"
+                  : "bg-theme-surface text-theme-muted hover:text-accent")
+              }
+            >
+              مشخصات فنی
+            </button>
+          </div>
+
+          {/* محتوای تب */}
+          {activeTab === "desc" ? (
+            <div>
+              <p className="whitespace-pre-line text-sm leading-8 text-theme-muted md:text-base md:leading-9">
+                {product.description}
+              </p>
+
+              {product.features.length > 0 && (
+                <ul className="mt-6 space-y-3">
+                  {product.features.map((f) => (
+                    <li
+                      key={f}
+                      className="flex items-start gap-3 text-sm text-theme-muted md:text-base"
+                    >
+                      <span className="mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2 md:gap-x-8">
+              {[
+                { label: "برند", value: brand },
+                { label: "نام انگلیسی", value: englishName },
+                { label: "شناسه", value: productCode },
+                { label: "امتیاز", value: `${product.rating} از ۵` },
+                ...(colors.length > 0
+                  ? [
+                      {
+                        label: "رنگ‌ها",
+                        value: colors.map((c) => c.label).join(" / "),
+                      },
+                    ]
+                  : []),
+                ...(sizes.length > 0
+                  ? [
+                      {
+                        label: "سایزها",
+                        value: sizes.map((s) => s.label).join(" / "),
+                      },
+                    ]
+                  : []),
+              ].map((row, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between border-b border-theme py-3 text-sm md:text-base"
                 >
-                  <span className="mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#E84C4C]" />
-                  <span>{f}</span>
-                </li>
+                  <span className="text-theme-muted">{row.label}</span>
+                  <span
+                    className="font-bold text-theme"
+                    dir={
+                      row.label === "نام انگلیسی" || row.label === "شناسه"
+                        ? "ltr"
+                        : undefined
+                    }
+                  >
+                    {row.value}
+                  </span>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
 
-        <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6 md:p-7">
-          <h2 className="mb-6 text-lg font-black text-white md:text-xl">
+        {/* ستون راست: چرا از ما بخرید */}
+        <div className="rounded-2xl border border-theme bg-theme-card p-6 md:p-7">
+          <h2 className="mb-6 text-lg font-black text-theme md:text-xl">
             چرا از ما بخرید؟
           </h2>
           <div className="space-y-5">
             {whyUsItems.map((item, i) => (
               <div key={i} className="flex items-start gap-3">
-                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#E84C4C]/30 text-[#E84C4C]">
+                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-accent/30 text-accent">
                   {item.icon}
                 </span>
                 <div>
-                  <p className="text-sm font-black text-white md:text-base">
+                  <p className="text-sm font-black text-theme md:text-base">
                     {item.title}
                   </p>
-                  <p className="mt-1 text-xs text-zinc-500 md:text-sm">
+                  <p className="mt-1 text-xs text-theme-muted md:text-sm">
                     {item.desc}
                   </p>
                 </div>
@@ -418,54 +490,6 @@ export default function ProductPageClient({ product }: { product: Product }) {
           </div>
         </div>
       </div>
-
-      {/* ═══════ مشخصات فنی ═══════ */}
-      <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-6 md:p-7">
-        <h2 className="mb-6 text-lg font-black text-white md:text-xl">
-          مشخصات فنی
-        </h2>
-        <div className="grid gap-3 md:grid-cols-2 md:gap-x-8">
-          {[
-            { label: "برند", value: brand },
-            { label: "نام انگلیسی", value: englishName },
-            { label: "شناسه", value: productCode },
-            {
-              label: "امتیاز",
-              value: `${product.rating} از ۵`,
-            },
-            ...(colors.length > 0
-              ? [
-                  {
-                    label: "رنگ‌ها",
-                    value: colors.map((c) => c.label).join(" / "),
-                  },
-                ]
-              : []),
-            ...(sizes.length > 0
-              ? [
-                  {
-                    label: "سایزها",
-                    value: sizes.map((s) => s.label).join(" / "),
-                  },
-                ]
-              : []),
-          ].map((row, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between border-b border-zinc-800 py-3 text-sm md:text-base"
-            >
-              <span className="text-zinc-500">{row.label}</span>
-              <span
-                className="font-bold text-white"
-                dir={row.label === "نام انگلیسی" || row.label === "شناسه" ? "ltr" : undefined}
-              >
-                {row.value}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
-

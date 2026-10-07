@@ -30,28 +30,29 @@ export default function MobileMenuDrawer({
     defaultMenu as MobileMenuCategory[]
   );
   const { totalItems } = useCart();
-    // مخفی کردن نوار پایین موبایل وقتی منو بازه
- useEffect(() => {
-  if (isOpen) {
-    const scrollY = window.scrollY;
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.width = "100%";
-    document.body.style.overflow = "hidden";
 
-    return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
-      window.scrollTo(0, scrollY);
-    };
-  }
-}, [isOpen]);
+  // قفل اسکرول پس‌زمینه وقتی منو بازه
+  useEffect(() => {
+    if (isOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
+
+      return () => {
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        document.body.style.width = "";
+        document.body.style.overflow = "";
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,48 +96,30 @@ export default function MobileMenuDrawer({
   }
 
   return (
-    <aside
-      dir="rtl"
-      className={
-        "fixed inset-0 z-[210] flex h-[100dvh] w-full flex-col bg-theme-card transition-transform duration-300 md:hidden " +
-        (isOpen ? "visible translate-x-0" : "invisible translate-x-full")
-      }
-    >
-      <header className="flex flex-shrink-0 items-center justify-between border-b border-theme bg-theme-card px-3 py-2.5">
-        <button
-          type="button"
-          onClick={closeAll}
-          aria-label="بستن"
-          className="flex h-9 w-9 items-center justify-center text-theme"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+    <>
+      {/* Backdrop — کلیک روی صفحه منو رو می‌بنده */}
+      <div
+        onClick={closeAll}
+        aria-hidden="true"
+        className={
+          "fixed inset-0 z-[205] bg-black/50 backdrop-blur-sm transition-opacity duration-300 " +
+          (isOpen ? "visible opacity-100" : "invisible opacity-0")
+        }
+      />
 
-        <Link
-          href="/"
-          onClick={closeAll}
-          className="text-base font-black tracking-[0.2em] text-theme"
-        >
-          KAW CAMP
-        </Link>
-
-        <div className="flex items-center">
+      <aside
+        dir="rtl"
+        className={
+          "fixed inset-y-0 right-0 z-[210] flex h-[100dvh] w-full max-w-full flex-col bg-theme-card shadow-2xl transition-transform duration-300 md:max-w-[420px] " +
+          (isOpen ? "visible translate-x-0" : "invisible translate-x-full")
+        }
+      >
+        <header className="flex flex-shrink-0 items-center justify-between border-b border-theme bg-theme-card px-3 py-2.5">
           <button
+            type="button"
+            onClick={closeAll}
+            aria-label="بستن"
             className="flex h-9 w-9 items-center justify-center text-theme"
-            aria-label="جستجو"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -149,99 +132,129 @@ export default function MobileMenuDrawer({
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                d="M6 18L18 6M6 6l12 12"
               />
             </svg>
           </button>
 
           <Link
-            href="/login"
+            href="/"
             onClick={closeAll}
-            className="flex h-9 w-9 items-center justify-center text-theme"
-            aria-label="حساب کاربری"
+            className="text-base font-black tracking-[0.2em] text-theme"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-              />
-            </svg>
+            KAW CAMP
           </Link>
 
-          <Link
-            href="/cart"
-            onClick={closeAll}
-            className="relative flex h-9 w-9 items-center justify-center text-theme"
-            aria-label="کوله"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-5 w-5"
+          <div className="flex items-center">
+            <button
+              className="flex h-9 w-9 items-center justify-center text-theme"
+              aria-label="جستجو"
             >
-              <path
-                d="M11 1h2a0.5 0.5 0 0 1 0 1h-2a0.5 0.5 0 0 1 0-1z"
-                opacity="0.55"
-              />
-              <path d="M8.5 3C8.5 2.2 9.2 1.5 10 1.5h4c0.8 0 1.5 0.7 1.5 1.5V4h-7V3z" />
-              <path d="M7 6.5C7 5.7 7.7 5 8.5 5h7c0.8 0 1.5 0.7 1.5 1.5V22c0 0.8-0.7 1.5-1.5 1.5h-7c-0.8 0-1.5-0.7-1.5-1.5V6.5z" />
-              <ellipse cx="6.3" cy="14" rx="0.9" ry="3.5" />
-              <ellipse cx="17.7" cy="14" rx="0.9" ry="3.5" />
-              <rect
-                x="11.05"
-                y="6.5"
-                width="0.55"
-                height="15.5"
-                rx="0.27"
-                fill="#fff"
-                opacity="0.9"
-              />
-              <rect
-                x="12.4"
-                y="6.5"
-                width="0.55"
-                height="15.5"
-                rx="0.27"
-                fill="#fff"
-                opacity="0.9"
-              />
-            </svg>
-            {totalItems > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-white">
-                {totalItems}
-              </span>
-            )}
-          </Link>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </button>
+
+            <Link
+              href="/login"
+              onClick={closeAll}
+              className="flex h-9 w-9 items-center justify-center text-theme"
+              aria-label="حساب کاربری"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
+              </svg>
+            </Link>
+
+            <Link
+              href="/cart"
+              onClick={closeAll}
+              className="relative flex h-9 w-9 items-center justify-center text-theme"
+              aria-label="کوله"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  d="M11 1h2a0.5 0.5 0 0 1 0 1h-2a0.5 0.5 0 0 1 0-1z"
+                  opacity="0.55"
+                />
+                <path d="M8.5 3C8.5 2.2 9.2 1.5 10 1.5h4c0.8 0 1.5 0.7 1.5 1.5V4h-7V3z" />
+                <path d="M7 6.5C7 5.7 7.7 5 8.5 5h7c0.8 0 1.5 0.7 1.5 1.5V22c0 0.8-0.7 1.5-1.5 1.5h-7c-0.8 0-1.5-0.7-1.5-1.5V6.5z" />
+                <ellipse cx="6.3" cy="14" rx="0.9" ry="3.5" />
+                <ellipse cx="17.7" cy="14" rx="0.9" ry="3.5" />
+                <rect
+                  x="11.05"
+                  y="6.5"
+                  width="0.55"
+                  height="15.5"
+                  rx="0.27"
+                  fill="#fff"
+                  opacity="0.9"
+                />
+                <rect
+                  x="12.4"
+                  y="6.5"
+                  width="0.55"
+                  height="15.5"
+                  rx="0.27"
+                  fill="#fff"
+                  opacity="0.9"
+                />
+              </svg>
+              {totalItems > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-white">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto">
+          {view.type === "main" ? (
+            <MainView
+              menuItems={menuItems}
+              onCategory={goToCategory}
+              onClose={closeAll}
+            />
+          ) : currentCategory ? (
+            <CategoryView
+              category={currentCategory}
+              openGroups={openGroups}
+              onToggleGroup={toggleGroup}
+              onBack={backToMain}
+              onClose={closeAll}
+            />
+          ) : null}
         </div>
-      </header>
-
-      <div className="flex-1 overflow-y-auto">
-        {view.type === "main" ? (
-          <MainView
-            menuItems={menuItems}
-            onCategory={goToCategory}
-            onClose={closeAll}
-          />
-        ) : currentCategory ? (
-          <CategoryView
-            category={currentCategory}
-            openGroups={openGroups}
-            onToggleGroup={toggleGroup}
-            onBack={backToMain}
-            onClose={closeAll}
-          />
-        ) : null}
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
 
@@ -448,8 +461,6 @@ function CapacityFilter({
         <span>۱۲+ نفره</span>
       </div>
 
-
-
       <Link
         href={
           isAll
@@ -499,7 +510,7 @@ function CategoryView({
       <button
         type="button"
         onClick={onBack}
-        className="flex w-full items-center gap-2 border-b border-theme/40 px-5 py-3.5 text-base font-bold text-theme transition hover:bg-theme-surface"
+        className="flex w-full items-center gap-2 border-b border-theme bg-theme-surface px-5 py-3.5 text-base font-bold text-accent transition hover:bg-accent hover:text-white"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

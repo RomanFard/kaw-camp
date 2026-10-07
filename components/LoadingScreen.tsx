@@ -154,14 +154,14 @@ export default function LoadingScreen() {
         {/* لوگو */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="animate-pulse-slow">
-            <Image
-              src="/images/logo.png"
-              alt="KAW CAMP"
-              width={140}
-              height={140}
-              priority
-              className="h-20 w-auto dark:brightness-0 dark:invert md:h-24"
-            />
+<Image
+  src="/images/loading.png"        // ← مسیر عکس جدیدت
+  alt="KAW CAMP"
+  width={200}
+  height={200}
+  priority
+  className="h-24 w-auto md:h-28"
+/>
           </div>
         </div>
       </div>

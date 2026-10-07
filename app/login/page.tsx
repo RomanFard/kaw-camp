@@ -30,8 +30,8 @@ export default function LoginPage() {
               </h1>
               <p className="mt-2 text-sm text-gray-500">
                 {mode === "login"
-                  ? "به کو کمپ خوش آمدید"
-                  : "به خانواده کو کمپ بپیوندید"}
+                  ? "به کاو کمپ خوش آمدید"
+                  : "به خانواده کاو کمپ بپیوندید"}
               </p>
             </div>
 
@@ -150,7 +150,7 @@ export default function LoginPage() {
                     <a href="/rules" className="font-semibold text-amber-600 hover:underline">
                       قوانین و مقررات
                     </a>{" "}
-                    کو کمپ را خوانده‌ام و می‌پذیرم
+                    کاو کمپ را خوانده‌ام و می‌پذیرم
                   </span>
                 </label>
               )}

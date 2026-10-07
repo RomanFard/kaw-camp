@@ -303,7 +303,7 @@ export default function SearchPanel({
                           {product.name}
                         </div>
                         <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
-                          <span>{product.brand || "کو کمپ"}</span>
+                          <span>{product.brand || "کاو کمپ"}</span>
                           <span className="text-amber-600">•</span>
                           <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
                             {matchReason}

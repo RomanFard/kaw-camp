@@ -22,11 +22,10 @@ export default function Footer() {
        <div className="grid grid-cols-2 gap-6 md:gap-10 lg:grid-cols-4 lg:gap-8">
           {/* ─── ستون ۱: برند + درباره ─── */}
           <div className="lg:col-span-1">
-            <h3 className="mb-3 text-xl font-black text-theme">
-              کو کمپ <span className="text-accent">KAW CAMP</span>
-            </h3>
+           <h3 className="mb-2 text-xl font-black text-accent">KAW CAMP</h3>
+<div className="mb-4 h-[2px] w-12 rounded-full bg-accent" />
             <p className="text-xs leading-6 text-theme-muted md:text-sm md:leading-7">
-              کو کمپ مرجع تخصصی تجهیزات کمپینگ، طبیعت‌گردی و کوهنوردی است. تلاش
+              کاو کمپ مرجع تخصصی تجهیزات کمپینگ، طبیعت‌گردی و کوهنوردی است. تلاش
               می‌کنیم انتخاب و خرید تجهیزات را برای شما سریع‌تر، مطمئن‌تر و
               حرفه‌ای‌تر کنیم.
             </p>
@@ -60,27 +59,39 @@ export default function Footer() {
 
           {/* ─── ستون ۲: دسترسی سریع ─── */}
           <div>
-            <h4 className="relative mb-5 inline-block text-sm font-black text-theme md:text-base">
-              دسترسی سریع
+           <h4 className="relative mb-5 mt-2 inline-block text-sm font-black text-theme md:text-base">
+  دسترسی سریع
               <span className="absolute -bottom-2 right-0 h-[2px] w-8 bg-accent" />
             </h4>
             <ul className="space-y-2.5 text-xs md:text-sm">
               {[
                 { label: "صفحه اصلی", href: "/" },
                 { label: "تمامی محصولات", href: "/products" },
-                { label: "درباره ما", href: "/about" },
+                { label: "درباره ما", href: "/about", highlight: true },
                 { label: "حساب کاربری", href: "/account" },
                 { label: "سبد خرید", href: "/cart" },
                 { label: "مقالات", href: "/blog" },
               ].map((item) => (
                 <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="group flex items-center gap-2 text-theme-muted transition hover:text-accent"
-                  >
-                    <span className="h-1 w-1 rounded-full bg-theme-muted transition group-hover:bg-accent" />
-                    <span>{item.label}</span>
-                  </Link>
+                 <Link
+  href={item.href}
+  className={
+    "group flex items-center gap-2 transition " +
+    ((item as any).highlight
+      ? "text-accent hover:text-accent"
+      : "text-theme-muted hover:text-accent")
+  }
+>
+  <span
+    className={
+      "h-1 w-1 rounded-full transition " +
+      ((item as any).highlight
+        ? "bg-accent"
+        : "bg-theme-muted group-hover:bg-accent")
+    }
+  />
+  <span>{item.label}</span>
+</Link>
                 </li>
               ))}
             </ul>

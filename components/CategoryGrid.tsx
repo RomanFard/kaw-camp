@@ -30,15 +30,20 @@ const LABELS: Record<string, string> = {
   accessories: "لوازم جانبی",
 };
 
-const PEEK = 18; // مقدار بیرون‌زدگی لایه زیرین در گوشه (px)
-const BEHIND_OPACITY = 0.35; // شدت محو بودن لایه زیرین
-const PAD = 20; // padding اطراف اسلایدر (باید با px-5 و pt-5 یکی باشد)
+const PEEK = 18;
+const BEHIND_OPACITY = 0.35;
+const PAD = 20;
+
+const AUTOPLAY_MS = 4500;      // فاصله بین اسلایدها در حالت خودکار
+const IDLE_RESUME_MS = 300;   // بعد از نیم ثانیه بی‌کاری، حرکت ادامه پیدا می‌کند
 
 export default function CategoryGrid() {
   const [filters, setFilters] = useState<CategoryGridFilter[]>(DEFAULT_FILTERS);
   const [index, setIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
-  // وضعیت کشیدن زنده
+  // وضعیت کشیدن
   const wrapRef = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
   const [dx, setDx] = useState(0);
@@ -46,6 +51,14 @@ export default function CategoryGrid() {
   const startX = useRef<number | null>(null);
   const moved = useRef(false);
 
+  // زمان آخرین تعامل کاربر
+  const lastInteractRef = useRef(Date.now());
+
+  function markInteraction() {
+    lastInteractRef.current = Date.now();
+  }
+
+  // ─── لود فیلترها ───
   useEffect(() => {
     (async () => {
       const data = await getAppContent<CategoryGridFilter[]>("category_grid");
@@ -53,6 +66,15 @@ export default function CategoryGrid() {
     })();
   }, []);
 
+  // ─── تشخیص موبایل ───
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // ─── اندازه عرض ───
   useEffect(() => {
     const measure = () => setW(wrapRef.current?.offsetWidth || 0);
     measure();
@@ -60,11 +82,34 @@ export default function CategoryGrid() {
     return () => window.removeEventListener("resize", measure);
   }, []);
 
+  // ─── autoplay فقط در موبایل ───
+  useEffect(() => {
+    if (!isMobile) return;
+    if (filters.length <= 1) return;
+
+    const id = setInterval(() => {
+      // اگه کاربر اخیراً تعامل داشته، جلو نرو
+      if (Date.now() - lastInteractRef.current < IDLE_RESUME_MS) return;
+      // اگه در حال کشیدنه، جلو نرو
+      if (dragging) return;
+      // اگه موس روی کاروسله (فقط دسکتاپ، ولی برای اطمینان)، جلو نرو
+      if (isHovering) return;
+
+      setIndex((i) => (i + 1) % filters.length);
+    }, AUTOPLAY_MS);
+
+    return () => clearInterval(id);
+  }, [isMobile, filters.length, dragging, isHovering]);
+
   const last = filters.length - 1;
-  const goTo = (i: number) => setIndex(Math.max(0, Math.min(last, i)));
+  const goTo = (i: number) => {
+    markInteraction();
+    setIndex(Math.max(0, Math.min(last, i)));
+  };
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    markInteraction();
     startX.current = e.clientX;
     moved.current = false;
   };
@@ -76,10 +121,12 @@ export default function CategoryGrid() {
       if (Math.abs(d) < 6) return;
       moved.current = true;
       setDragging(true);
+      markInteraction();
       try {
         e.currentTarget.setPointerCapture(e.pointerId);
       } catch {}
     }
+    markInteraction();
     setDx(d);
   };
 
@@ -89,13 +136,13 @@ export default function CategoryGrid() {
     startX.current = null;
     setDragging(false);
     setDx(0);
+    markInteraction();
     if (!moved.current) return;
     const threshold = Math.max(60, w * 0.2);
     if (d < -threshold) goTo(index + 1);
     else if (d > threshold) goTo(index - 1);
   };
 
-  // اگر کاربر کشیده، کلیک روی لینک‌ها نادیده گرفته شود
   const onClickCapture = (e: React.MouseEvent) => {
     if (moved.current) {
       e.preventDefault();
@@ -104,7 +151,7 @@ export default function CategoryGrid() {
     }
   };
 
-  // استایل هر صفحه بر اساس فاصله‌اش با صفحه فعال (rel)
+  // استایل هر صفحه
   const pageStyle = (rel: number): React.CSSProperties => {
     const p = w ? Math.min(Math.abs(dx) / w, 1) : 0;
     const toNext = dragging && dx < 0 && index < last;
@@ -115,7 +162,7 @@ export default function CategoryGrid() {
     let op = 1;
 
     if (rel > 0) {
-      tx = "calc(100% + 40px)"; // بیرون از کادر، سمت راست
+      tx = "calc(100% + 40px)";
       if (toNext && rel === 1) tx = Math.max(0, w + dx);
     } else if (rel === 0) {
       if (toNext) {
@@ -158,9 +205,9 @@ export default function CategoryGrid() {
 
   return (
     <section
-  className="relative py-12 md:py-16"
-  style={{ isolation: "isolate", zIndex: 1 }}
->
+      className="relative py-12 md:py-16"
+      style={{ isolation: "isolate", zIndex: 1 }}
+    >
       <div className="relative w-full bg-theme py-12 md:py-16">
         <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div className="mb-8 text-center">
@@ -195,7 +242,6 @@ export default function CategoryGrid() {
             ))}
           </div>
 
-          {/* اسلایدر لایه‌ای با کشیدن زنده؛ گوشه لایه زیرین کمی محو دیده می‌شود */}
           <div
             ref={wrapRef}
             dir="ltr"
@@ -212,6 +258,14 @@ export default function CategoryGrid() {
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
             onClickCapture={onClickCapture}
+            onPointerEnter={(e) => {
+              if (e.pointerType !== "mouse") return;
+              setIsHovering(true);
+            }}
+            onPointerLeave={(e) => {
+              if (e.pointerType !== "mouse") return;
+              setIsHovering(false);
+            }}
           >
             <div className="grid">
               {filters.map((f, pageIdx) => {
@@ -287,7 +341,6 @@ export default function CategoryGrid() {
             </div>
           </div>
 
-          {/* نقطه‌های پایین اسلایدر */}
           <div className="mt-6 flex items-center justify-center gap-2">
             {filters.map((f, i) => (
               <button

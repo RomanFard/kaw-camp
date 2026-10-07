@@ -158,7 +158,7 @@ export default function AddToCartSection({
       <div className="rounded-xl border border-[#D4C5A0] bg-white p-5">
         <div className="flex items-center justify-between border-b border-[#EDE4CE] pb-3">
           <span className="text-sm font-bold text-gray-800">فروشنده</span>
-          <span className="text-sm font-bold text-amber-600">کو کمپ</span>
+          <span className="text-sm font-bold text-amber-600">کاو کمپ</span>
         </div>
 
         <ul className="mt-3 space-y-2.5 text-sm text-gray-700">
