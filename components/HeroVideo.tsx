@@ -28,6 +28,10 @@ const FALLBACK_SLIDES: HeroSlide[] = [
   },
 ];
 
+// ارتفاع یکسان برای اسکلت لود و اسلایدر تا هنگام لود پرش نداشته باشیم
+const SECTION_SIZE =
+  "h-[72svh] min-h-[440px] max-h-[620px] md:h-[700px] md:max-h-none lg:h-screen lg:max-h-[900px]";
+
 export default function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [slides, setSlides] = useState<HeroSlide[]>([]);
@@ -36,6 +40,9 @@ export default function HeroVideo() {
   const [paused, setPaused] = useState(false);
   const [textKey, setTextKey] = useState(0);
   const { setSlideState } = useHeroSlide();
+
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   // ─── آپدیت context ───
   useEffect(() => {
@@ -81,11 +88,37 @@ export default function HeroVideo() {
     setCurrent((c) => (c - 1 + slides.length) % slides.length);
   }
 
+  // ─── هندلرهای swipe ───
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    setPaused(true);
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+
+    // فقط اگه حرکت افقی بیشتر از عمودی بود
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) {
+        goNext();
+      } else {
+        goPrev();
+      }
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+    setPaused(false);
+  }
+
   if (loading) {
     return (
       <section
         dir="rtl"
-        className="relative h-[600px] w-full overflow-hidden bg-black md:h-[700px] lg:h-screen lg:max-h-[900px]"
+        className={`relative w-full overflow-hidden bg-black ${SECTION_SIZE}`}
       >
         <div className="h-full w-full animate-pulse bg-zinc-900" />
       </section>
@@ -95,7 +128,9 @@ export default function HeroVideo() {
   return (
     <section
       dir="rtl"
-      className="relative h-[600px] w-full overflow-hidden bg-black md:h-[700px] lg:h-screen lg:max-h-[900px]"
+      className={`relative w-full overflow-hidden bg-black ${SECTION_SIZE}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* ─── تصاویر ─── */}
       {slides.map((s, i) => {
@@ -115,7 +150,7 @@ export default function HeroVideo() {
                 playsInline
                 preload="auto"
                 poster={s.poster}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover object-center"
               >
                 <source src={s.video} type="video/mp4" />
               </video>
@@ -124,8 +159,8 @@ export default function HeroVideo() {
               <img
                 src={s.poster}
                 alt={s.title_line1}
-                className={`h-full w-full object-cover transition-transform duration-[8000ms] ease-out ${
-                  isActive ? "scale-110" : "scale-100"
+                className={`h-full w-full object-cover object-center transition-transform duration-[8000ms] ease-out ${
+                  isActive ? "md:scale-110" : "scale-100"
                 }`}
               />
             )}
@@ -133,11 +168,13 @@ export default function HeroVideo() {
         );
       })}
 
-      {/* ─── Overlay ─── */}
-      <div className="absolute inset-0 bg-gradient-to-l from-black via-black/70 to-black/30" />
+      {/* ─── Overlay ───
+          موبایل: تیره‌شدن از پایین، تا عکس در بالا دیده شود و متن پایین بنشیند
+          دسکتاپ: تیره‌شدن از سمت راست مثل قبل */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/5 md:bg-gradient-to-l md:from-black md:via-black/70 md:to-black/30" />
 
       {/* ─── محتوا ─── */}
-      <div className="relative z-10 flex h-full items-center overflow-hidden">
+      <div className="relative z-10 flex h-full items-end overflow-hidden pb-14 md:items-center md:pb-0">
         <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div
             onMouseEnter={() => setPaused(true)}
@@ -147,7 +184,7 @@ export default function HeroVideo() {
             <div key={textKey}>
               {/* Eyebrow */}
               {slide.eyebrow && (
-                <div className="animate-hero-1 mb-4 flex items-center justify-start gap-3">
+                <div className="animate-hero-1 mb-3 flex items-center justify-start gap-3 md:mb-4">
                   <span className="h-[2px] w-10 bg-accent" />
                   <span className="text-xs font-bold tracking-wider text-accent md:text-sm">
                     {slide.eyebrow}
@@ -156,18 +193,18 @@ export default function HeroVideo() {
               )}
 
               {/* خط اول عنوان */}
-              <h1 className="animate-hero-2 mb-0 text-4xl font-black leading-[1.15] text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
+              <h1 className="animate-hero-2 mb-0 text-3xl font-black leading-[1.15] text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
                 {slide.title_line1}
               </h1>
 
               {/* خط دوم عنوان */}
-              <h1 className="animate-hero-3 mb-5 text-4xl font-black leading-[1.15] text-accent drop-shadow-2xl md:text-6xl lg:text-7xl">
+              <h1 className="animate-hero-3 mb-3 text-3xl font-black leading-[1.15] text-accent drop-shadow-2xl md:mb-5 md:text-6xl lg:text-7xl">
                 {slide.title_line2}
               </h1>
 
               {/* توضیحات */}
               {slide.description && (
-                <p className="animate-hero-4 mb-8 max-w-xl text-sm leading-7 text-zinc-300 md:text-base md:leading-8">
+                <p className="animate-hero-4 mb-5 max-w-xl text-xs leading-6 text-zinc-200 md:mb-8 md:text-base md:leading-8">
                   {slide.description}
                 </p>
               )}
@@ -177,7 +214,7 @@ export default function HeroVideo() {
                 {slide.primary_label && slide.primary_href && (
                   <a
                     href={slide.primary_href}
-                    className="group inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-accent/30 transition hover:bg-accent-hover md:px-8 md:text-base"
+                    className="group inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-xs font-bold text-white shadow-xl shadow-accent/30 transition hover:bg-accent-hover md:px-8 md:py-3.5 md:text-base"
                   >
                     <span>{slide.primary_label}</span>
                     <svg
@@ -200,7 +237,7 @@ export default function HeroVideo() {
                 {slide.secondary_label && slide.secondary_href && (
                   <a
                     href={slide.secondary_href}
-                    className="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 bg-transparent px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/10 md:px-8 md:text-base"
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 bg-transparent px-5 py-3 text-xs font-bold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/10 md:px-8 md:py-3.5 md:text-base"
                   >
                     {slide.secondary_label}
                   </a>
@@ -263,7 +300,7 @@ export default function HeroVideo() {
 
       {/* ─── نقطه‌ها ─── */}
       {slides.length > 1 && (
-        <div className="absolute bottom-6 right-1/2 z-20 flex translate-x-1/2 items-center gap-3 md:bottom-8">
+        <div className="absolute bottom-4 right-1/2 z-20 flex translate-x-1/2 items-center gap-3 md:bottom-8">
           {slides.map((_, i) => (
             <button
               key={i}

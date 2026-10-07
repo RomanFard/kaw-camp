@@ -157,7 +157,10 @@ export default function CategoryGrid() {
   };
 
   return (
-    <section className="relative overflow-hidden py-12 md:py-16">
+    <section
+  className="relative py-12 md:py-16"
+  style={{ isolation: "isolate", zIndex: 1 }}
+>
       <div className="relative w-full bg-theme py-12 md:py-16">
         <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
           <div className="mb-8 text-center">
