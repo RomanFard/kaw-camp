@@ -64,6 +64,9 @@ export default function HeroVideo() {
 
   const slide = slides[current] || FALLBACK_SLIDES[0];
 
+  // دکمه‌ی تخفیف‌ها همیشه قرمز است، مستقل از رنگ تم
+  const isDiscountPrimary = !!slide.primary_label?.includes("تخفیف");
+
   useEffect(() => {
     if (videoRef.current && slide?.video) {
       videoRef.current.load();
@@ -218,7 +221,11 @@ export default function HeroVideo() {
                 {slide.primary_label && slide.primary_href && (
                   <a
                     href={slide.primary_href}
-                    className="group inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-xs font-bold text-white shadow-xl shadow-accent/30 transition hover:bg-accent-hover md:px-8 md:py-3.5 md:text-base"
+                    className={`group inline-flex items-center gap-2 rounded-lg px-5 py-3 text-xs font-bold text-white shadow-xl transition md:px-8 md:py-3.5 md:text-base ${
+                      isDiscountPrimary
+                        ? "bg-[#dc2626] shadow-[#dc2626]/30 hover:bg-[#b91c1c]"
+                        : "bg-accent shadow-accent/30 hover:bg-accent-hover"
+                    }`}
                   >
                     <span>{slide.primary_label}</span>
                     <svg

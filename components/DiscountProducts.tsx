@@ -156,11 +156,11 @@ export default function DiscountProducts() {
     <section className="relative py-10 md:py-20">
       {/* Header */}
       <div className="mx-auto max-w-[1400px] px-4 text-center md:px-12 lg:px-16">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3 py-1 backdrop-blur-sm md:mb-4 md:px-4 md:py-1.5">
-          <span className="text-[10px] font-bold tracking-[0.15em] text-accent md:text-xs">
-            SHOP
-          </span>
-        </div>
+ <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-3 py-1 backdrop-blur-sm md:mb-4 md:px-4 md:py-1.5">
+  <span className="text-[10px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
+    SHOP
+  </span>
+</div>
 
         <h2 className="text-xl font-black tracking-tight text-theme md:text-4xl lg:text-5xl">
           تخفیف‌های <span className="text-accent">ویژه</span>
@@ -338,26 +338,26 @@ export default function DiscountProducts() {
 
       {/* CTA */}
       <div className="mt-6 text-center md:mt-10">
-        <a
-          href="/products?sort=discount"
-          className="group inline-flex items-center gap-2 border border-accent bg-transparent px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-accent transition hover:bg-accent hover:text-white md:px-6 md:py-2.5 md:text-sm"
-        >
-          <span>مشاهده همه تخفیف‌ها</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="h-3 w-3 transition group-hover:-translate-x-1 md:h-3.5 md:w-3.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-            />
-          </svg>
-        </a>
+<a
+  href="/products?sort=discount"
+  className="group inline-flex items-center gap-2 border border-[#E84C4C] bg-transparent px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white md:px-6 md:py-2.5 md:text-sm"
+>
+  <span>مشاهده همه تخفیف‌ها</span>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2.5}
+    stroke="currentColor"
+    className="h-3 w-3 transition group-hover:-translate-x-1 md:h-3.5 md:w-3.5"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+    />
+  </svg>
+</a>
       </div>
     </section>
   );
