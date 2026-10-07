@@ -56,7 +56,7 @@ const menuItems: MenuItem[] = [
       { label: "حساب کاربری", href: "/account" },
     ],
   },
-  { label: "مقالات", href: "/blog" },
+  
 ];
 
 export default function Header() {
