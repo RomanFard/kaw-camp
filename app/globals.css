@@ -209,3 +209,12 @@ input[type="range"].kaw-range::-moz-range-thumb {
   border: none;
   cursor: pointer;
 }
+/* وقتی منوی موبایل بازه، نوار پایین مخفی بشه */
+body.menu-drawer-open nav[dir="rtl"].pb-safe {
+  display: none !important;
+}
+
+/* جلوگیری از اسکرول بک‌گراند وقتی منو بازه */
+body.menu-drawer-open {
+  overflow: hidden !important;
+}

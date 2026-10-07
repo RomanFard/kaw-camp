@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import PopularTab from "@/components/admin/categories/PopularTab";
 import SpecialTab from "@/components/admin/categories/SpecialTab";
 import MobileTab from "@/components/admin/categories/MobileTab";
+import CategoryGridTab from "@/components/admin/categories/CategoryGridTab";
 import ImageUploader from "@/components/admin/ImageUploader";
 import { categories } from "@/data/products";
 import {
@@ -14,14 +15,15 @@ import {
   type CategoryPhoto,
 } from "@/lib/supabase/categoryPhotos";
 
-type Tab = "products" | "photos" | "special" | "popular" | "mobile";
+type Tab = "products" | "photos" | "special" | "popular" | "mobile" | "grid";
 
 export default function AdminCategoriesPage() {
   const [tab, setTab] = useState<Tab>("popular");
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "popular", label: "🔥 محبوب" },
-    { key: "special", label: "⭐ ویژه" },
+    { key: "grid", label: "⭐ خاص پسندها" },
+    { key: "special", label: "🎯 ویژه" },
     { key: "mobile", label: "📱 موبایل" },
     { key: "photos", label: "🖼 عکس‌ها" },
     { key: "products", label: "📦 محصولات" },
@@ -41,7 +43,7 @@ export default function AdminCategoriesPage() {
             🗂 مدیریت دسته‌بندی‌ها
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            مدیریت کامل دسته‌بندی‌های محبوب، ویژه، منوی موبایل و عکس‌ها
+            مدیریت کامل دسته‌بندی‌های محبوب، خاص پسندها، ویژه، منوی موبایل و عکس‌ها
           </p>
         </div>
 
@@ -67,6 +69,7 @@ export default function AdminCategoriesPage() {
         {/* محتوای تب */}
         <div className="rounded-2xl border border-[#D4C5A0] bg-white p-5">
           {tab === "popular" && <PopularTab />}
+          {tab === "grid" && <CategoryGridTab />}
           {tab === "special" && <SpecialTab />}
           {tab === "mobile" && <MobileTab />}
           {tab === "photos" && <PhotosTab />}
@@ -90,7 +93,7 @@ export default function AdminCategoriesPage() {
 }
 
 /* ═══════════════════════════════════
-   تب عکس‌ها (محتوای صفحه قبلی)
+   تب عکس‌ها
    ═══════════════════════════════════ */
 function PhotosTab() {
   const supabase = createClient();

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import Header from "@/components/Header";
 import HeroVideo from "@/components/HeroVideo";
-import AboutSection from "@/components/AboutSection";
 import CategoryGrid from "@/components/CategoryGrid";
+import LatestProducts from "@/components/LatestProducts";
 import CategoryShowcase from "@/components/CategoryShowcase";
 import DiscountProducts from "@/components/DiscountProducts";
 import ContactSection from "@/components/ContactSection";
@@ -78,10 +78,12 @@ export default function Home() {
       <div className="relative z-10">
 <Header />
 <HeroVideo />
+<LatestProducts />
 <CategoryShowcase />
 <DiscountProducts />
-<AboutSection />
 <CategoryGrid />
+
+
 <ContactSection />
 <Footer />
       </div>

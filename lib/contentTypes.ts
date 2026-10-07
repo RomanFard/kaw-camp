@@ -30,3 +30,8 @@ export const SPECIAL_ICON_KEYS = [
   "cooking",
   "tools",
 ] as const;
+export type CategoryGridFilter = {
+  key: string;
+  label: string;
+  photos: string[];
+};

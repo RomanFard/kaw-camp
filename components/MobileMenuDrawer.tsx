@@ -30,6 +30,28 @@ export default function MobileMenuDrawer({
     defaultMenu as MobileMenuCategory[]
   );
   const { totalItems } = useCart();
+    // مخفی کردن نوار پایین موبایل وقتی منو بازه
+ useEffect(() => {
+  if (isOpen) {
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, scrollY);
+    };
+  }
+}, [isOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,7 +98,7 @@ export default function MobileMenuDrawer({
     <aside
       dir="rtl"
       className={
-        "fixed inset-0 z-[210] flex h-screen w-full flex-col bg-theme-card transition-transform duration-300 md:hidden " +
+        "fixed inset-0 z-[210] flex h-[100dvh] w-full flex-col bg-theme-card transition-transform duration-300 md:hidden " +
         (isOpen ? "visible translate-x-0" : "invisible translate-x-full")
       }
     >
@@ -426,26 +448,7 @@ function CapacityFilter({
         <span>۱۲+ نفره</span>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {CAPACITIES.slice(0, -1).map((cap, i) => {
-          const active = i === index;
-          return (
-            <button
-              key={cap}
-              type="button"
-              onClick={() => setIndex(i)}
-              className={
-                "rounded-full border px-2.5 py-1 text-[10px] font-bold transition " +
-                (active
-                  ? "border-accent bg-accent text-white"
-                  : "border-theme/50 bg-theme-surface text-theme-muted hover:border-accent hover:text-accent")
-              }
-            >
-              {cap}
-            </button>
-          );
-        })}
-      </div>
+
 
       <Link
         href={
