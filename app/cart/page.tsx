@@ -28,11 +28,9 @@ export default function CartPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  // ارسال رایگان بر اساس مبلغ قبل از تخفیف
   const shipping = totalPrice > 2_000_000 || totalPrice === 0 ? 0 : 80_000;
   const grandTotal = totalAfterDiscount + shipping;
 
-  // کد اعمال شده اما شرطش برقرار نیست؟
   const codeInvalid =
     appliedCode !== null &&
     discountAmount === 0 &&
@@ -72,56 +70,56 @@ export default function CartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E3]">
+    <main className="min-h-screen bg-theme">
       <Header />
 
       <div className="mx-auto max-w-[1600px] px-6 py-8">
         {/* مسیر ناوبری */}
-        <nav className="mb-6 text-sm text-gray-500">
-          <a href="/" className="hover:text-amber-600">خانه</a>
+        <nav className="mb-6 text-sm text-theme-muted">
+          <a href="/" className="transition hover:text-accent">
+            خانه
+          </a>
           <span className="mx-2">/</span>
-          <span className="text-gray-800">سبد خرید</span>
+          <span className="text-theme">سبد خرید</span>
         </nav>
 
-        <h1 className="mb-6 text-2xl font-bold text-gray-900">
+        <h1 className="mb-6 text-2xl font-bold text-theme">
           سبد خرید
           {totalItems > 0 && (
-            <span className="mr-3 text-base font-normal text-gray-500">
+            <span className="mr-3 text-base font-normal text-theme-muted">
               ({totalItems} کالا)
             </span>
           )}
         </h1>
 
         {items.length === 0 ? (
-          /* سبد خالی */
-          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-12 text-center">
+          <div className="rounded-2xl border border-theme bg-theme-card p-12 text-center">
             <p className="text-6xl">🛒</p>
-            <p className="mt-4 text-lg font-bold text-gray-800">
+            <p className="mt-4 text-lg font-bold text-theme">
               سبد خرید شما خالی است
             </p>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-theme-muted">
               برای شروع خرید، محصولات ما را مرور کنید.
             </p>
             <a
               href="/products"
-              className="mt-6 inline-block rounded-lg bg-amber-500 px-6 py-3 text-base font-bold text-white transition hover:bg-amber-600"
+              className="mt-6 inline-block rounded-lg bg-accent px-6 py-3 text-base font-bold text-white transition hover:bg-accent-hover"
             >
               مشاهده محصولات
             </a>
           </div>
         ) : (
-          /* گرید: لیست آیتم‌ها + سایدبار */
           <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
             {/* لیست آیتم‌ها */}
             <div className="space-y-3">
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 rounded-xl border border-[#D4C5A0] bg-white p-4"
+                  className="flex gap-4 rounded-xl border border-theme bg-theme-card p-4"
                 >
                   <a
                     href={"/product/" + item.id}
-                    className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100"
+                    className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-theme-surface"
                   >
                     <img
                       src={item.image}
@@ -133,45 +131,49 @@ export default function CartPage() {
                   <div className="flex flex-1 flex-col">
                     <a
                       href={"/product/" + item.id}
-                      className="text-sm font-bold text-gray-800 hover:text-amber-600 md:text-base"
+                      className="text-sm font-bold text-theme transition hover:text-accent md:text-base"
                     >
                       {item.name}
                     </a>
 
-                    <div className="mt-2 text-sm text-gray-500">
+                    <div className="mt-2 text-sm text-theme-muted">
                       قیمت واحد: {formatPrice(item.price)}
                     </div>
 
                     <div className="mt-auto flex items-center justify-between">
-                      <div className="flex items-center gap-2 rounded-lg border border-[#D4C5A0] px-2 py-1">
+                      <div className="flex items-center gap-2 rounded-lg border border-theme px-2 py-1">
                         <button
                           type="button"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="flex h-7 w-7 items-center justify-center rounded text-lg font-bold text-gray-600 transition hover:bg-gray-100"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
+                          className="flex h-7 w-7 items-center justify-center rounded text-lg font-bold text-theme-muted transition hover:bg-theme-surface"
                         >
                           −
                         </button>
-                        <span className="min-w-[28px] text-center text-sm font-bold text-gray-800">
+                        <span className="min-w-[28px] text-center text-sm font-bold text-theme">
                           {item.quantity}
                         </span>
                         <button
                           type="button"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="flex h-7 w-7 items-center justify-center rounded text-lg font-bold text-gray-600 transition hover:bg-gray-100"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                          className="flex h-7 w-7 items-center justify-center rounded text-lg font-bold text-theme-muted transition hover:bg-theme-surface"
                         >
                           +
                         </button>
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <div className="text-sm font-bold text-gray-900 md:text-base">
+                        <div className="text-sm font-bold text-theme md:text-base">
                           {formatPrice(item.price * item.quantity)}
                         </div>
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(item.id, item.name)}
                           aria-label="حذف"
-                          className="text-gray-400 transition hover:text-red-500"
+                          className="text-theme-muted transition hover:text-red-500"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -203,20 +205,20 @@ export default function CartPage() {
               </button>
             </div>
 
-            {/* سایدبار - خلاصه سفارش */}
-            <aside className="sticky top-4 h-fit rounded-xl border border-[#D4C5A0] bg-white p-6">
-              <h2 className="mb-4 text-lg font-bold text-gray-800">
+            {/* سایدبار — خلاصه سفارش */}
+            <aside className="sticky top-4 h-fit rounded-xl border border-theme bg-theme-card p-6">
+              <h2 className="mb-4 text-lg font-bold text-theme">
                 خلاصه سفارش
               </h2>
 
-              {/* ─── کد تخفیف ─── */}
-              <div className="mb-4 border-b border-[#EDE4CE] pb-4">
+              {/* کد تخفیف */}
+              <div className="mb-4 border-b border-theme pb-4">
                 {appliedCode ? (
                   <div
                     className={`rounded-lg border p-3 ${
                       codeInvalid
-                        ? "border-amber-300 bg-amber-50"
-                        : "border-green-300 bg-green-50"
+                        ? "border-accent/40 bg-accent/5"
+                        : "border-green-500/40 bg-green-500/10"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -225,7 +227,7 @@ export default function CartPage() {
                           <span className="text-lg">🎟️</span>
                           <span
                             className={`font-bold ${
-                              codeInvalid ? "text-amber-800" : "text-green-800"
+                              codeInvalid ? "text-accent" : "text-green-500"
                             }`}
                           >
                             {appliedCode.code}
@@ -233,7 +235,7 @@ export default function CartPage() {
                         </div>
                         <p
                           className={`mt-1 text-xs ${
-                            codeInvalid ? "text-amber-700" : "text-green-700"
+                            codeInvalid ? "text-accent" : "text-green-500"
                           }`}
                         >
                           {codeInvalid
@@ -247,7 +249,7 @@ export default function CartPage() {
                         type="button"
                         onClick={handleRemoveCode}
                         aria-label="حذف کد"
-                        className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-white hover:text-red-500"
+                        className="flex h-6 w-6 items-center justify-center rounded-full text-theme-muted transition hover:bg-theme-surface hover:text-red-500"
                       >
                         ✕
                       </button>
@@ -255,7 +257,7 @@ export default function CartPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleApplyCode}>
-                    <label className="mb-2 block text-xs font-bold text-gray-600">
+                    <label className="mb-2 block text-xs font-bold text-theme-muted">
                       کد تخفیف دارید؟
                     </label>
                     <div className="flex gap-2">
@@ -268,12 +270,12 @@ export default function CartPage() {
                           setSuccessMsg("");
                         }}
                         placeholder="مثلاً KAW10"
-                        className="min-w-0 flex-1 rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-sm outline-none transition focus:border-amber-500"
+                        className="min-w-0 flex-1 rounded-lg border border-theme bg-theme-surface px-3 py-2 text-sm outline-none transition focus:border-accent"
                         dir="ltr"
                       />
                       <button
                         type="submit"
-                        className="shrink-0 rounded-lg bg-[#1E40AF] px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-900"
+                        className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white transition hover:bg-accent-hover"
                       >
                         اعمال
                       </button>
@@ -282,17 +284,17 @@ export default function CartPage() {
                 )}
               </div>
 
-              {/* ─── خلاصه ─── */}
-              <div className="space-y-3 border-b border-[#EDE4CE] pb-4 text-sm">
-                <div className="flex items-center justify-between text-gray-600">
+              {/* خلاصه */}
+              <div className="space-y-3 border-b border-theme pb-4 text-sm">
+                <div className="flex items-center justify-between text-theme-muted">
                   <span>جمع کالاها</span>
-                  <span className="font-bold text-gray-800">
+                  <span className="font-bold text-theme">
                     {formatPrice(totalPrice)}
                   </span>
                 </div>
 
                 {discountAmount > 0 && (
-                  <div className="flex items-center justify-between text-green-700">
+                  <div className="flex items-center justify-between text-green-500">
                     <span>تخفیف ({appliedCode?.code})</span>
                     <span className="font-bold">
                       − {formatPrice(discountAmount)}
@@ -300,13 +302,13 @@ export default function CartPage() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between text-gray-600">
+                <div className="flex items-center justify-between text-theme-muted">
                   <span>هزینه ارسال</span>
                   <span
                     className={
                       shipping === 0
-                        ? "font-bold text-green-600"
-                        : "font-bold text-gray-800"
+                        ? "font-bold text-green-500"
+                        : "font-bold text-theme"
                     }
                   >
                     {shipping === 0 ? "رایگان" : formatPrice(shipping)}
@@ -314,7 +316,7 @@ export default function CartPage() {
                 </div>
 
                 {shipping > 0 && (
-                  <div className="rounded-lg bg-amber-50 p-2.5 text-xs text-amber-700">
+                  <div className="rounded-lg border border-accent/30 bg-accent/5 p-2.5 text-xs text-accent">
                     🎁 با {formatPrice(2_000_000 - totalPrice)} خرید بیشتر، ارسال
                     رایگان می‌شود
                   </div>
@@ -322,24 +324,24 @@ export default function CartPage() {
               </div>
 
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-base font-bold text-gray-800">
+                <span className="text-base font-bold text-theme">
                   مبلغ قابل پرداخت
                 </span>
-                <span className="text-lg font-black text-gray-900">
+                <span className="text-lg font-black text-accent">
                   {formatPrice(grandTotal)}
                 </span>
               </div>
 
               <a
                 href="/checkout"
-                className="mt-5 block w-full rounded-lg bg-green-700 py-3 text-center text-base font-bold text-white transition hover:bg-green-800"
+                className="mt-5 block w-full rounded-lg bg-accent py-3 text-center text-base font-bold text-white transition hover:bg-accent-hover"
               >
                 ادامه فرآیند خرید
               </a>
 
               <a
                 href="/products"
-                className="mt-3 block w-full rounded-lg border-2 border-amber-500 bg-white py-3 text-center text-sm font-bold text-amber-600 transition hover:bg-amber-50"
+                className="mt-3 block w-full rounded-lg border-2 border-accent bg-transparent py-3 text-center text-sm font-bold text-accent transition hover:bg-accent/10"
               >
                 ← ادامه خرید
               </a>

@@ -93,26 +93,28 @@ export default function FaqPage() {
   const [openIndex, setOpenIndex] = useState<string | null>("0-0");
 
   return (
-    <main className="min-h-screen bg-[#F7F1E3]">
+    <main className="min-h-screen bg-theme">
       <Header />
 
       <div className="mx-auto max-w-[1600px] px-6 py-8">
         {/* مسیر ناوبری */}
-        <nav className="mb-6 text-sm text-gray-500">
-          <a href="/" className="hover:text-amber-600">خانه</a>
+        <nav className="mb-6 text-sm text-theme-muted">
+          <a href="/" className="transition hover:text-accent">
+            خانه
+          </a>
           <span className="mx-2">/</span>
-          <span className="text-gray-800">سوالات متداول</span>
+          <span className="text-theme">سوالات متداول</span>
         </nav>
 
         {/* هدر صفحه */}
-        <div className="mb-8 rounded-2xl border border-[#D4C5A0] bg-white p-8 text-center md:p-12">
-          <span className="inline-block rounded-full bg-amber-50 px-5 py-2 text-sm font-semibold text-amber-600">
+        <div className="mb-8 rounded-2xl border border-theme bg-theme-card p-8 text-center md:p-12">
+          <span className="inline-block rounded-full border border-accent/30 bg-accent/5 px-5 py-2 text-sm font-semibold text-accent">
             سوالات متداول
           </span>
-          <h1 className="mt-5 text-2xl font-bold text-gray-900 md:text-3xl">
+          <h1 className="mt-5 text-2xl font-bold text-theme md:text-3xl">
             پاسخ سوالات پرتکرار شما
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-gray-600">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-theme-muted">
             اگر سوالی دارید، ابتدا اینجا را بررسی کنید. اگر پاسخ سوال خود را
             پیدا نکردید، با ما تماس بگیرید.
           </p>
@@ -123,14 +125,14 @@ export default function FaqPage() {
           {faqs.map((group, gi) => (
             <div
               key={gi}
-              className="overflow-hidden rounded-2xl border border-[#D4C5A0] bg-white"
+              className="overflow-hidden rounded-2xl border border-theme bg-theme-card"
             >
               {/* عنوان دسته */}
-              <div className="flex items-center gap-3 border-b border-[#EDE4CE] bg-[#F7F1E3]/50 px-6 py-4">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-xl text-white">
+              <div className="flex items-center gap-3 border-b border-theme bg-theme-surface px-6 py-4">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-xl text-white">
                   {group.icon}
                 </span>
-                <h2 className="text-base font-bold text-gray-800">
+                <h2 className="text-base font-bold text-theme">
                   {group.category}
                 </h2>
               </div>
@@ -144,22 +146,22 @@ export default function FaqPage() {
                   return (
                     <div
                       key={ii}
-                      className="border-b border-[#EDE4CE] last:border-0"
+                      className="border-b border-theme last:border-0"
                     >
                       <button
                         type="button"
                         onClick={() => setOpenIndex(isOpen ? null : key)}
-                        className="flex w-full items-center justify-between gap-4 px-6 py-4 text-right transition hover:bg-[#F7F1E3]/30"
+                        className="flex w-full items-center justify-between gap-4 px-6 py-4 text-right transition hover:bg-theme-surface"
                       >
-                        <span className="flex-1 text-sm font-bold text-gray-800 md:text-base">
+                        <span className="flex-1 text-sm font-bold text-theme md:text-base">
                           {item.q}
                         </span>
                         <span
                           className={
                             "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-base font-bold transition " +
                             (isOpen
-                              ? "bg-amber-500 text-white rotate-180"
-                              : "bg-[#F7F1E3] text-amber-600")
+                              ? "rotate-180 bg-accent text-white"
+                              : "bg-theme-surface text-accent")
                           }
                         >
                           ⌄
@@ -167,8 +169,8 @@ export default function FaqPage() {
                       </button>
 
                       {isOpen && (
-                        <div className="border-t border-[#EDE4CE] bg-[#F7F1E3]/30 px-6 py-4">
-                          <p className="text-sm leading-7 text-gray-600">
+                        <div className="border-t border-theme bg-theme-surface px-6 py-4">
+                          <p className="text-sm leading-7 text-theme-muted">
                             {item.a}
                           </p>
                         </div>
@@ -182,7 +184,7 @@ export default function FaqPage() {
         </div>
 
         {/* CTA تماس */}
-        <div className="mx-auto mt-8 max-w-4xl rounded-2xl bg-gradient-to-l from-amber-600 to-amber-500 p-8 text-center text-white">
+        <div className="mx-auto mt-8 max-w-4xl rounded-2xl bg-accent p-8 text-center text-white">
           <h2 className="text-xl font-bold md:text-2xl">
             پاسخ سوال خود را پیدا نکردید؟
           </h2>
@@ -192,7 +194,7 @@ export default function FaqPage() {
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a
               href="/contact"
-              className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-amber-600 transition hover:bg-amber-50"
+              className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-accent transition hover:bg-white/90"
             >
               ارسال پیام
             </a>

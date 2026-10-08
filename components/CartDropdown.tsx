@@ -32,21 +32,13 @@ function BackpackIcon({ className = "" }: { className?: string }) {
       fill="currentColor"
       className={className}
     >
-      {/* دستگیره بالایی */}
       <path d="M11 1h2a0.5 0.5 0 0 1 0 1h-2a0.5 0.5 0 0 1 0-1z" opacity="0.55" />
-      {/* فلپ بالایی */}
       <path d="M8.5 3C8.5 2.2 9.2 1.5 10 1.5h4c0.8 0 1.5 0.7 1.5 1.5V4h-7V3z" />
-      {/* بدنه اصلی — باریک و کشیده */}
       <path d="M7 6.5C7 5.7 7.7 5 8.5 5h7c0.8 0 1.5 0.7 1.5 1.5V22c0 0.8-0.7 1.5-1.5 1.5h-7c-0.8 0-1.5-0.7-1.5-1.5V6.5z" />
-      {/* جیب کناری چپ */}
       <ellipse cx="6.3" cy="14" rx="0.9" ry="3.5" />
-      {/* جیب کناری راست */}
       <ellipse cx="17.7" cy="14" rx="0.9" ry="3.5" />
-      {/* زیپ وسط چپ */}
       <rect x="11.05" y="6.5" width="0.55" height="15.5" rx="0.27" fill="#fff" opacity="0.9" />
-      {/* زیپ وسط راست */}
       <rect x="12.4" y="6.5" width="0.55" height="15.5" rx="0.27" fill="#fff" opacity="0.9" />
-      {/* بند فلپ */}
       <rect x="11.5" y="1.7" width="1" height="3.3" rx="0.25" fill="#fff" opacity="0.55" />
     </svg>
   );
@@ -63,12 +55,12 @@ export default function CartDropdown() {
         type="button"
         onClick={() => setIsOpen(true)}
         data-cart-icon
-        className="relative flex items-center gap-2 text-gray-700 transition hover:text-amber-600"
+        className="relative flex items-center gap-2 text-theme-muted transition hover:text-accent"
       >
         <span className="relative">
           <BackpackIcon className="h-10 w-9" />
           {totalItems > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white">
+            <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
               {totalItems}
             </span>
           )}
@@ -78,7 +70,7 @@ export default function CartDropdown() {
         </span>
       </button>
 
-      {/* Backdrop تاریک */}
+      {/* Backdrop */}
       <div
         onClick={() => setIsOpen(false)}
         className={
@@ -90,20 +82,20 @@ export default function CartDropdown() {
       {/* پنل کناری چپ */}
       <aside
         className={
-          "fixed left-0 top-0 z-[110] h-screen w-[400px] max-w-full bg-white shadow-2xl transition-transform duration-300 " +
+          "fixed left-0 top-0 z-[110] h-screen w-[400px] max-w-full bg-theme-card shadow-2xl transition-transform duration-300 " +
           (isOpen ? "translate-x-0" : "-translate-x-full")
         }
       >
         {/* هدر پنل */}
-        <div className="flex items-center justify-between border-b border-[#EDE4CE] px-5 py-4">
-          <span className="text-base font-bold text-gray-800">
+        <div className="flex items-center justify-between border-b border-theme px-5 py-4">
+          <span className="text-base font-bold text-theme">
             محصولات داخل کوله
           </span>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
             aria-label="بستن"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-xl font-light text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-xl font-light text-theme-muted transition hover:bg-theme-surface hover:text-theme"
           >
             ✕
           </button>
@@ -112,13 +104,13 @@ export default function CartDropdown() {
         {items.length === 0 ? (
           /* کوله خالی */
           <div className="flex h-[calc(100vh-140px)] flex-col items-center justify-center p-8 text-center">
-            <BackpackIcon className="h-24 w-20 text-gray-300" />
-            <p className="mt-4 text-base font-bold text-gray-700">
+            <BackpackIcon className="h-24 w-20 text-theme-muted/40" />
+            <p className="mt-4 text-base font-bold text-theme">
               کوله شما خالی است
             </p>
             <a
               href="/products"
-              className="mt-5 inline-block rounded-lg bg-amber-500 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-amber-600"
+              className="mt-5 inline-block rounded-lg bg-accent px-6 py-2.5 text-sm font-bold text-white transition hover:bg-accent-hover"
             >
               مشاهده محصولات
             </a>
@@ -130,12 +122,12 @@ export default function CartDropdown() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center gap-3 border-b border-[#EDE4CE] px-5 py-4 last:border-0"
+                  className="flex items-center gap-3 border-b border-theme px-5 py-4 last:border-0"
                 >
                   {/* تصویر */}
                   <a
                     href={"/product/" + item.id}
-                    className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-[#EDE4CE] bg-[#F7F1E3]"
+                    className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-theme bg-theme-surface"
                   >
                     <img
                       src={getProductPlaceholder(item.name, getCategoryEmojiFromName(item.name))}
@@ -148,15 +140,15 @@ export default function CartDropdown() {
                   <div className="flex flex-1 flex-col">
                     <a
                       href={"/product/" + item.id}
-                      className="line-clamp-2 text-sm font-semibold text-gray-800 hover:text-amber-600"
+                      className="line-clamp-2 text-sm font-semibold text-theme transition hover:text-accent"
                     >
                       {item.name}
                     </a>
 
                     <div className="mt-2 flex items-center justify-between">
-                      <div className="text-sm font-bold text-gray-900">
+                      <div className="text-sm font-bold text-theme">
                         {formatPrice(item.price)}
-                        <span className="mx-1 text-gray-400">×</span>
+                        <span className="mx-1 text-theme-muted">×</span>
                         {item.quantity}
                       </div>
 
@@ -165,7 +157,7 @@ export default function CartDropdown() {
                         type="button"
                         onClick={() => removeItem(item.id)}
                         aria-label="حذف"
-                        className="flex h-6 w-6 items-center justify-center rounded-full border border-[#DDD1B5] text-xs text-gray-400 transition hover:border-red-500 hover:text-red-500"
+                        className="flex h-6 w-6 items-center justify-center rounded-full border border-theme text-xs text-theme-muted transition hover:border-red-500 hover:text-red-500"
                       >
                         ✕
                       </button>
@@ -176,10 +168,12 @@ export default function CartDropdown() {
             </div>
 
             {/* جمع جزء + دکمه‌ها */}
-            <div className="absolute bottom-0 left-0 right-0 border-t border-[#EDE4CE] bg-white">
+            <div className="absolute bottom-0 left-0 right-0 border-t border-theme bg-theme-card">
               <div className="flex items-center justify-between px-5 py-3">
-                <span className="text-sm font-bold text-gray-700">جمع جزء</span>
-                <span className="text-base font-black text-red-600">
+                <span className="text-sm font-bold text-theme-muted">
+                  جمع جزء
+                </span>
+                <span className="text-base font-black text-accent">
                   {formatPrice(totalPrice)}
                 </span>
               </div>
@@ -187,14 +181,14 @@ export default function CartDropdown() {
               <div className="flex gap-2 px-5 pb-5">
                 <a
                   href="/cart"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-100 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-200"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-theme bg-theme-surface py-3 text-sm font-bold text-theme transition hover:border-accent hover:text-accent"
                 >
                   <BackpackIcon className="h-4 w-3.5" />
                   <span>مشاهده کوله</span>
                 </a>
                 <a
                   href="/checkout"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 py-3 text-sm font-bold text-white transition hover:bg-red-700"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-bold text-white transition hover:bg-accent-hover"
                 >
                   <span>✓</span>
                   <span>تسویه حساب</span>

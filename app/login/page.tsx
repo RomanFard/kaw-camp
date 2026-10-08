@@ -8,27 +8,32 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [otpMode, setOtpMode] = useState(false);
 
+  const inputCls =
+    "w-full rounded-lg border border-theme bg-theme-surface px-4 py-3 text-sm outline-none transition focus:border-accent";
+
   return (
-    <main className="min-h-screen bg-[#F7F1E3]">
+    <main className="min-h-screen bg-theme">
       <Header />
 
       <div className="mx-auto max-w-[1600px] px-6 py-12">
         {/* مسیر ناوبری */}
-        <nav className="mb-6 text-sm text-gray-500">
-          <a href="/" className="hover:text-amber-600">خانه</a>
+        <nav className="mb-6 text-sm text-theme-muted">
+          <a href="/" className="transition hover:text-accent">
+            خانه
+          </a>
           <span className="mx-2">/</span>
-          <span className="text-gray-800">ورود / ثبت‌نام</span>
+          <span className="text-theme">ورود / ثبت‌نام</span>
         </nav>
 
         <div className="mx-auto max-w-md">
           {/* کارت اصلی */}
-          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-8 shadow-sm">
-            {/* لوگو */}
+          <div className="rounded-2xl border border-theme bg-theme-card p-8 shadow-sm">
+            {/* عنوان */}
             <div className="mb-6 text-center">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-theme">
                 {mode === "login" ? "ورود به حساب" : "ایجاد حساب جدید"}
               </h1>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-theme-muted">
                 {mode === "login"
                   ? "به کاو کمپ خوش آمدید"
                   : "به خانواده کاو کمپ بپیوندید"}
@@ -36,7 +41,7 @@ export default function LoginPage() {
             </div>
 
             {/* تب‌ها */}
-            <div className="mb-6 flex rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/50 p-1">
+            <div className="mb-6 flex rounded-lg border border-theme bg-theme-surface p-1">
               <button
                 type="button"
                 onClick={() => {
@@ -46,8 +51,8 @@ export default function LoginPage() {
                 className={
                   "flex-1 rounded-md py-2.5 text-sm font-bold transition " +
                   (mode === "login"
-                    ? "bg-white text-amber-600 shadow-sm"
-                    : "text-gray-600 hover:text-amber-600")
+                    ? "bg-theme-card text-accent shadow-sm"
+                    : "text-theme-muted hover:text-accent")
                 }
               >
                 ورود
@@ -61,8 +66,8 @@ export default function LoginPage() {
                 className={
                   "flex-1 rounded-md py-2.5 text-sm font-bold transition " +
                   (mode === "register"
-                    ? "bg-white text-amber-600 shadow-sm"
-                    : "text-gray-600 hover:text-amber-600")
+                    ? "bg-theme-card text-accent shadow-sm"
+                    : "text-theme-muted hover:text-accent")
                 }
               >
                 ثبت‌نام
@@ -74,27 +79,27 @@ export default function LoginPage() {
               {/* نام و نام خانوادگی - فقط در ثبت‌نام */}
               {mode === "register" && (
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                  <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
                     نام و نام خانوادگی
                   </label>
                   <input
                     type="text"
                     placeholder="مثلاً علی محمدی"
-                    className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500"
+                    className={inputCls}
                   />
                 </div>
               )}
 
               {/* شماره موبایل */}
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                <label className="mb-1.5 block text-sm font-semibold text-theme-muted">
                   شماره موبایل
                 </label>
                 <input
                   type="tel"
                   dir="ltr"
                   placeholder="09123456789"
-                  className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-3 text-right text-sm outline-none transition focus:border-amber-500"
+                  className={`${inputCls} text-right`}
                 />
               </div>
 
@@ -102,14 +107,14 @@ export default function LoginPage() {
               {!otpMode && (
                 <div>
                   <div className="mb-1.5 flex items-center justify-between">
-                    <label className="text-sm font-semibold text-gray-700">
+                    <label className="text-sm font-semibold text-theme-muted">
                       رمز عبور
                     </label>
                     {mode === "login" && (
                       <button
                         type="button"
                         onClick={() => setOtpMode(true)}
-                        className="text-xs font-semibold text-amber-600 hover:underline"
+                        className="text-xs font-semibold text-accent hover:underline"
                       >
                         ورود با کد یکبار مصرف
                       </button>
@@ -118,36 +123,39 @@ export default function LoginPage() {
                   <input
                     type="password"
                     placeholder="••••••••"
-                    className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500"
+                    className={inputCls}
                   />
                 </div>
               )}
 
               {/* حالت OTP */}
               {otpMode && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-sm text-amber-700">
+                <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
+                  <p className="text-sm text-accent">
                     کد یکبار مصرف به شماره شما پیامک می‌شود
                   </p>
                   <button
                     type="button"
                     onClick={() => setOtpMode(false)}
-                    className="mt-2 text-xs font-semibold text-amber-600 hover:underline"
+                    className="mt-2 text-xs font-semibold text-accent hover:underline"
                   >
                     بازگشت به ورود با رمز
                   </button>
                 </div>
               )}
 
-              {/* ثبت‌نام با موبایل - تیک قوانین */}
+              {/* ثبت‌نام — تیک قوانین */}
               {mode === "register" && (
-                <label className="flex items-start gap-2 text-xs text-gray-600">
+                <label className="flex items-start gap-2 text-xs text-theme-muted">
                   <input
                     type="checkbox"
-                    className="mt-0.5 h-4 w-4 accent-amber-500"
+                    className="mt-0.5 h-4 w-4 accent-[var(--accent)]"
                   />
                   <span>
-                    <a href="/rules" className="font-semibold text-amber-600 hover:underline">
+                    <a
+                      href="/rules"
+                      className="font-semibold text-accent hover:underline"
+                    >
                       قوانین و مقررات
                     </a>{" "}
                     کاو کمپ را خوانده‌ام و می‌پذیرم
@@ -158,7 +166,7 @@ export default function LoginPage() {
               {/* دکمه اصلی */}
               <button
                 type="submit"
-                className="w-full rounded-lg bg-amber-500 py-3 text-base font-bold text-white transition hover:bg-amber-600"
+                className="w-full rounded-lg bg-accent py-3 text-base font-bold text-white transition hover:bg-accent-hover"
               >
                 {otpMode
                   ? "دریافت کد یکبار مصرف"
@@ -170,16 +178,16 @@ export default function LoginPage() {
 
             {/* جداکننده */}
             <div className="my-6 flex items-center gap-3">
-              <div className="flex-1 border-t border-[#D4C5A0]"></div>
-              <span className="text-xs text-gray-500">یا</span>
-              <div className="flex-1 border-t border-[#D4C5A0]"></div>
+              <div className="flex-1 border-t border-theme"></div>
+              <span className="text-xs text-theme-muted">یا</span>
+              <div className="flex-1 border-t border-theme"></div>
             </div>
 
-            {/* دکمه‌های شبکه اجتماعی */}
+            {/* دکمه گوگل */}
             <div className="space-y-2">
               <button
                 type="button"
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#D4C5A0] bg-white py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-theme bg-theme-card py-3 text-sm font-semibold text-theme transition hover:bg-theme-surface"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -208,14 +216,14 @@ export default function LoginPage() {
             </div>
 
             {/* تغییر حالت */}
-            <p className="mt-6 text-center text-sm text-gray-600">
+            <p className="mt-6 text-center text-sm text-theme-muted">
               {mode === "login" ? (
                 <>
                   حساب کاربری ندارید؟{" "}
                   <button
                     type="button"
                     onClick={() => setMode("register")}
-                    className="font-bold text-amber-600 hover:underline"
+                    className="font-bold text-accent hover:underline"
                   >
                     ثبت‌نام کنید
                   </button>
@@ -226,7 +234,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setMode("login")}
-                    className="font-bold text-amber-600 hover:underline"
+                    className="font-bold text-accent hover:underline"
                   >
                     وارد شوید
                   </button>
@@ -237,21 +245,21 @@ export default function LoginPage() {
 
           {/* مزیت‌ها */}
           <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-lg border border-[#D4C5A0] bg-white p-3">
+            <div className="rounded-lg border border-theme bg-theme-card p-3">
               <span className="text-2xl">🎁</span>
-              <p className="mt-2 text-xs font-semibold text-gray-700">
+              <p className="mt-2 text-xs font-semibold text-theme-muted">
                 تخفیف ویژه اعضا
               </p>
             </div>
-            <div className="rounded-lg border border-[#D4C5A0] bg-white p-3">
+            <div className="rounded-lg border border-theme bg-theme-card p-3">
               <span className="text-2xl">🚚</span>
-              <p className="mt-2 text-xs font-semibold text-gray-700">
+              <p className="mt-2 text-xs font-semibold text-theme-muted">
                 ارسال سریع
               </p>
             </div>
-            <div className="rounded-lg border border-[#D4C5A0] bg-white p-3">
+            <div className="rounded-lg border border-theme bg-theme-card p-3">
               <span className="text-2xl">💬</span>
-              <p className="mt-2 text-xs font-semibold text-gray-700">
+              <p className="mt-2 text-xs font-semibold text-theme-muted">
                 پشتیبانی ۲۴/۷
               </p>
             </div>
