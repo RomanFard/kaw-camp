@@ -35,7 +35,15 @@ const SiteSettingsContext = createContext<
 >(undefined);
 
 export function SiteSettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState(DEFAULTS);
+  // ─── مقدار اولیه از localStorage (اگه موجود باشه) ───
+  const [settings, setSettings] = useState<Omit<SiteSettings, "id">>(() => {
+    if (typeof window === "undefined") return DEFAULTS;
+    try {
+      const cached = localStorage.getItem("kaw-site-settings");
+      if (cached) return { ...DEFAULTS, ...JSON.parse(cached) };
+    } catch {}
+    return DEFAULTS;
+  });
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -44,6 +52,11 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     if (result) {
       const { id, ...rest } = result;
       setSettings(rest);
+
+      // ─── ذخیره در localStorage برای دفعه بعد ───
+      try {
+        localStorage.setItem("kaw-site-settings", JSON.stringify(rest));
+      } catch {}
     }
     setLoading(false);
   }

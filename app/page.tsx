@@ -6,7 +6,15 @@ import Header from "@/components/Header";
 import HeroVideo from "@/components/HeroVideo";
 import CategoryGrid from "@/components/CategoryGrid";
 import LatestProducts from "@/components/LatestProducts";
-import CategoryShowcase from "@/components/CategoryShowcase";
+import CategoryShowcase, {
+  CategoryShowcaseData,
+  DEFAULT_CATEGORY_SHOWCASE,
+} from "@/components/CategoryShowcase";
+import BlackDogSteps, {
+  BlackDogStepsData,
+  DEFAULT_BLACK_DOG_STEPS,
+} from "@/components/BlackDogSteps";
+import { getAppContent } from "@/lib/supabase/appContent";
 import DiscountProducts from "@/components/DiscountProducts";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
@@ -14,6 +22,7 @@ import LiveBackground from "@/components/LiveBackground";
 import SnowBackground from "@/components/SnowBackground";
 import { useDevicePerformance } from "@/hooks/useDevicePerformance";
 import { useSiteSettings } from "@/components/context/SiteSettingsContext";
+import NewsletterSection from "@/components/NewsletterSection";
 
 export default function Home() {
   const { mounted, level } = useDevicePerformance();
@@ -21,8 +30,37 @@ export default function Home() {
   const { settings } = useSiteSettings();
   const [isClient, setIsClient] = useState(false);
 
+  const [blackDogData, setBlackDogData] =
+    useState<BlackDogStepsData>(DEFAULT_BLACK_DOG_STEPS);
+  const [categoryShowcaseData, setCategoryShowcaseData] =
+    useState<CategoryShowcaseData>(DEFAULT_CATEGORY_SHOWCASE);
+
   useEffect(() => {
     setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await getAppContent<BlackDogStepsData>("black_dog_steps");
+        if (saved) setBlackDogData(saved);
+      } catch (e) {
+        console.error("black_dog_steps load error", e);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await getAppContent<CategoryShowcaseData>(
+          "category_showcase"
+        );
+        if (saved) setCategoryShowcaseData(saved);
+      } catch (e) {
+        console.error("category_showcase load error", e);
+      }
+    })();
   }, []);
 
   const showBackground =
@@ -76,16 +114,16 @@ export default function Home() {
       )}
 
       <div className="relative z-10">
-<Header />
-<HeroVideo />
-<LatestProducts />
-<CategoryShowcase />
-<DiscountProducts />
-<CategoryGrid />
-
-
-<ContactSection />
-<Footer />
+        <Header />
+        <HeroVideo />
+        <LatestProducts />
+        <BlackDogSteps data={blackDogData} />
+        <CategoryShowcase data={categoryShowcaseData} />
+        <DiscountProducts />
+        <CategoryGrid />
+        <ContactSection />
+        <NewsletterSection />
+        <Footer />
       </div>
     </main>
   );

@@ -1,30 +1,28 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import CategoryShowcase, {
-  CategoryShowcaseData,
-  DEFAULT_CATEGORY_SHOWCASE,
-} from "@/components/CategoryShowcase";
+import BlackDogSteps, {
+  BlackDogStepsData,
+  DEFAULT_BLACK_DOG_STEPS,
+} from "@/components/BlackDogSteps";
 import { getAppContent, setAppContent } from "@/lib/supabase/appContent";
 import { createClient } from "@/lib/supabase/client";
 
-const KEY = "category_showcase";
+const KEY = "black_dog_steps";
 const BUCKET = "products";
-const FOLDER = "category-showcase";
+const FOLDER = "black-dog-steps";
 
-export default function AdminCategoryShowcasePage() {
-  const [data, setData] = useState<CategoryShowcaseData>(
-    DEFAULT_CATEGORY_SHOWCASE
-  );
+export default function AdminBlackDogStepsPage() {
+  const [data, setData] = useState<BlackDogStepsData>(DEFAULT_BLACK_DOG_STEPS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const itemKeyRef = useRef<string | null>(null);
+  const stepIndexRef = useRef<number | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const saved = await getAppContent<CategoryShowcaseData>(KEY);
+        const saved = await getAppContent<BlackDogStepsData>(KEY);
         if (saved) setData(saved);
       } catch (e) {
         console.error("load error", e);
@@ -34,35 +32,35 @@ export default function AdminCategoryShowcasePage() {
     })();
   }, []);
 
-  const handleImagePick = (key: string) => {
-    itemKeyRef.current = key;
+  const handleImagePick = (i: number) => {
+    stepIndexRef.current = i;
     fileRef.current?.click();
   };
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    const key = itemKeyRef.current;
-    if (!file || !key) return;
+    const idx = stepIndexRef.current;
+    if (!file || idx === null) return;
 
     try {
       const supabase = createClient();
       const ext = file.name.split(".").pop() || "jpg";
-      const path = `${FOLDER}/${key}-${Date.now()}.${ext}`;
+      const path = `${FOLDER}/${Date.now()}.${ext}`;
       const { error } = await supabase.storage
         .from(BUCKET)
         .upload(path, file, { upsert: true, cacheControl: "3600" });
       if (error) throw error;
 
       const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
-      const next = data.items.map((it) =>
-        it.key === key ? { ...it, image: pub.publicUrl } : it
+      const steps = data.steps.map((s, i) =>
+        i === idx ? { ...s, image: pub.publicUrl } : s
       );
-      setData({ items: next });
+      setData({ ...data, steps });
     } catch (err: any) {
       alert("خطا در آپلود: " + (err?.message ?? err));
     } finally {
       if (fileRef.current) fileRef.current.value = "";
-      itemKeyRef.current = null;
+      stepIndexRef.current = null;
     }
   };
 
@@ -88,16 +86,17 @@ export default function AdminCategoryShowcasePage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      {/* ─── Admin bar ─── */}
       <div className="sticky top-0 z-50 flex items-center justify-between gap-3 border-b border-white/10 bg-black/80 px-4 py-3 backdrop-blur">
         <h1 className="text-xs font-bold text-white md:text-sm">
-          ویرایش «بلک داگ» — CategoryShowcase
+          ویرایش «چقدر سریع برپاش می‌کنی؟»
         </h1>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => {
               if (confirm("بازگردانی به حالت پیش‌فرض؟")) {
-                setData(DEFAULT_CATEGORY_SHOWCASE);
+                setData(DEFAULT_BLACK_DOG_STEPS);
               }
             }}
             className="rounded-lg border border-white/20 px-3 py-1.5 text-xs text-white/80 transition hover:bg-white/10"
@@ -115,11 +114,13 @@ export default function AdminCategoryShowcasePage() {
         </div>
       </div>
 
+      {/* ─── Hint ─── */}
       <p className="border-b border-white/5 bg-amber-500/10 px-4 py-2 text-center text-[11px] text-amber-200">
-        پیش‌نمایش زنده بالا · پنل ویرایش پایین (نام، زیرنویس، تصویر)
+        روی متن‌ها کلیک کن و ویرایش کن · برای تغییر عکس، روی تصویر هاور کن
       </p>
 
-      <CategoryShowcase
+      {/* ─── Live preview (exactly like the public page) ─── */}
+      <BlackDogSteps
         data={data}
         editable
         onChange={setData}

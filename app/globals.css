@@ -1,3 +1,9 @@
+/* ═══════════════════════════════════════════════════
+   🔴 Anti-Flash: body رو مخفی کن تا تم روی html اعمال بشه
+   ═══════════════════════════════════════════════════ */
+html:not(.dark):not(.light) body {
+  visibility: hidden;
+}
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ═══ Light Theme ═══ */

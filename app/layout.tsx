@@ -26,10 +26,39 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <head>
-        {/* ⬇️ اسکریپت ضد فلش: تم رو قبل از هر paint اعمال می‌کنه */}
+        {/* ═══════════════════════════════════════════════
+            🔴 Anti-Flash Script
+            - تم (dark/light) رو از localStorage می‌خونه
+            - رنگ accent رو از localStorage می‌خونه
+            - قبل از هر paint روی <html> اعمال می‌کنه
+            ═══════════════════════════════════════════════ */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme')||'dark';if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})();`,
+            __html: `
+              (function() {
+                try {
+                  // ─── تم ───
+                  var stored = localStorage.getItem('theme');
+                  var theme = stored === 'light' ? 'light' : 'dark';
+                  var html = document.documentElement;
+                  html.classList.remove('dark', 'light');
+                  html.classList.add(theme);
+                  html.style.colorScheme = theme;
+
+                  // ─── رنگ accent ───
+                  var settings = localStorage.getItem('kaw-site-settings');
+                  if (settings) {
+                    var s = JSON.parse(settings);
+                    if (s.accent_color) {
+                      html.style.setProperty('--accent', s.accent_color);
+                    }
+                    if (s.accent_hover) {
+                      html.style.setProperty('--accent-hover', s.accent_hover);
+                    }
+                  }
+                } catch (e) {}
+              })();
+            `,
           }}
         />
         <link

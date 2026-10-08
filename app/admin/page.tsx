@@ -111,6 +111,20 @@ export default function AdminPage() {
 
   const quickLinks = [
     {
+      title: "چقدر سریع برپاش می‌کنی؟",
+      icon: "🏕️",
+      href: "/admin/black-dog-steps",
+      description: "ویرایش سکشن Black Dog Steps",
+      active: true,
+    },
+    {
+      title: "بلک داگ (CategoryShowcase)",
+      icon: "🐕",
+      href: "/admin/category-showcase",
+      description: "ویرایش کاروسل ۳بعدی بلک داگ",
+      active: true,
+    },
+    {
       title: "تنظیمات تم",
       icon: "🎨",
       href: "/admin/theme",
