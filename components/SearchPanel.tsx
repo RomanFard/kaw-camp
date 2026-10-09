@@ -41,14 +41,12 @@ export default function SearchPanel({
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // فوکوس روی input وقتی باز میشه
   useEffect(() => {
     if ((isOpen || forceOpen) && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen, forceOpen]);
 
-  // بستن با Escape
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -61,7 +59,6 @@ export default function SearchPanel({
     return () => document.removeEventListener("keydown", handleEsc);
   }, [isOpen, forceOpen]);
 
-  // قفل اسکرول
   useEffect(() => {
     if (isOpen || forceOpen) {
       document.body.style.overflow = "hidden";
@@ -115,7 +112,7 @@ export default function SearchPanel({
           type="button"
           onClick={() => setIsOpen(true)}
           aria-label="جستجو"
-          className="text-gray-700 transition hover:text-amber-600"
+          className="text-theme transition hover:text-accent"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -148,10 +145,10 @@ export default function SearchPanel({
       {/* پنل جستجو */}
       <div
         className={
-          "bg-white shadow-2xl transition-transform duration-300 " +
+          "bg-theme-card shadow-2xl transition-transform duration-300 " +
           (forceOpen
-            ? "fixed inset-0 z-[300] h-screen w-screen " // تمام صفحه در موبایل
-            : "fixed left-0 right-0 top-0 z-[210] " + // از بالا در دسکتاپ
+            ? "fixed inset-0 z-[300] h-screen w-screen"
+            : "fixed left-0 right-0 top-0 z-[210] " +
               (showPanel ? "translate-y-0" : "-translate-y-full"))
         }
         dir="rtl"
@@ -169,14 +166,14 @@ export default function SearchPanel({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="جستجوی محصول، برند، کد یا مدل..."
-                className="w-full rounded-lg border border-[#D4C5A0] bg-[#F7F1E3]/30 px-4 py-3 text-sm outline-none transition focus:border-amber-500 md:text-base"
+                className="w-full rounded-lg border border-theme bg-theme-surface px-4 py-3 text-sm text-theme outline-none transition focus:border-accent md:text-base"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
                   aria-label="پاک کردن"
-                  className="absolute left-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-xs text-gray-600 transition hover:bg-gray-300"
+                  className="absolute left-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-theme-surface text-xs text-theme-muted transition hover:bg-theme"
                 >
                   ✕
                 </button>
@@ -185,7 +182,7 @@ export default function SearchPanel({
 
             <button
               type="submit"
-              className="hidden rounded-lg bg-amber-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-amber-600 md:block md:text-base"
+              className="hidden rounded-lg bg-accent px-6 py-3 text-sm font-bold text-white transition hover:bg-accent-hover md:block md:text-base"
             >
               جستجو
             </button>
@@ -194,7 +191,7 @@ export default function SearchPanel({
               type="button"
               onClick={closePanel}
               aria-label="بستن"
-              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg border border-[#D4C5A0] text-xl text-gray-600 transition hover:bg-[#F7F1E3]"
+              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg border border-theme text-xl text-theme-muted transition hover:bg-theme-surface"
             >
               ✕
             </button>
@@ -205,7 +202,7 @@ export default function SearchPanel({
             {/* حالت ۱: query خالیه */}
             {!query.trim() && (
               <div>
-                <div className="mb-2 flex items-center gap-2 text-xs font-bold text-gray-500 md:text-sm">
+                <div className="mb-2 flex items-center gap-2 text-xs font-bold text-theme-muted md:text-sm">
                   <span>🔥</span>
                   <span>جستجوهای محبوب</span>
                 </div>
@@ -215,7 +212,7 @@ export default function SearchPanel({
                       key={term}
                       type="button"
                       onClick={() => searchFor(term)}
-                      className="rounded-full border border-[#D4C5A0] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
+                      className="rounded-full border border-theme bg-theme-card px-4 py-2 text-xs font-semibold text-theme transition hover:border-accent hover:bg-accent/10 hover:text-accent md:text-sm"
                     >
                       {term}
                     </button>
@@ -227,20 +224,20 @@ export default function SearchPanel({
             {/* حالت ۲: نتیجه‌ای نیست */}
             {query.trim() && totalResults === 0 && (
               <div className="space-y-4">
-                <div className="rounded-xl border-2 border-dashed border-[#D4C5A0] bg-[#F7F1E3]/30 p-6 text-center md:p-8">
+                <div className="rounded-xl border-2 border-dashed border-theme bg-theme-surface p-6 text-center md:p-8">
                   <p className="text-5xl">🔍</p>
-                  <p className="mt-4 text-base font-bold text-gray-700">
+                  <p className="mt-4 text-base font-bold text-theme">
                     نتیجه‌ای برای «{query}» پیدا نشد
                   </p>
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm text-theme-muted">
                     املای کلمه رو چک کن یا از پیشنهادات زیر استفاده کن
                   </p>
                 </div>
 
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <div className="rounded-lg border border-accent/30 bg-accent/10 p-4">
                   <div className="flex items-start gap-3">
                     <span className="text-2xl">💡</span>
-                    <div className="text-sm text-amber-800 md:text-base">
+                    <div className="text-sm text-accent md:text-base">
                       <p className="font-bold">راهنمای جستجو:</p>
                       <ul className="mt-2 space-y-1 leading-7">
                         <li>• با <b>کد محصول</b> (مثل <b>19</b>) جستجو کن</li>
@@ -253,7 +250,7 @@ export default function SearchPanel({
                 </div>
 
                 <div>
-                  <div className="mb-2 flex items-center gap-2 text-xs font-bold text-gray-500 md:text-sm">
+                  <div className="mb-2 flex items-center gap-2 text-xs font-bold text-theme-muted md:text-sm">
                     <span>🔥</span>
                     <span>اینا رو امتحان کن</span>
                   </div>
@@ -263,7 +260,7 @@ export default function SearchPanel({
                         key={term}
                         type="button"
                         onClick={() => searchFor(term)}
-                        className="rounded-full border border-[#D4C5A0] bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-600 md:text-sm"
+                        className="rounded-full border border-theme bg-theme-card px-4 py-2 text-xs font-semibold text-theme transition hover:border-accent hover:bg-accent/10 hover:text-accent md:text-sm"
                       >
                         {term}
                       </button>
@@ -276,43 +273,43 @@ export default function SearchPanel({
             {/* حالت ۳: نتیجه داریم */}
             {query.trim() && totalResults > 0 && (
               <div>
-                <div className="mb-3 flex items-center justify-between text-xs text-gray-500 md:text-sm">
+                <div className="mb-3 flex items-center justify-between text-xs text-theme-muted md:text-sm">
                   <span>
-                    <span className="font-bold text-gray-800">
+                    <span className="font-bold text-theme">
                       {totalResults}
                     </span>{" "}
                     نتیجه برای «
-                    <span className="font-bold text-amber-600">{query}</span>»
+                    <span className="font-bold text-accent">{query}</span>»
                   </span>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-[#D4C5A0] bg-white">
+                <div className="overflow-hidden rounded-xl border border-theme bg-theme-card">
                   {topResults.map(({ product, matchReason }) => (
                     <button
                       key={product.id}
                       type="button"
                       onClick={() => goToProduct(product.id)}
-                      className="flex w-full items-center gap-3 border-b border-[#EDE4CE] p-3 text-right transition last:border-0 hover:bg-[#F7F1E3]/50"
+                      className="flex w-full items-center gap-3 border-b border-theme p-3 text-right transition last:border-0 hover:bg-theme-surface"
                     >
-                      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F1E3] text-2xl md:h-16 md:w-16">
+                      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-theme-surface text-2xl md:h-16 md:w-16">
                         {getCategoryEmoji(product.category)}
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <div className="line-clamp-1 text-sm font-bold text-gray-800 md:text-base">
+                        <div className="line-clamp-1 text-sm font-bold text-theme md:text-base">
                           {product.name}
                         </div>
-                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                        <div className="mt-1 flex items-center gap-2 text-xs text-theme-muted">
                           <span>{product.brand || "کاو کمپ"}</span>
-                          <span className="text-amber-600">•</span>
-                          <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                          <span className="text-accent">•</span>
+                          <span className="rounded bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold text-accent">
                             {matchReason}
                           </span>
                         </div>
                       </div>
 
                       <div className="flex-shrink-0 text-left">
-                        <div className="text-xs font-bold text-gray-900 md:text-sm">
+                        <div className="text-xs font-bold text-theme md:text-sm">
                           {formatPrice(product.price)}
                         </div>
                       </div>
@@ -323,7 +320,7 @@ export default function SearchPanel({
                     <button
                       type="button"
                       onClick={() => handleSubmit()}
-                      className="w-full border-t border-[#EDE4CE] bg-[#F7F1E3]/50 p-3 text-center text-xs font-bold text-amber-600 transition hover:bg-[#F7F1E3] md:text-sm"
+                      className="w-full border-t border-theme bg-theme-surface p-3 text-center text-xs font-bold text-accent transition hover:bg-theme md:text-sm"
                     >
                       مشاهده همه {totalResults} نتیجه ←
                     </button>
@@ -338,7 +335,7 @@ export default function SearchPanel({
             <button
               type="button"
               onClick={() => handleSubmit()}
-              className="mt-3 w-full flex-shrink-0 rounded-lg bg-amber-500 py-3 text-sm font-bold text-white transition hover:bg-amber-600 md:hidden"
+              className="mt-3 w-full flex-shrink-0 rounded-lg bg-accent py-3 text-sm font-bold text-white transition hover:bg-accent-hover md:hidden"
             >
               جستجوی کامل برای «{query}»
             </button>

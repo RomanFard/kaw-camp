@@ -5,6 +5,7 @@ import { Product } from "@/data/products";
 import { useCart } from "@/components/context/CartContext";
 import { useWishlist } from "@/components/context/WishlistContext";
 import { formatPrice } from "@/lib/utils";
+import ImageLightbox from "@/components/ImageLightbox";
 
 type FlyingItem = {
   x: number;
@@ -29,8 +30,10 @@ export default function ProductPageClient({ product }: { product: Product }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<"desc" | "specs">("specs");
   const [flyingItems, setFlyingItems] = useState<FlyingItem[]>([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const cartButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileGalleryRef = useRef<HTMLDivElement>(null);
 
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
@@ -50,6 +53,19 @@ export default function ProductPageClient({ product }: { product: Product }) {
   const englishName = product.englishName || product.slug;
   const productCode = "KC-" + product.id.padStart(4, "0");
 
+  // رفتن به یک عکس مشخص: هم عکس فعال عوض می‌شود هم اسلایدر موبایل اسکرول می‌کند
+  function goToImage(i: number) {
+    setActiveImageIndex(i);
+    const slide = mobileGalleryRef.current?.children[i] as
+      | HTMLElement
+      | undefined;
+    slide?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }
+
   function getCartTarget() {
     const isMobile = window.innerWidth < 768;
     const selector = isMobile
@@ -63,7 +79,6 @@ export default function ProductPageClient({ product }: { product: Product }) {
         y: rect.top + rect.height / 2,
       };
     }
-    // fallback
     return {
       x: isMobile ? window.innerWidth / 2 : window.innerWidth - 100,
       y: isMobile ? window.innerHeight - 40 : 100,
@@ -73,7 +88,6 @@ export default function ProductPageClient({ product }: { product: Product }) {
   function handleAddToCart() {
     if (!product.inStock) return;
 
-    // انیمیشن پرتاب
     if (cartButtonRef.current) {
       const rect = cartButtonRef.current.getBoundingClientRect();
       const target = getCartTarget();
@@ -98,34 +112,102 @@ export default function ProductPageClient({ product }: { product: Product }) {
       <div className="grid gap-6 lg:grid-cols-[1fr_540px] lg:gap-8">
         {/* ═══ ستون گالری ═══ */}
         <div className="overflow-hidden rounded-lg border border-theme bg-theme-card">
-          <div className="relative aspect-square w-full overflow-hidden bg-white">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={activeImage}
-              alt={product.name}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+          <div className="relative">
+            {/* دسکتاپ: تصویر بزرگ قابل کلیک برای Lightbox */}
+            <div
+              className="relative hidden aspect-square w-full cursor-zoom-in overflow-hidden bg-white md:block"
+              onClick={() => setLightboxOpen(true)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={activeImage}
+                alt={product.name}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
 
-            {discount > 0 && (
-              <span className="absolute right-3 top-3 z-10 rounded bg-accent px-2.5 py-1 text-sm font-bold text-white">
-                -{discount}%
-              </span>
-            )}
+              {discount > 0 && (
+                <span className="absolute right-3 top-3 z-10 rounded bg-accent px-2.5 py-1 text-sm font-bold text-white">
+                  -{discount}%
+                </span>
+              )}
 
-            {!product.inStock && (
-              <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-lg font-bold text-white">
-                ناموجود
-              </span>
+              {!product.inStock && (
+                <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-lg font-bold text-white">
+                  ناموجود
+                </span>
+              )}
+            </div>
+
+            {/* موبایل: اسلایدر افقی قابل swipe */}
+            <div
+              ref={mobileGalleryRef}
+              className="flex snap-x snap-mandatory overflow-x-auto bg-white md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                const w = el.clientWidth;
+                if (w === 0) return;
+                // در حالت راست‌چین scrollLeft منفی می‌شود، پس قدر مطلق می‌گیریم
+                const i = Math.round(Math.abs(el.scrollLeft) / w);
+                if (i !== activeImageIndex) setActiveImageIndex(i);
+              }}
+            >
+              {galleryImages.map((img, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setLightboxOpen(true)}
+                  className="relative aspect-square w-full flex-shrink-0 snap-center overflow-hidden"
+                  aria-label={`${product.name} ${i + 1}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img}
+                    alt={`${product.name} ${i + 1}`}
+                    className="h-full w-full object-cover"
+                    draggable={false}
+                  />
+
+                  {i === 0 && discount > 0 && (
+                    <span className="absolute right-3 top-3 z-10 rounded bg-accent px-2.5 py-1 text-sm font-bold text-white">
+                      -{discount}%
+                    </span>
+                  )}
+
+                  {!product.inStock && (
+                    <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-lg font-bold text-white">
+                      ناموجود
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* نقطه‌های ناوبری موبایل */}
+            {galleryImages.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 md:hidden">
+                {galleryImages.map((_, i) => (
+                  <span
+                    key={i}
+                    className={
+                      "h-1.5 rounded-full transition-all " +
+                      (i === activeImageIndex
+                        ? "w-6 bg-accent"
+                        : "w-1.5 bg-white/60")
+                    }
+                  />
+                ))}
+              </div>
             )}
           </div>
 
+          {/* thumbnails — حالا در موبایل و دسکتاپ */}
           {galleryImages.length > 1 && (
-            <div className="flex items-center justify-start gap-2 overflow-x-auto border-t border-theme bg-theme-surface/40 p-2 md:gap-3 md:p-3">
+            <div className="flex items-center justify-start gap-2 overflow-x-auto border-t border-theme bg-theme-surface/40 p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-3 md:p-3">
               {galleryImages.slice(0, 12).map((img, i) => (
                 <button
                   key={i}
                   type="button"
-                  onClick={() => setActiveImageIndex(i)}
+                  onClick={() => goToImage(i)}
                   className={`relative aspect-square w-14 flex-shrink-0 overflow-hidden rounded border-2 transition md:w-16 ${
                     i === activeImageIndex
                       ? "border-accent"
@@ -496,6 +578,17 @@ export default function ProductPageClient({ product }: { product: Product }) {
           </div>
         </div>
       ))}
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <ImageLightbox
+          images={galleryImages}
+          index={activeImageIndex}
+          alt={product.name}
+          onClose={() => setLightboxOpen(false)}
+          onIndexChange={(i) => setActiveImageIndex(i)}
+        />
+      )}
 
       <style jsx global>{`
         @keyframes flyToCartPage {

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/context/CartContext";
 import { getAppContent } from "@/lib/supabase/appContent";
 import { megaMenu as defaultMenu } from "@/lib/megaMenu";
 import type { MobileMenuCategory } from "@/lib/contentTypes";
+import SearchPanel from "./SearchPanel";
 
 type View = { type: "main" } | { type: "category"; key: string };
 
@@ -29,9 +30,11 @@ export default function MobileMenuDrawer({
   const [menuItems, setMenuItems] = useState<MobileMenuCategory[]>(
     defaultMenu as MobileMenuCategory[]
   );
+  const [searchOpen, setSearchOpen] = useState(false);
+  // 🆕 برای انیمیشن زیرمنو دسکتاپ
+  const [submenuVisible, setSubmenuVisible] = useState(false);
   const { totalItems } = useCart();
 
-  // قفل اسکرول پس‌زمینه وقتی منو بازه
   useEffect(() => {
     if (isOpen) {
       const scrollY = window.scrollY;
@@ -65,6 +68,16 @@ export default function MobileMenuDrawer({
     };
   }, []);
 
+  // 🆕 انیمیشن ورود زیرمنو دسکتاپ (چپ به راست)
+  useLayoutEffect(() => {
+    if (view.type === "category") {
+      requestAnimationFrame(() => setSubmenuVisible(true));
+      return () => setSubmenuVisible(false);
+    } else {
+      setSubmenuVisible(false);
+    }
+  }, [view.type]);
+
   const currentCategory =
     view.type === "category"
       ? (menuItems.find((c) => c.key === view.key) as
@@ -97,7 +110,6 @@ export default function MobileMenuDrawer({
 
   return (
     <>
-      {/* Backdrop — کلیک روی صفحه منو رو می‌بنده */}
       <div
         onClick={closeAll}
         aria-hidden="true"
@@ -107,6 +119,7 @@ export default function MobileMenuDrawer({
         }
       />
 
+      {/* ─── Drawer اصلی ─── */}
       <aside
         dir="rtl"
         className={
@@ -147,6 +160,11 @@ export default function MobileMenuDrawer({
 
           <div className="flex items-center">
             <button
+              type="button"
+              onClick={() => {
+                closeAll();
+                window.setTimeout(() => setSearchOpen(true), 350);
+              }}
               className="flex h-9 w-9 items-center justify-center text-theme"
               aria-label="جستجو"
             >
@@ -237,13 +255,44 @@ export default function MobileMenuDrawer({
         </header>
 
         <div className="flex-1 overflow-y-auto">
-          {view.type === "main" ? (
+          {/* 🆕 در دسکتاپ همیشه MainView نمایش داده می‌شه */}
+          <div className={view.type === "category" ? "hidden md:block" : ""}>
             <MainView
               menuItems={menuItems}
               onCategory={goToCategory}
               onClose={closeAll}
+              activeKey={view.type === "category" ? view.key : undefined}
             />
-          ) : currentCategory ? (
+          </div>
+
+          {/* 🆕 در موبایل، CategoryView جایگزین می‌شه */}
+          {view.type === "category" && currentCategory && (
+            <div className="md:hidden">
+              <CategoryView
+                category={currentCategory}
+                openGroups={openGroups}
+                onToggleGroup={toggleGroup}
+                onBack={backToMain}
+                onClose={closeAll}
+              />
+            </div>
+          )}
+        </div>
+      </aside>
+
+      {/* ─── 🆕 پنل زیرمنو دسکتاپ (سمت چپ drawer) ─── */}
+      {view.type === "category" && currentCategory && (
+        <div
+          dir="rtl"
+          className="fixed bottom-0 right-[420px] top-0 z-[209] hidden w-[520px] flex-col border-r border-theme bg-theme-card shadow-2xl md:flex"
+          style={{
+            transform: submenuVisible ? "translateX(0)" : "translateX(-100%)",
+            opacity: submenuVisible ? 1 : 0,
+            transition:
+              "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease",
+          }}
+        >
+          <div className="flex-1 overflow-y-auto">
             <CategoryView
               category={currentCategory}
               openGroups={openGroups}
@@ -251,9 +300,16 @@ export default function MobileMenuDrawer({
               onBack={backToMain}
               onClose={closeAll}
             />
-          ) : null}
+          </div>
         </div>
-      </aside>
+      )}
+
+      {searchOpen && (
+        <SearchPanel
+          forceOpen={true}
+          onClose={() => setSearchOpen(false)}
+        />
+      )}
     </>
   );
 }
@@ -262,39 +318,51 @@ function MainView({
   menuItems,
   onCategory,
   onClose,
+  activeKey,
 }: {
   menuItems: MobileMenuCategory[];
   onCategory: (key: string) => void;
   onClose: () => void;
+  activeKey?: string;
 }) {
   return (
     <div className="pb-6">
       <ul>
-        {menuItems.map((cat) => (
-          <li key={cat.key}>
-            <button
-              type="button"
-              onClick={() => onCategory(cat.key)}
-              className="flex w-full items-center justify-between border-b border-theme/40 px-5 py-3.5 text-right text-sm font-bold text-theme transition hover:bg-theme-surface"
-            >
-              <span>{cat.label}</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.2}
-                stroke="currentColor"
-                className="h-3.5 w-3.5 text-theme-muted"
+        {menuItems.map((cat) => {
+          const isActive = activeKey === cat.key;
+          return (
+            <li key={cat.key}>
+              <button
+                type="button"
+                onClick={() => onCategory(cat.key)}
+                className={
+                  "flex w-full items-center justify-between border-b border-theme/40 px-5 py-3.5 text-right text-sm font-bold transition " +
+                  (isActive
+                    ? "bg-accent/10 text-accent"
+                    : "text-theme hover:bg-theme-surface")
+                }
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 19.5L8.25 12l7.5-7.5"
-                />
-              </svg>
-            </button>
-          </li>
-        ))}
+                <span>{cat.label}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.2}
+                  stroke="currentColor"
+                  className={
+                    "h-3.5 w-3.5 " + (isActive ? "text-accent" : "text-theme-muted")
+                  }
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 19.5L8.25 12l7.5-7.5"
+                  />
+                </svg>
+              </button>
+            </li>
+          );
+        })}
 
         <li>
           <Link
@@ -416,21 +484,21 @@ function CapacityFilter({
   onApply: () => void;
 }) {
   const CAPACITIES = [
-    "۱ نفره",
-    "۲ نفره",
-    "۳ نفره",
-    "۴ نفره",
-    "۵ نفره",
-    "۶ نفره",
-    "۷ نفره",
-    "۸ نفره",
-    "۱۰ نفره",
     "۱۲ نفره و بالاتر",
+    "۱۰ نفره",
+    "۸ نفره",
+    "۷ نفره",
+    "۶ نفره",
+    "۵ نفره",
+    "۴ نفره",
+    "۳ نفره",
+    "۲ نفره",
+    "۱ نفره",
   ];
-  const [index, setIndex] = useState(CAPACITIES.length - 1);
+  const [index, setIndex] = useState(0);
   const MAX = CAPACITIES.length - 1;
   const percent = (index / MAX) * 100;
-  const isAll = index === MAX;
+  const isAll = index === 0;
 
   return (
     <div className="border-b border-theme/40 px-5 py-5">
@@ -457,8 +525,8 @@ function CapacityFilter({
       </div>
 
       <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-theme-muted">
-        <span>۱ نفره</span>
         <span>۱۲+ نفره</span>
+        <span>۱ نفره</span>
       </div>
 
       <Link

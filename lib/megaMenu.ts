@@ -45,12 +45,12 @@ export const megaMenu: MegaMenuCategory[] = [
       {
         title: "براساس ظرفیت",
         items: [
-          { label: "چادر ۱ نفره", href: "/products?cat=tent&capacity=1" },
+          { label: "چادر ۱۰ نفره و بالاتر", href: "/products?cat=tent&capacity=10" },
           { label: "چادر ۲ نفره", href: "/products?cat=tent&capacity=2" },
           { label: "چادر ۳ نفره", href: "/products?cat=tent&capacity=3" },
           { label: "چادر ۴ نفره", href: "/products?cat=tent&capacity=4" },
           { label: "چادر ۶ تا ۸ نفره", href: "/products?cat=tent&capacity=6-8" },
-          { label: "چادر ۱۰ نفره و بالاتر", href: "/products?cat=tent&capacity=10" },
+          { label: "چادر ۱ نفره", href: "/products?cat=tent&capacity=1" },
         ],
       },
     ],
