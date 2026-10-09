@@ -30,33 +30,28 @@ const LABELS: Record<string, string> = {
   accessories: "لوازم جانبی",
 };
 
-const SPEED = 0.5; // سرعت حرکت پیوسته (تعداد عکس در ثانیه)؛ کمتر = آرام‌تر
-const STEP_DEG = 26; // زاویه‌ی بین هر عکس روی قوس (بزرگ‌تر = گردتر)
-const GAP = 1.04; // فاصله‌ی مرکز دو عکس مجاور نسبت به اندازه‌ی عکس
-const PERSPECTIVE = 2400; // عمق دید
+const SPEED = 0.5;
+const STEP_DEG = 26;
+const GAP = 1.04;
+const PERSPECTIVE = 2400;
 
-// موبایل: همان کاروسل، ولی عمودی و با حرکت از بالا به پایین
-const VERTICAL_MAX = 640; // عرض (px) زیر این مقدار یعنی حالت عمودی
-const VERTICAL_SIZE_RATIO = 0.55; // عرض عکس‌ها نسبت به عرض صفحه
-const VERTICAL_SIZE_MAX = 280;
+const MOBILE_MAX = 640;
 
 const mod = (a: number, m: number) => ((a % m) + m) % m;
-// تبدیل به بازه‌ی متقارن [-n/2, n/2)
 const wrapP = (x: number, n: number) => mod(x + n / 2, n) - n / 2;
 
 type RowProps = {
   photos: string[];
+  reverse?: boolean;
 };
 
-// کاروسل سه‌بعدی: افقی در دسکتاپ، عمودی (از بالا به پایین) در موبایل
-function Carousel3D({ photos }: RowProps) {
+function Carousel3D({ photos, reverse = false }: RowProps) {
   const [wrapW, setWrapW] = useState(1200);
   const [dot, setDot] = useState(0);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  // وضعیت حرکت (بدون رندر دوباره‌ی React در هر فریم)
   const posRef = useRef(0);
   const velRef = useRef(0);
   const targetRef = useRef<number | null>(null);
@@ -64,7 +59,9 @@ function Carousel3D({ photos }: RowProps) {
   const dotRef = useRef(0);
   const dragStartX = useRef<number | null>(null);
   const dragged = useRef(false);
-  const hoverRef = useRef(false); // موس روی یکی از عکس‌هاست
+  const hoverRef = useRef(false);
+  const reverseRef = useRef(reverse);
+  reverseRef.current = reverse;
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -77,21 +74,20 @@ function Carousel3D({ photos }: RowProps) {
   }, []);
 
   const n = photos.length;
-  const vertical = wrapW < VERTICAL_MAX;
+  const isMobile = wrapW < MOBILE_MAX;
 
-  const size = vertical
-    ? Math.round(Math.min(VERTICAL_SIZE_MAX, wrapW * VERTICAL_SIZE_RATIO))
-    : Math.round(Math.min(380, Math.max(140, wrapW * 0.3)));
+  // 🆕 سایز کوچیک‌تر برای هر دو حالت
+  const size = isMobile
+    ? Math.round(Math.min(130, Math.max(80, wrapW * 0.28)))
+    : Math.round(Math.min(240, Math.max(100, wrapW * 0.2)));
+
   const radius = (size * GAP) / 2 / Math.tan((STEP_DEG / 2) * (Math.PI / 180));
 
   const nRef = useRef(n);
   const radiusRef = useRef(radius);
-  const verticalRef = useRef(vertical);
   nRef.current = n;
   radiusRef.current = radius;
-  verticalRef.current = vertical;
 
-  // قرار دادن هر عکس در جای پیوسته‌ی خودش
   const applyRef = useRef<() => void>(() => {});
   applyRef.current = () => {
     const nn = nRef.current;
@@ -106,19 +102,18 @@ function Carousel3D({ photos }: RowProps) {
       const el = cardRefs.current[i];
       if (!el) continue;
 
-      // جفتِ وسط روی -0.5 و +0.5
       const p = wrapP(i - pos - 0.5, nn);
       const a = Math.abs(p);
       const beyond = Math.max(0, a - 0.5);
 
       const opacity =
-        a <= fadeStart ? 1 : Math.max(0, 1 - (a - fadeStart) / (fadeEnd - fadeStart));
+        a <= fadeStart
+          ? 1
+          : Math.max(0, 1 - (a - fadeStart) / (fadeEnd - fadeStart));
       const textOpacity = 1 - Math.min(1, beyond / 0.6);
 
       const angle = (p * STEP_DEG).toFixed(3);
-      el.style.transform = verticalRef.current
-        ? `translate(-50%, -50%) rotateX(${(-p * STEP_DEG).toFixed(3)}deg) translateZ(${R.toFixed(1)}px)`
-        : `translate(-50%, -50%) rotateY(${angle}deg) translateZ(${R.toFixed(1)}px)`;
+      el.style.transform = `translate(-50%, -50%) rotateY(${angle}deg) translateZ(${R.toFixed(1)}px)`;
       el.style.filter = beyond > 0.02 ? `blur(${(beyond * 3.2).toFixed(2)}px)` : "none";
       el.style.opacity = opacity.toFixed(3);
       el.style.pointerEvents = opacity > 0.3 ? "auto" : "none";
@@ -134,9 +129,8 @@ function Carousel3D({ photos }: RowProps) {
 
   useLayoutEffect(() => {
     applyRef.current();
-  }, [size, n, vertical]);
+  }, [size, n]);
 
-  // حلقه‌ی انیمیشن: حرکت پیوسته و هم‌سرعت
   useEffect(() => {
     const reduced =
       typeof window !== "undefined" &&
@@ -158,8 +152,7 @@ function Carousel3D({ photos }: RowProps) {
         }
         velRef.current = 0;
       } else {
-        // موبایل: عکس‌ها از بالا به پایین حرکت می‌کنند
-        const dir = verticalRef.current ? -1 : 1;
+        const dir = reverseRef.current ? -1 : 1;
         const goal =
           pausedRef.current || reduced || nRef.current < 2 ? 0 : SPEED * dir;
         velRef.current += (goal - velRef.current) * (1 - Math.exp(-dt * 3));
@@ -184,9 +177,8 @@ function Carousel3D({ photos }: RowProps) {
     targetRef.current = posRef.current + wrapP(i - posRef.current, nRef.current);
   };
 
-  // محوشدن تدریجی به سمت لبه‌ها؛ جفتِ وسط کامل واضح
   const edge = `calc(50% - ${Math.round(size * GAP)}px)`;
-  const fadeMask = `linear-gradient(${vertical ? "to bottom" : "to right"},
+  const fadeMask = `linear-gradient(to right,
     transparent 0%,
     rgba(0,0,0,0.12) calc(${edge} * 0.25),
     rgba(0,0,0,0.35) calc(${edge} * 0.5),
@@ -224,7 +216,7 @@ function Carousel3D({ photos }: RowProps) {
         dir="ltr"
         className="relative w-full select-none touch-pan-y"
         style={{
-          height: vertical ? Math.round(size * 3.3) : size + 90,
+          height: size + 90,
           perspective: `${PERSPECTIVE}px`,
           WebkitMaskImage: fadeMask,
           maskImage: fadeMask,
@@ -254,7 +246,6 @@ function Carousel3D({ photos }: RowProps) {
                   cardRefs.current[i] = el;
                 }}
                 href="/products"
-                // توقف فقط با ماوس؛ لمس روی موبایل باعث گیر کردن حرکت نشود
                 onPointerEnter={(e) => {
                   if (e.pointerType !== "mouse") return;
                   hoverRef.current = true;
@@ -271,7 +262,6 @@ function Carousel3D({ photos }: RowProps) {
                     dragged.current = false;
                     return;
                   }
-                  // اگر عکس در جفتِ وسط نیست، کلیک آن را به وسط می‌آورد
                   const p = wrapP(i - posRef.current - 0.5, nRef.current);
                   if (Math.abs(p) > 0.55) {
                     e.preventDefault();
@@ -302,7 +292,7 @@ function Carousel3D({ photos }: RowProps) {
                       const wrapper = document.createElement("div");
                       wrapper.className =
                         "fallback-emoji absolute inset-0 flex flex-col items-center justify-center gap-2 bg-theme-surface";
-                      wrapper.innerHTML = `<span style="font-size: 3rem">📦</span>`;
+                      wrapper.innerHTML = `<span style="font-size: 2rem">📦</span>`;
                       parent.appendChild(wrapper);
                     }
                   }}
@@ -311,17 +301,16 @@ function Carousel3D({ photos }: RowProps) {
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-                {/* متن با نزدیک شدن به وسط پررنگ می‌شود */}
                 <div
                   dir="rtl"
-                  className="absolute bottom-0 left-0 right-0 p-4"
+                  className="absolute bottom-0 left-0 right-0 p-2 md:p-3"
                   style={{ opacity: "var(--t, 1)" }}
                 >
-                  <div className="mb-2.5 h-[3px] w-8 bg-accent" />
-                  <h3 className="text-sm font-black text-white md:text-base">
+                  <div className="mb-1 h-[2px] w-6 bg-accent md:mb-1.5" />
+                  <h3 className="text-[10px] font-black text-white md:text-xs">
                     {label}
                   </h3>
-                  <p className="mt-0.5 text-[10px] font-bold text-accent md:text-[11px]">
+                  <p className="mt-0.5 text-[8px] font-bold text-accent md:text-[10px]">
                     مشاهده محصولات
                   </p>
                 </div>
@@ -330,34 +319,28 @@ function Carousel3D({ photos }: RowProps) {
           })}
         </div>
 
-        {/* دکمه‌های قبلی / بعدی (فقط دسکتاپ) */}
-        {!vertical && (
-          <>
-            <button
-              type="button"
-              aria-label="قبلی"
-              onClick={goPrev}
-              onPointerDown={(e) => e.stopPropagation()}
-              onPointerUp={(e) => e.stopPropagation()}
-              className="absolute left-2 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-accent hover:text-accent md:left-6"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              aria-label="بعدی"
-              onClick={goNext}
-              onPointerDown={(e) => e.stopPropagation()}
-              onPointerUp={(e) => e.stopPropagation()}
-              className="absolute right-2 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-accent hover:text-accent md:right-6"
-            >
-              ›
-            </button>
-          </>
-        )}
+        <button
+          type="button"
+          aria-label="قبلی"
+          onClick={goPrev}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
+          className="absolute left-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-accent hover:text-accent md:left-6 md:h-9 md:w-9"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          aria-label="بعدی"
+          onClick={goNext}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
+          className="absolute right-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-accent hover:text-accent md:right-6 md:h-9 md:w-9"
+        >
+          ›
+        </button>
       </div>
 
-      {/* نقطه‌های پایین */}
       <div className="mt-4 flex items-center justify-center gap-2">
         {photos.map((_, i) => (
           <button
@@ -408,6 +391,9 @@ export default function CategoryGrid() {
         </div>
 
         <Carousel3D photos={photos} />
+        <div className="mt-2 md:mt-4">
+          <Carousel3D photos={photos} reverse />
+        </div>
       </div>
     </section>
   );

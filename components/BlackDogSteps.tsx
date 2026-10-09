@@ -88,12 +88,19 @@ export default function BlackDogSteps({
             </span>
           </h2>
 
+                    {/* Description — موبایل: خط اول | دسکتاپ: کل متن */}
           <p
             dir="rtl"
             contentEditable={editable}
             suppressContentEditableWarning
             onBlur={(e) => update({ description: e.currentTarget.innerText ?? "" })}
-            className={`${vazir.className} max-w-[19rem] whitespace-pre-line text-sm font-medium leading-7 text-[#f8f3e8]/80 dark:text-[#5b0000] md:mt-1 ${editCls}`}
+            className={`${vazir.className} block max-w-[19rem] whitespace-pre-line text-sm font-medium leading-7 text-[#f8f3e8]/80 dark:text-[#5b0000] md:mt-1 ${editCls} md:hidden`}
+          >
+            {data.description.split("\n")[0]}
+          </p>
+          <p
+            dir="rtl"
+            className={`${vazir.className} hidden max-w-[19rem] whitespace-pre-line text-sm font-medium leading-7 text-[#f8f3e8]/80 dark:text-[#5b0000] md:mt-1 md:block`}
           >
             {data.description}
           </p>
@@ -101,9 +108,9 @@ export default function BlackDogSteps({
 
         <div className="flex [direction:rtl] snap-x snap-mandatory gap-4 overflow-x-auto py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:[direction:ltr] md:grid-cols-3 md:gap-6 md:overflow-visible md:py-0">
           {data.steps.map((step, i) => (
-            <div
+             <div
               key={i}
-              className="group relative flex w-[72%] shrink-0 snap-start flex-col gap-3 hover:z-10 md:w-auto md:gap-4"
+              className="group relative flex w-[72%] shrink-0 snap-start flex-col hover:z-10 md:w-auto"
             >
               <div className="relative aspect-[9/10] overflow-hidden rounded-2xl bg-black/5 transition duration-500 ease-out group-hover:scale-110 group-hover:shadow-2xl">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -114,6 +121,16 @@ export default function BlackDogSteps({
                   draggable={false}
                   className="h-full w-full object-cover"
                 />
+
+                {/* 🆕 شماره داخل تصویر — گوشه بالا راست */}
+                <span
+                  contentEditable={editable}
+                  suppressContentEditableWarning
+                  onBlur={(e) => updateStep(i, { num: e.currentTarget.textContent ?? "" })}
+                  className={`${anton.className} absolute right-3 top-3 z-10 rounded-xl bg-black/50 px-2.5 py-1 text-3xl leading-none text-white backdrop-blur-sm md:right-4 md:top-4 md:text-4xl ${editCls}`}
+                >
+                  {step.num}
+                </span>
 
                 {editable && (
                   <button
@@ -127,15 +144,6 @@ export default function BlackDogSteps({
                   </button>
                 )}
               </div>
-
-              <span
-                contentEditable={editable}
-                suppressContentEditableWarning
-                onBlur={(e) => updateStep(i, { num: e.currentTarget.textContent ?? "" })}
-                className={`${anton.className} text-4xl leading-none text-[#f8f3e8] dark:text-[#1a1a1a] md:text-5xl ${editCls}`}
-              >
-                {step.num}
-              </span>
             </div>
           ))}
         </div>

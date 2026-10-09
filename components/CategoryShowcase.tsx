@@ -61,11 +61,22 @@ export default function CategoryShowcase({
 
   return (
     <section dir="rtl" className="overflow-hidden py-12 md:py-24">
+      {/* mobile heading */}
       <div className="mx-auto max-w-[1400px] px-4 md:hidden">
         <SectionHeading />
       </div>
 
-      <CategoryCarousel items={items} />
+      {/* 🆕 دو کاروسل یکسان کنار هم */}
+      <div className="mx-auto w-full max-w-[1400px] px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:gap-6">
+          <div className="min-w-0">
+            <CategoryCarousel items={items} />
+          </div>
+          <div className="min-w-0">
+            <CategoryCarousel items={items} />
+          </div>
+        </div>
+      </div>
 
       {/* ─── Edit Panel (only in admin) ─── */}
       {editable && onChange && (
@@ -81,7 +92,6 @@ export default function CategoryShowcase({
                   key={item.key}
                   className="flex flex-col gap-3 rounded-lg border border-white/10 bg-black/30 p-3 md:flex-row md:items-center"
                 >
-                  {/* Thumbnail */}
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-black/40">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -91,7 +101,6 @@ export default function CategoryShowcase({
                     />
                   </div>
 
-                  {/* Label input */}
                   <input
                     value={item.label}
                     onChange={(e) => {
@@ -104,7 +113,6 @@ export default function CategoryShowcase({
                     className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-400 md:flex-1"
                   />
 
-                  {/* Subtitle input */}
                   <input
                     value={item.subtitle}
                     onChange={(e) => {
@@ -117,7 +125,6 @@ export default function CategoryShowcase({
                     className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 outline-none focus:border-amber-400 md:flex-1"
                   />
 
-                  {/* Upload button */}
                   <button
                     type="button"
                     onClick={() => onImagePick?.(item.key)}
@@ -168,9 +175,10 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
   const n = items.length;
   const isMobile = wrapW < 640;
 
+  // 🆕 سایز کارت — موبایل کوچیک‌تر
   const cardW = isMobile
-    ? Math.round(Math.min(240, wrapW * 0.55))
-    : Math.round(Math.min(384, Math.max(220, wrapW * 0.3)));
+    ? Math.round(Math.min(150, wrapW * 0.4))
+    : Math.round(Math.min(260, Math.max(180, wrapW * 0.45)));
   const cardH = Math.round(cardW / ASPECT);
 
   const nRef = useRef(n);
@@ -285,10 +293,10 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
   };
 
   return (
-    <div className="mx-auto mt-10 max-w-[1400px] px-4 md:mt-0 md:px-12 lg:px-16">
+    <div className="mx-auto mt-10 w-full px-4 md:mt-0 md:px-6">
       <div
         dir="ltr"
-        className="relative mb-24 flex flex-col items-stretch gap-6 md:mt-44 md:block"
+        className="relative mb-24 flex flex-col items-stretch gap-6 md:mt-44 md:block md:pr-44"
       >
         <ul
           dir="rtl"
@@ -373,7 +381,6 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
             );
           })}
 
-          {/* mobile: names under the cards, one visible at a time, sliding with the images */}
           {items.map((cat, i) => (
             <span
               key={`cap-${cat.key}`}
