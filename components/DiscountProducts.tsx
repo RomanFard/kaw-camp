@@ -1,10 +1,45 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { formatPrice } from "@/lib/utils";
-import { getProductImage } from "@/lib/productImages";
-import { useProducts } from "@/components/context/ProductsContext";
-import { useCart } from "@/components/context/CartContext";
+
+export type BrandItem = {
+  key: string;
+  nameFa: string;
+  nameEn: string;
+  photo: string;
+  href: string;
+};
+
+const DEFAULT_BRANDS: BrandItem[] = [
+  {
+    key: "naturehike",
+    nameFa: "نیچرهایک",
+    nameEn: "NatureHike",
+    photo: "/images/brands/naturehike.jpg",
+    href: "/products?brand=naturehike",
+  },
+  {
+    key: "shinetrip",
+    nameFa: "شاین تریپ",
+    nameEn: "Shine Trip",
+    photo: "/images/brands/shinetrip.jpg",
+    href: "/products?brand=shinetrip",
+  },
+  {
+    key: "mountainhiker",
+    nameFa: "ماونتین هایکر",
+    nameEn: "Mountainhiker",
+    photo: "/images/brands/mountainhiker.jpg",
+    href: "/products?brand=mountainhiker",
+  },
+  {
+    key: "blackdog",
+    nameFa: "بلک داگ",
+    nameEn: "BLACK DOG",
+    photo: "/images/brands/blackdog.jpg",
+    href: "/products?brand=blackdog",
+  },
+];
 
 const PIXELS_PER_SECOND = 40;
 const BUTTON_STEP = 300;
@@ -14,10 +49,7 @@ function easeInOut(t: number) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
 
-export default function DiscountProducts() {
-  const { products, loading } = useProducts();
-  const { addItem } = useCart();
-
+export default function BrandShowcase() {
   const trackRef = useRef<HTMLDivElement>(null);
   const hoverRef = useRef(false);
   const offsetRef = useRef(0);
@@ -36,13 +68,8 @@ export default function DiscountProducts() {
     pointerId: -1,
   });
 
-  const items = useMemo(() => {
-    const withDiscount = products.filter((p) => p.oldPrice);
-    const withoutDiscount = products.filter((p) => !p.oldPrice);
-    return [...withDiscount, ...withoutDiscount].slice(0, 12);
-  }, [products]);
-
-  const loopItems = useMemo(() => [...items, ...items], [items]);
+  const items = DEFAULT_BRANDS;
+  const loopItems = useMemo(() => [...items, ...items, ...items], [items]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -53,9 +80,9 @@ export default function DiscountProducts() {
 
     function apply() {
       if (!track) return;
-      const half = track.offsetWidth / 2;
-      if (half > 0) {
-        offsetRef.current = ((offsetRef.current % half) + half) % half;
+      const third = track.offsetWidth / 3;
+      if (third > 0) {
+        offsetRef.current = ((offsetRef.current % third) + third) % third;
       }
       track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
     }
@@ -140,31 +167,23 @@ export default function DiscountProducts() {
     }
   }
 
-  function handleAddToCart(
-    e: React.MouseEvent,
-    product: (typeof products)[0]
-  ) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!product.inStock) return;
-    addItem(product, 1);
-  }
-
-  if (loading || items.length === 0) return null;
-
   return (
     <section className="relative py-10 md:py-20">
       {/* Header */}
       <div className="mx-auto max-w-[1400px] px-4 text-center md:px-12 lg:px-16">
- <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-3 py-1 backdrop-blur-sm md:mb-4 md:px-4 md:py-1.5">
-  <span className="text-[10px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
-    SHOP
-  </span>
-</div>
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-3 py-1 backdrop-blur-sm md:mb-4 md:px-4 md:py-1.5">
+          <span className="text-[10px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
+            BRANDS
+          </span>
+        </div>
 
         <h2 className="text-xl font-black tracking-tight text-theme md:text-4xl lg:text-5xl">
-          تخفیف‌های <span className="text-accent">ویژه</span>
+          برندهای <span className="text-accent">معتبر</span>
         </h2>
+
+        <p className="mt-2 text-[11px] text-theme-muted md:mt-3 md:text-sm">
+          با بهترین برندهای جهانی کمپینگ و کوهنوردی همکاری می‌کنیم
+        </p>
 
         <div className="mx-auto mt-3 h-[2px] w-12 bg-accent md:mt-4 md:w-16" />
       </div>
@@ -241,123 +260,72 @@ export default function DiscountProducts() {
             className="flex w-max"
             style={{ willChange: "transform", backfaceVisibility: "hidden" }}
           >
-            {loopItems.map((product, idx) => {
-              const hasDiscount = !!product.oldPrice;
-              const discount = product.oldPrice
-                ? Math.round(
-                    ((product.oldPrice - product.price) / product.oldPrice) *
-                      100
-                  )
-                : 0;
-              const image =
-                product.image || getProductImage(product.category, product.id);
+            {loopItems.map((brand, idx) => (
+              <a
+                key={`${brand.key}-${idx}`}
+                draggable={false}
+                href={brand.href}
+                className="group/card relative ml-2.5 w-[180px] flex-shrink-0 overflow-hidden rounded-lg border border-theme bg-theme-card transition-colors duration-300 hover:border-accent/50 sm:ml-3 sm:w-[210px] md:ml-5 md:w-[260px] md:rounded-xl lg:w-[300px]"
+              >
+                {/* تصویر برند */}
+                <div className="relative aspect-[4/5] overflow-hidden bg-theme-surface">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={brand.photo}
+                    alt={brand.nameFa}
+                    loading="lazy"
+                    draggable={false}
+                    className="h-full w-full object-cover object-center transition duration-700 group-hover/card:scale-110"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.style.display = "none";
+                    }}
+                  />
 
-              return (
-                <a
-                  key={`${product.id}-${idx}`}
-                  draggable={false}
-                  href={`/product/${product.id}`}
-                  className="group/card relative ml-2.5 w-[130px] flex-shrink-0 overflow-hidden rounded-lg border border-theme bg-theme-card transition-colors duration-300 hover:border-accent/50 sm:ml-3 sm:w-[150px] md:ml-5 md:w-[200px] md:rounded-xl lg:w-[228px]"
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-theme-surface">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={image}
-                      alt={product.name}
-                      loading="lazy"
-                      draggable={false}
-                      className="h-full w-full object-cover object-center transition duration-500 group-hover/card:scale-105"
-                    />
+                  {/* gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent transition duration-500 group-hover/card:from-black/95 group-hover/card:via-black/55" />
 
-                    {hasDiscount && discount > 0 && (
-                      <span className="absolute right-1 top-1 rounded bg-accent px-1 py-0.5 text-[8px] font-black text-white shadow-lg md:right-1.5 md:top-1.5 md:px-1.5 md:text-[9px]">
-                        {discount}٪
-                      </span>
-                    )}
-
-                    {!hasDiscount && (
-                      <span className="absolute right-1 top-1 rounded bg-theme-surface/90 px-1 py-0.5 text-[8px] font-black text-theme backdrop-blur-sm md:right-1.5 md:top-1.5 md:px-1.5 md:text-[9px]">
-                        جدید
-                      </span>
-                    )}
-
-                    {!product.inStock && (
-                      <span className="absolute inset-0 flex items-center justify-center bg-black/70 text-[10px] font-bold text-white md:text-xs">
-                        ناموجود
-                      </span>
-                    )}
+                  {/* آیکون گوشه بالا راست */}
+                  <div className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-accent/60 bg-black/40 backdrop-blur transition duration-500 group-hover/card:border-accent group-hover/card:bg-accent md:right-3 md:top-3 md:h-8 md:w-8">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="h-3 w-3 text-white md:h-3.5 md:w-3.5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                      />
+                    </svg>
                   </div>
 
-                  <div className="p-1.5 md:p-2.5">
-                    <h3 className="line-clamp-1 text-[10px] font-bold text-theme transition group-hover/card:text-accent md:text-xs">
-                      {product.name}
+                  {/* اسم برند روی تصویر */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2.5 md:p-4">
+                    <div className="mb-1.5 h-[2px] w-5 bg-accent transition-all duration-500 group-hover/card:w-10 md:mb-2 md:h-[3px] md:w-6 md:group-hover/card:w-12" />
+
+                    <h3 className="text-sm font-black leading-tight text-white transition duration-500 group-hover/card:text-accent md:text-lg">
+                      {brand.nameFa}
                     </h3>
 
-                    <div className="mt-1.5 flex items-center justify-between gap-1 md:mt-2 md:gap-1.5">
-                      <div className="flex min-w-0 flex-col">
-                        {product.oldPrice && (
-                          <span className="text-[8px] text-theme-muted line-through md:text-[9px]">
-                            {formatPrice(product.oldPrice)}
-                          </span>
-                        )}
-                        <span className="text-[10px] font-black text-accent md:text-sm">
-                          {formatPrice(product.price)}
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={(e) => handleAddToCart(e, product)}
-                        disabled={!product.inStock}
-                        aria-label="افزودن به کوله"
-                        className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded border border-accent bg-transparent text-accent transition hover:bg-accent hover:text-white disabled:cursor-not-allowed disabled:border-theme disabled:text-theme-muted md:h-7 md:w-7"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={2}
-                          stroke="currentColor"
-                          className="h-2.5 w-2.5 md:h-3 md:w-3"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 4.5v15m7.5-7.5h-15"
-                          />
-                        </svg>
-                      </button>
-                    </div>
+                    <p
+                      dir="ltr"
+                      className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/60 md:mt-1 md:text-[10px]"
+                    >
+                      {brand.nameEn}
+                    </p>
                   </div>
-                </a>
-              );
-            })}
+
+                  {/* خط accent پایین */}
+                  <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover/card:w-full md:h-[3px]" />
+                </div>
+              </a>
+            ))}
           </div>
         </div>
-      </div>
-
-      {/* CTA */}
-      <div className="mt-6 text-center md:mt-10">
-<a
-  href="/products?sort=discount"
-  className="group inline-flex items-center gap-2 border border-[#E84C4C] bg-transparent px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[#E84C4C] transition hover:bg-[#E84C4C] hover:text-white md:px-6 md:py-2.5 md:text-sm"
->
-  <span>مشاهده همه تخفیف‌ها</span>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2.5}
-    stroke="currentColor"
-    className="h-3 w-3 transition group-hover:-translate-x-1 md:h-3.5 md:w-3.5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-    />
-  </svg>
-</a>
       </div>
     </section>
   );

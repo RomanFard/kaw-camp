@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import Header from "@/components/Header";
 import HeroVideo from "@/components/HeroVideo";
 import CategoryGrid from "@/components/CategoryGrid";
+import BrandShowcase from "@/components/BrandShowcase";
 import LatestProducts from "@/components/LatestProducts";
 import CategoryShowcase, {
   CategoryShowcaseData,
@@ -117,6 +118,9 @@ export default function Home() {
         <Header />
         <HeroVideo />
         <LatestProducts />
+        <SpecialDiscountSlot />
+<BrandShowcase />
+<CategoryGrid />
         <BlackDogSteps data={blackDogData} />
         <CategoryShowcase data={categoryShowcaseData} />
         <SpecialDiscountSlot />
