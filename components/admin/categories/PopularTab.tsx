@@ -23,6 +23,7 @@ export default function PopularTab() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function load() {
@@ -72,19 +73,27 @@ export default function PopularTab() {
     setEditing(null);
   }
 
-  if (loading) return <div className="p-12 text-center text-gray-500">در حال بارگذاری...</div>;
+  if (loading) {
+    return (
+      <div className="p-12 text-center text-xs text-theme-muted">
+        در حال بارگذاری...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600">
-          {items.length} دسته — این‌ها توی بخش «دسته‌بندی‌های محبوب» صفحه اصلی نمایش داده می‌شن
+      {/* هدر */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-theme-muted">
+          {items.length.toLocaleString("fa-IR")} دسته — این‌ها توی بخش «دسته‌بندی‌های
+          محبوب» صفحه اصلی نمایش داده می‌شن
         </p>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={addNew}
-            className="rounded-lg bg-[#E84C4C] px-4 py-2 text-sm font-bold text-white hover:bg-[#D63F3F]"
+            className="rounded-xl bg-accent px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:opacity-90"
           >
             ➕ افزودن
           </button>
@@ -92,15 +101,16 @@ export default function PopularTab() {
             type="button"
             onClick={save}
             disabled={saving}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50"
           >
             {saving ? "..." : "💾 ذخیره"}
           </button>
         </div>
       </div>
 
+      {/* لیست خالی */}
       {items.length === 0 ? (
-        <div className="rounded-xl border-2 border-dashed border-gray-300 p-12 text-center text-gray-400">
+        <div className="rounded-xl border-2 border-dashed border-theme p-12 text-center text-xs text-theme-muted">
           هنوز دسته‌ای اضافه نشده
         </div>
       ) : (
@@ -108,9 +118,10 @@ export default function PopularTab() {
           {items.map((cat, i) => (
             <div
               key={i}
-              className="rounded-xl border border-[#D4C5A0] bg-white p-4"
+              className="rounded-xl border border-theme bg-theme-card p-4 shadow-sm"
             >
               {editing === i ? (
+                /* ─── حالت ویرایش ─── */
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-2">
                     <input
@@ -118,31 +129,27 @@ export default function PopularTab() {
                       value={cat.key}
                       onChange={(e) => update(i, "key", e.target.value)}
                       dir="ltr"
-                      style={{ color: "#111827", colorScheme: "light" }}
-                      className="rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-sm"
+                      className="rounded-lg border border-theme bg-theme-surface px-3 py-2 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
                     />
                     <input
                       placeholder="emoji"
                       value={cat.emoji}
                       onChange={(e) => update(i, "emoji", e.target.value)}
-                      style={{ color: "#111827", colorScheme: "light" }}
-                      className="rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-center text-lg"
+                      className="rounded-lg border border-theme bg-theme-surface px-3 py-2 text-center text-lg outline-none transition focus:border-accent"
                     />
                   </div>
                   <input
                     placeholder="نام دسته"
                     value={cat.label}
                     onChange={(e) => update(i, "label", e.target.value)}
-                    style={{ color: "#111827", colorScheme: "light" }}
-                    className="w-full rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-theme bg-theme-surface px-3 py-2 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
                   />
                   <input
                     placeholder="لینک (مثلاً /products?cat=tent)"
                     value={cat.href}
                     onChange={(e) => update(i, "href", e.target.value)}
                     dir="ltr"
-                    style={{ color: "#111827", colorScheme: "light" }}
-                    className="w-full rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 font-mono text-xs"
+                    className="w-full rounded-lg border border-theme bg-theme-surface px-3 py-2 font-mono text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
                   />
                   <ImageUploader
                     value={cat.image}
@@ -153,35 +160,40 @@ export default function PopularTab() {
                     <button
                       type="button"
                       onClick={() => setEditing(null)}
-                      className="flex-1 rounded-lg bg-gray-100 py-2 text-xs font-bold text-gray-700"
+                      className="flex-1 rounded-lg border border-theme bg-theme-surface py-2 text-xs font-bold text-theme-muted transition hover:text-theme"
                     >
                       بستن
                     </button>
                     <button
                       type="button"
                       onClick={() => remove(i)}
-                      className="rounded-lg bg-red-50 px-3 py-2 text-xs font-bold text-red-600"
+                      className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-500 transition hover:bg-red-500/20"
                     >
                       🗑 حذف
                     </button>
                   </div>
                 </div>
               ) : (
+                /* ─── حالت نمایش ─── */
                 <div>
-                  <div className="mb-3 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg bg-gray-100">
+                  <div className="mb-3 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg bg-theme-surface">
                     {cat.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={cat.image} alt={cat.label} className="h-full w-full object-cover" />
+                      <img
+                        src={cat.image}
+                        alt={cat.label}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <span className="text-5xl">{cat.emoji}</span>
                     )}
                   </div>
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="truncate text-sm font-bold text-gray-900">
+                      <div className="truncate text-xs font-bold text-theme">
                         {cat.emoji} {cat.label || "(بدون نام)"}
                       </div>
-                      <div className="truncate font-mono text-[10px] text-gray-400">
+                      <div className="truncate font-mono text-[10px] text-theme-muted">
                         {cat.key}
                       </div>
                     </div>
@@ -190,7 +202,8 @@ export default function PopularTab() {
                         type="button"
                         onClick={() => move(i, -1)}
                         disabled={i === 0}
-                        className="rounded p-1 text-xs hover:bg-gray-100 disabled:opacity-30"
+                        className="rounded p-1 text-xs text-theme-muted transition hover:bg-theme-surface hover:text-theme disabled:opacity-30"
+                        aria-label="بالا"
                       >
                         ↑
                       </button>
@@ -198,14 +211,15 @@ export default function PopularTab() {
                         type="button"
                         onClick={() => move(i, 1)}
                         disabled={i === items.length - 1}
-                        className="rounded p-1 text-xs hover:bg-gray-100 disabled:opacity-30"
+                        className="rounded p-1 text-xs text-theme-muted transition hover:bg-theme-surface hover:text-theme disabled:opacity-30"
+                        aria-label="پایین"
                       >
                         ↓
                       </button>
                       <button
                         type="button"
                         onClick={() => setEditing(i)}
-                        className="rounded bg-amber-50 px-2 py-1 text-xs font-bold text-amber-700"
+                        className="rounded-lg border border-theme bg-theme-surface px-2 py-1 text-xs font-bold text-theme transition hover:border-accent"
                       >
                         ✏️
                       </button>

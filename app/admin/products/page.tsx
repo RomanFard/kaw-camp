@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import ProductModal, { type ProductFormData } from "@/components/admin/ProductModal";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import { formatPrice } from "@/lib/utils";
 import { useToast } from "@/components/context/ToastContext";
 import {
@@ -26,6 +27,7 @@ const EMPTY_FORM: ProductFormData = {
   englishName: "",
   price: "",
   oldPrice: "",
+  costPrice: "",   // 🆕
   category: "tent",
   image: "",
   images: [""],
@@ -49,12 +51,14 @@ export default function ProductsAdminPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<Category | "all">("all");
 
-  // مودال
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+
+  // 🆕 state برای منوی موبایل
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -97,6 +101,7 @@ export default function ProductsAdminPage() {
       englishName: p.englishName ?? "",
       price: String(p.price),
       oldPrice: p.oldPrice ? String(p.oldPrice) : "",
+      costPrice: (p as any).costPrice ? String((p as any).costPrice) : "",   // 🆕
       category: p.category,
       image: p.image,
       images: p.images && p.images.length > 0 ? p.images : [""],
@@ -131,14 +136,7 @@ export default function ProductsAdminPage() {
       return setFormError("قیمت باید بزرگتر از صفر باشد");
     if (!form.image.trim()) return setFormError("عکس اصلی الزامی است");
 
-    const invalidColor = form.colors.find((c) => !c.label.trim());
-    if (invalidColor) return setFormError("همه رنگ‌ها باید نام داشته باشن");
-
-    const invalidSize = form.sizes.find((s) => !s.label.trim());
-    if (invalidSize) return setFormError("همه سایزها باید نام داشته باشن");
-
     setSaving(true);
-
     const cleanImages = form.images.map((s) => s.trim()).filter(Boolean);
 
     const productData: Product = {
@@ -148,6 +146,7 @@ export default function ProductsAdminPage() {
       englishName: form.englishName.trim() || undefined,
       price: Number(form.price),
       oldPrice: form.oldPrice ? Number(form.oldPrice) : undefined,
+      costPrice: form.costPrice ? Number(form.costPrice) : 0,   // 🆕
       category: form.category,
       image: form.image.trim(),
       images: cleanImages.length > 0 ? cleanImages : undefined,
@@ -173,11 +172,7 @@ export default function ProductsAdminPage() {
     }
 
     if (result.error) {
-      if (result.error.message.includes("duplicate")) {
-        setFormError("این slug یا ID قبلاً استفاده شده");
-      } else {
-        setFormError("خطا: " + result.error.message);
-      }
+      setFormError("خطا: " + result.error.message);
       setSaving(false);
       return;
     }
@@ -214,33 +209,18 @@ export default function ProductsAdminPage() {
   }
 
   async function handleReset() {
-    if (
-      !confirm(
-        `آیا مطمئنی؟ این کار همه محصولات Supabase رو پاک می‌کنه و ${seedProducts.length} محصول اولیه رو برمی‌گردونه.`
-      )
-    )
-      return;
+    if (!confirm("آیا مطمئنی؟ محصولات اولیه جایگزین می‌شوند.")) return;
 
     setLoading(true);
-
-    const { error: delErr } = await supabase
-      .from("products")
-      .delete()
-      .neq("id", "___never___");
-
-    if (delErr) {
-      toast.error("خطا در حذف: " + delErr.message);
-      setLoading(false);
-      return;
-    }
-
-    const { error: insErr } = await supabase.from("products").insert(
+    await supabase.from("products").delete().neq("id", "___never___");
+    await supabase.from("products").insert(
       seedProducts.map((p) => ({
         id: p.id,
         name: p.name,
         slug: p.slug,
         price: p.price,
         old_price: p.oldPrice ?? null,
+        cost_price: 0,
         category: p.category,
         image: p.image,
         images: p.images ?? null,
@@ -256,13 +236,6 @@ export default function ProductsAdminPage() {
         sizes: p.sizes ?? null,
       }))
     );
-
-    if (insErr) {
-      toast.error("خطا در درج: " + insErr.message);
-      setLoading(false);
-      return;
-    }
-
     toast.success("بازنشانی موفق!");
     load();
   }
@@ -275,235 +248,271 @@ export default function ProductsAdminPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F7F1E3]">
-      <div className="mx-auto max-w-7xl px-6 py-8">
-        {/* Header */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <a
-              href="/admin"
-              className="text-sm text-gray-500 hover:text-amber-600"
-            >
-              ← بازگشت به داشبورد
-            </a>
-            <h1 className="mt-2 text-3xl font-black text-gray-900">
-              📦 مدیریت محصولات
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {stats.total.toLocaleString("fa-IR")} محصول •{" "}
-              {stats.inStock.toLocaleString("fa-IR")} موجود
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="rounded-lg border border-[#D4C5A0] bg-white px-4 py-2.5 text-xs font-bold text-gray-600 transition hover:bg-gray-50"
-            >
-              🔄 بازنشانی به اولیه
-            </button>
-            <button
-              type="button"
-              onClick={openAddModal}
-              className="rounded-lg bg-[#E84C4C] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#D63F3F]"
-            >
-              ➕ محصول جدید
-            </button>
-          </div>
-        </div>
+    <div dir="rtl" className="flex min-h-screen bg-theme text-theme">
+      {/* Backdrop موبایل */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+        />
+      )}
 
-        {/* آمار */}
-        <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-          <StatCard label="کل" value={stats.total} icon="📦" />
-          <StatCard label="موجود" value={stats.inStock} icon="✅" green />
-          <StatCard label="تخفیف‌دار" value={stats.discounted} icon="🏷️" />
-          <StatCard label="ناموجود" value={stats.outOfStock} icon="⛔" red />
-        </div>
-
-        {/* فیلترها */}
-        <div className="mb-4 flex flex-wrap gap-3">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="🔍 جستجو در نام، slug، برند، ID..."
-            className="min-w-[240px] flex-1 rounded-lg border border-[#D4C5A0] bg-white px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-          />
-          <select
-            value={categoryFilter}
-            onChange={(e) =>
-              setCategoryFilter(e.target.value as Category | "all")
-            }
-            className="rounded-lg border border-[#D4C5A0] bg-white px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-          >
-            <option value="all">همه دسته‌ها</option>
-            {categories.map((c) => (
-              <option key={c.key} value={c.key}>
-                {c.emoji} {c.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* جدول */}
-        <div className="overflow-hidden rounded-2xl border border-[#D4C5A0] bg-white">
-          {loading ? (
-            <div className="p-12 text-center text-gray-500">
-              در حال بارگذاری...
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              محصولی با این فیلتر پیدا نشد
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-right text-sm">
-                <thead className="border-b border-[#EDE4CE] bg-[#F7F1E3]/50">
-                  <tr className="text-xs font-bold text-gray-600">
-                    <th className="px-3 py-3">عکس</th>
-                    <th className="px-3 py-3">ID</th>
-                    <th className="px-3 py-3">نام</th>
-                    <th className="px-3 py-3">دسته</th>
-                    <th className="px-3 py-3">قیمت</th>
-                    <th className="px-3 py-3">موجودی</th>
-                    <th className="px-3 py-3 text-left">عملیات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((p) => {
-                    const cat = categories.find((c) => c.key === p.category);
-                    return (
-                      <tr
-                        key={p.id}
-                        className="border-b border-[#EDE4CE] last:border-0 transition hover:bg-[#F7F1E3]/30"
-                      >
-                        <td className="px-3 py-2">
-                          <div className="h-12 w-12 overflow-hidden rounded-lg border border-[#EDE4CE] bg-gray-50">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={p.image}
-                              alt={p.name}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                        </td>
-                        <td className="px-3 py-2 font-mono text-xs text-gray-500">
-                          {p.id}
-                        </td>
-                        <td className="px-3 py-2">
-                          <div className="line-clamp-1 max-w-[280px] font-bold text-gray-900">
-                            {p.name}
-                          </div>
-                          {p.brand && (
-                            <div className="mt-0.5 text-[11px] text-gray-400">
-                              {p.brand}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-3 py-2 text-xs">
-                          {cat ? `${cat.emoji} ${cat.label}` : p.category}
-                        </td>
-                        <td className="px-3 py-2">
-                          <div className="font-bold text-gray-900">
-                            {formatPrice(p.price)}
-                          </div>
-                          {p.oldPrice && (
-                            <div className="text-[11px] text-gray-400 line-through">
-                              {formatPrice(p.oldPrice)}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-3 py-2">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleStock(p)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                              p.inStock ? "bg-green-500" : "bg-gray-300"
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${
-                                p.inStock ? "translate-x-1" : "translate-x-6"
-                              }`}
-                            />
-                          </button>
-                        </td>
-                        <td className="px-3 py-2 text-left">
-                          <div className="flex justify-end gap-2">
-                            <a
-                              href={`/product/${p.id}`}
-                              target="_blank"
-                              className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 transition hover:bg-blue-100"
-                            >
-                              👁
-                            </a>
-                            <button
-                              type="button"
-                              onClick={() => openEditModal(p)}
-                              className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 transition hover:bg-amber-100"
-                            >
-                              ✏️
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(p.id, p.name)}
-                              className="rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ─── مودال جدا ─── */}
-      <ProductModal
-        open={modalOpen}
-        editingId={editingId}
-        initialData={formData}
-        categories={categories}
-        saving={saving}
-        error={formError}
-        onClose={() => setModalOpen(false)}
-        onSave={handleSave}
+      {/* سایدبار مشترک */}
+      <AdminSidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
       />
-    </main>
+
+      {/* محتوای اصلی */}
+      <main className="flex-1 overflow-x-hidden p-4 pb-12 sm:p-8">
+        <div className="mx-auto max-w-7xl">
+          {/* هدر بالای صفحه */}
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              {/* دکمه منو موبایل */}
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-theme bg-theme-card text-theme transition hover:bg-theme-surface md:hidden"
+                aria-label="باز کردن منو"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.2}
+                  stroke="currentColor"
+                  className="h-5 w-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+                  />
+                </svg>
+              </button>
+
+              <div>
+                <h1 className="text-2xl font-black text-theme">
+                  📦 مدیریت محصولات
+                </h1>
+                <p className="text-xs text-theme-muted">
+                  {stats.total.toLocaleString("fa-IR")} محصول کل •{" "}
+                  {stats.inStock.toLocaleString("fa-IR")} موجود
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="rounded-xl border border-theme bg-theme-card px-4 py-2.5 text-xs font-bold text-theme-muted transition hover:text-theme"
+              >
+                🔄 بازنشانی داده‌ها
+              </button>
+              <button
+                type="button"
+                onClick={openAddModal}
+                className="rounded-xl bg-accent px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90"
+              >
+                ➕ محصول جدید
+              </button>
+            </div>
+          </div>
+
+          {/* کارت‌های آماری */}
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatCard label="کل محصولات" value={stats.total} icon="📦" />
+            <StatCard label="موجود در انبار" value={stats.inStock} icon="✅" />
+            <StatCard label="تخفیف‌دار" value={stats.discounted} icon="🏷️" />
+            <StatCard label="ناموجود" value={stats.outOfStock} icon="⛔" />
+          </div>
+
+          {/* نوار ابزار جستجو و فیلتر */}
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="🔍 جستجو در نام، برند، شناسه..."
+              className="flex-1 rounded-xl border border-theme bg-theme-card px-4 py-2.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+            />
+            <select
+              value={categoryFilter}
+              onChange={(e) =>
+                setCategoryFilter(e.target.value as Category | "all")
+              }
+              className="rounded-xl border border-theme bg-theme-card px-4 py-2.5 text-xs text-theme outline-none transition focus:border-accent"
+            >
+              <option value="all">همه دسته‌بندی‌ها</option>
+              {categories.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.emoji} {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* جدول محصولات */}
+          <div className="overflow-hidden rounded-2xl border border-theme bg-theme-card shadow-sm">
+            {loading ? (
+              <div className="p-12 text-center text-xs text-theme-muted">
+                در حال بارگذاری محصولات...
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="p-12 text-center text-xs text-theme-muted">
+                محصولی با این مشخصات یافت نشد
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-right text-xs">
+                  <thead className="border-b border-theme bg-theme-surface font-bold text-theme-muted">
+                    <tr>
+                      <th className="px-4 py-3">تصویر</th>
+                      <th className="px-4 py-3">شناسه</th>
+                      <th className="px-4 py-3">نام محصول</th>
+                      <th className="px-4 py-3">دسته‌بندی</th>
+                      <th className="px-4 py-3">قیمت</th>
+                      <th className="px-4 py-3">وضعیت موجودی</th>
+                      <th className="px-4 py-3 text-left">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-theme">
+                    {filtered.map((p) => {
+                      const cat = categories.find(
+                        (c) => c.key === p.category
+                      );
+                      return (
+                        <tr
+                          key={p.id}
+                          className="transition hover:bg-theme-surface/40"
+                        >
+                          <td className="px-4 py-2.5">
+                            <div className="h-10 w-10 overflow-hidden rounded-xl border border-theme bg-theme-surface">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={p.image}
+                                alt={p.name}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                          </td>
+                          <td className="px-4 py-2.5 font-mono text-[11px] text-theme-muted">
+                            {p.id}
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <p className="line-clamp-1 font-bold text-theme">
+                              {p.name}
+                            </p>
+                            {p.brand && (
+                              <p className="text-[10px] text-theme-muted">
+                                {p.brand}
+                              </p>
+                            )}
+                          </td>
+                          <td className="px-4 py-2.5 text-theme-muted">
+                            {cat ? `${cat.emoji} ${cat.label}` : p.category}
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <p className="font-bold text-theme">
+                              {formatPrice(p.price)}
+                            </p>
+                            {p.oldPrice && (
+                              <p className="text-[10px] text-theme-muted line-through">
+                                {formatPrice(p.oldPrice)}
+                              </p>
+                            )}
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStock(p)}
+                              className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${
+                                p.inStock
+                                  ? "bg-green-500"
+                                  : "border border-theme bg-theme-surface"
+                              }`}
+                            >
+                              <span
+                                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition ${
+                                  p.inStock
+                                    ? "translate-x-0.5"
+                                    : "translate-x-5"
+                                }`}
+                              />
+                            </button>
+                          </td>
+                          <td className="px-4 py-2.5 text-left">
+                            <div className="flex justify-end gap-1.5">
+                              <a
+                                href={`/product/${p.id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="rounded-lg border border-theme bg-theme-surface px-2.5 py-1.5 font-bold text-theme transition hover:border-accent"
+                                title="مشاهده"
+                              >
+                                👁
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => openEditModal(p)}
+                                className="rounded-lg border border-theme bg-theme-surface px-2.5 py-1.5 font-bold text-theme transition hover:border-accent"
+                                title="ویرایش"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(p.id, p.name)}
+                                className="rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 font-bold text-red-500 transition hover:bg-red-500/20"
+                                title="حذف"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <ProductModal
+          open={modalOpen}
+          editingId={editingId}
+          initialData={formData}
+          categories={categories}
+          saving={saving}
+          error={formError}
+          onClose={() => setModalOpen(false)}
+          onSave={handleSave}
+        />
+      </main>
+    </div>
   );
 }
 
-// ─── کامپوننت آماری ───
 function StatCard({
   label,
   value,
   icon,
-  green,
-  red,
 }: {
   label: string;
   value: number;
   icon: string;
-  green?: boolean;
-  red?: boolean;
 }) {
-  const color = green
-    ? "text-green-700"
-    : red
-    ? "text-red-600"
-    : "text-gray-900";
   return (
-    <div className="rounded-xl border border-[#D4C5A0] bg-white p-3">
+    <div className="rounded-2xl border border-theme bg-theme-card p-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-gray-500">{label}</span>
+        <span className="text-xs font-bold text-theme-muted">{label}</span>
         <span className="text-lg">{icon}</span>
       </div>
-      <div className={`mt-1 text-2xl font-black ${color}`}>
+      <div className="mt-2 text-xl font-black text-theme">
         {value.toLocaleString("fa-IR")}
       </div>
     </div>

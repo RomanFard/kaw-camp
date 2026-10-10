@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import { formatPrice } from "@/lib/utils";
 
-// ─── تایپ ───
+// ─── تایپ‌ها ───
 type OrderItem = {
   id: string;
   name: string;
@@ -41,11 +42,11 @@ const STATUS_LABELS: Record<Order["status"], string> = {
 };
 
 const STATUS_COLORS: Record<Order["status"], string> = {
-  pending: "bg-amber-100 text-amber-700 border-amber-300",
-  confirmed: "bg-blue-100 text-blue-700 border-blue-300",
-  shipped: "bg-purple-100 text-purple-700 border-purple-300",
-  delivered: "bg-green-100 text-green-700 border-green-300",
-  cancelled: "bg-red-100 text-red-700 border-red-300",
+  pending: "border-amber-500/40 bg-amber-500/10 text-amber-500",
+  confirmed: "border-blue-500/40 bg-blue-500/10 text-blue-500",
+  shipped: "border-purple-500/40 bg-purple-500/10 text-purple-500",
+  delivered: "border-green-500/40 bg-green-500/10 text-green-500",
+  cancelled: "border-red-500/40 bg-red-500/10 text-red-500",
 };
 
 export default function OrdersPage() {
@@ -56,8 +57,9 @@ export default function OrdersPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusKey>("all");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [copiedText, setCopiedText] = useState<string | null>(null);
 
-  // ─── لود ───
   async function loadOrders() {
     setLoading(true);
     setError("");
@@ -79,29 +81,39 @@ export default function OrdersPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── شمارش هر وضعیت ───
-  const counts = {
-    all: orders.length,
-    pending: orders.filter((o) => o.status === "pending").length,
-    confirmed: orders.filter((o) => o.status === "confirmed").length,
-    shipped: orders.filter((o) => o.status === "shipped").length,
-    delivered: orders.filter((o) => o.status === "delivered").length,
-    cancelled: orders.filter((o) => o.status === "cancelled").length,
-  };
+  // شمارش تعداد سفارشات هر وضعیت
+  const counts = useMemo(() => {
+    return {
+      all: orders.length,
+      pending: orders.filter((o) => o.status === "pending").length,
+      confirmed: orders.filter((o) => o.status === "confirmed").length,
+      shipped: orders.filter((o) => o.status === "shipped").length,
+      delivered: orders.filter((o) => o.status === "delivered").length,
+      cancelled: orders.filter((o) => o.status === "cancelled").length,
+    };
+  }, [orders]);
 
-  // ─── فیلتر ───
-  const filtered = orders.filter((o) => {
-    if (statusFilter !== "all" && o.status !== statusFilter) return false;
-    if (!search.trim()) return true;
-    const q = search.trim().toLowerCase();
-    return (
-      o.order_number.toLowerCase().includes(q) ||
-      o.phone.includes(q) ||
-      `${o.first_name} ${o.last_name}`.toLowerCase().includes(q)
-    );
-  });
+  // فیلتر سفارشات
+  const filtered = useMemo(() => {
+    return orders.filter((o) => {
+      if (statusFilter !== "all" && o.status !== statusFilter) return false;
+      if (!search.trim()) return true;
+      const q = search.trim().toLowerCase();
+      return (
+        o.order_number.toLowerCase().includes(q) ||
+        o.phone.includes(q) ||
+        `${o.first_name} ${o.last_name}`.toLowerCase().includes(q)
+      );
+    });
+  }, [orders, statusFilter, search]);
 
-  // ─── تغییر سریع وضعیت ───
+  // مجموع مبلغ سفارش‌های فیلترشده
+  const totalRevenue = useMemo(() => {
+    return filtered
+      .filter((o) => o.status !== "cancelled")
+      .reduce((sum, o) => sum + o.total, 0);
+  }, [filtered]);
+
   async function handleStatusChange(id: string, newStatus: Order["status"]) {
     const { error } = await supabase
       .from("orders")
@@ -117,7 +129,6 @@ export default function OrdersPage() {
     );
   }
 
-  // ─── حذف ───
   async function handleDelete(id: string, num: string) {
     if (!confirm(`آیا از حذف سفارش "${num}" مطمئنی؟`)) return;
     const { error } = await supabase.from("orders").delete().eq("id", id);
@@ -128,7 +139,12 @@ export default function OrdersPage() {
     loadOrders();
   }
 
-  // ─── تاریخ ───
+  function handleCopy(text: string) {
+    navigator.clipboard.writeText(text);
+    setCopiedText(text);
+    setTimeout(() => setCopiedText(null), 2000);
+  }
+
   function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString("fa-IR", {
       year: "numeric",
@@ -138,175 +154,246 @@ export default function OrdersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E3]">
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        {/* Header */}
-        <div className="mb-6">
-          <a
-            href="/admin"
-            className="text-sm text-gray-500 hover:text-amber-600"
-          >
-            ← بازگشت به داشبورد
-          </a>
-          <h1 className="mt-2 text-3xl font-black text-gray-900">
-            🛒 مدیریت سفارشات
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {orders.length.toLocaleString("fa-IR")} سفارش ثبت شده
-          </p>
-        </div>
+    <div dir="rtl" className="flex min-h-screen bg-theme text-theme">
+      {/* Backdrop موبایل */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+        />
+      )}
 
-        {/* کارت‌های آماری وضعیت */}
-        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-6">
-          {(
-            [
-              "all",
-              "pending",
-              "confirmed",
-              "shipped",
-              "delivered",
-              "cancelled",
-            ] as StatusKey[]
-          ).map((key) => {
-            const isActive = statusFilter === key;
-            const label =
-              key === "all" ? "همه" : STATUS_LABELS[key as Order["status"]];
-            return (
+      {/* سایدبار */}
+      <AdminSidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
+      />
+
+      {/* محتوای اصلی */}
+      <main className="flex-1 overflow-x-hidden p-4 pb-12 sm:p-8">
+        <div className="mx-auto max-w-7xl space-y-6">
+          
+          {/* هدر اصلی */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
               <button
-                key={key}
                 type="button"
-                onClick={() => setStatusFilter(key)}
-                className={`rounded-xl border p-3 text-center transition ${
-                  isActive
-                    ? "border-amber-500 bg-amber-50 shadow-sm"
-                    : "border-[#D4C5A0] bg-white hover:border-amber-400"
-                }`}
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-theme bg-theme-card text-theme md:hidden"
               >
-                <div className="text-2xl font-black text-gray-900">
-                  {counts[key].toLocaleString("fa-IR")}
-                </div>
-                <div className="mt-1 text-[11px] font-bold text-gray-600">
-                  {label}
-                </div>
+                ☰
               </button>
-            );
-          })}
-        </div>
+              <div>
+                <h1 className="text-xl font-black text-theme">
+                  🛒 مدیریت سفارشات
+                </h1>
+                <p className="mt-0.5 text-xs text-theme-muted">
+                  {orders.length.toLocaleString("fa-IR")} سفارش ثبت شده • کل کارکرد: {formatPrice(totalRevenue)}
+                </p>
+              </div>
+            </div>
 
-        {/* جستجو */}
-        <div className="mb-4">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="🔍 جستجو در شماره پیگیری، نام یا تلفن..."
-            className="w-full max-w-md rounded-lg border border-[#D4C5A0] bg-white px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-          />
-        </div>
-
-        {/* خطا */}
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
-            ⚠️ {error}
+            <button
+              type="button"
+              onClick={loadOrders}
+              disabled={loading}
+              className="rounded-xl border border-theme bg-theme-card px-4 py-2 text-xs font-bold text-theme-muted transition hover:text-theme disabled:opacity-50"
+            >
+              🔄 بروزرسانی
+            </button>
           </div>
-        )}
 
-        {/* جدول */}
-        <div className="overflow-hidden rounded-2xl border border-[#D4C5A0] bg-white">
-          {loading ? (
-            <div className="p-12 text-center text-gray-500">
-              در حال بارگذاری...
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              {search || statusFilter !== "all"
-                ? "سفارشی با این فیلتر پیدا نشد"
-                : "هنوز سفارشی ثبت نشده"}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-right text-sm">
-                <thead className="border-b border-[#EDE4CE] bg-[#F7F1E3]/50">
-                  <tr className="text-xs font-bold text-gray-600">
-                    <th className="px-4 py-3">شماره پیگیری</th>
-                    <th className="px-4 py-3">مشتری</th>
-                    <th className="px-4 py-3">تلفن</th>
-                    <th className="px-4 py-3">مبلغ</th>
-                    <th className="px-4 py-3">وضعیت</th>
-                    <th className="px-4 py-3">تاریخ</th>
-                    <th className="px-4 py-3 text-left">عملیات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((order) => (
-                    <tr
-                      key={order.id}
-                      className="border-b border-[#EDE4CE] last:border-0 transition hover:bg-[#F7F1E3]/30"
-                    >
-                      <td className="px-4 py-3">
-                        <span className="font-mono font-bold text-gray-900">
-                          {order.order_number}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {order.first_name} {order.last_name}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs text-gray-600" dir="ltr">
-                        {order.phone}
-                      </td>
-                      <td className="px-4 py-3 font-bold">
-                        {formatPrice(order.total)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <select
-                          value={order.status}
-                          onChange={(e) =>
-                            handleStatusChange(
-                              order.id,
-                              e.target.value as Order["status"]
-                            )
-                          }
-                          className={`cursor-pointer rounded-lg border px-2 py-1 text-xs font-bold outline-none ${
-                            STATUS_COLORS[order.status]
-                          }`}
-                        >
-                          {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                            <option key={k} value={k}>
-                              {v}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-gray-500">
-                        {formatDate(order.created_at)}
-                      </td>
-                      <td className="px-4 py-3 text-left">
-                        <div className="flex justify-end gap-2">
-                          <a
-                            href={`/admin/orders/${order.id}`}
-                            className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 transition hover:bg-blue-100"
-                          >
-                            👁 مشاهده
-                          </a>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleDelete(order.id, order.order_number)
-                            }
-                            className="rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* نوار تب‌های فیلتر وضعیت (خلوت و مینیمال) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+            {(
+              [
+                "all",
+                "pending",
+                "confirmed",
+                "shipped",
+                "delivered",
+                "cancelled",
+              ] as StatusKey[]
+            ).map((key) => {
+              const isActive = statusFilter === key;
+              const label = key === "all" ? "همه" : STATUS_LABELS[key as Order["status"]];
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setStatusFilter(key)}
+                  className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition whitespace-nowrap ${
+                    isActive
+                      ? "border-accent bg-accent text-white shadow-sm"
+                      : "border-theme bg-theme-card text-theme-muted hover:text-theme"
+                  }`}
+                >
+                  <span>{label}</span>
+                  <span className={`rounded-md px-1.5 py-0.5 text-[10px] ${isActive ? "bg-white/20 text-white" : "bg-theme-surface text-theme"}`}>
+                    {counts[key].toLocaleString("fa-IR")}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* نوار جستجو */}
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="🔍 جستجو در شماره پیگیری، نام یا تلفن..."
+              className="w-full max-w-md rounded-xl border border-theme bg-theme-card px-4 py-2.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+            />
+          </div>
+
+          {/* نمایش خطا */}
+          {error && (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs font-bold text-red-500">
+              ⚠️ {error}
             </div>
           )}
+
+          {/* جدول سفارشات */}
+          <div className="overflow-hidden rounded-2xl border border-theme bg-theme-card shadow-sm">
+            {loading ? (
+              <div className="p-12 text-center text-xs text-theme-muted">
+                در حال بارگذاری سفارشات...
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="p-12 text-center text-xs text-theme-muted">
+                {search || statusFilter !== "all"
+                  ? "سفارشی با این فیلتر پیدا نشد"
+                  : "هنوز سفارشی ثبت نشده است"}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-right text-xs">
+                  <thead className="border-b border-theme bg-theme-surface font-bold text-theme-muted">
+                    <tr>
+                      <th className="px-4 py-3">شماره پیگیری</th>
+                      <th className="px-4 py-3">مشتری</th>
+                      <th className="px-4 py-3">اقلام</th>
+                      <th className="px-4 py-3">مبلغ کل</th>
+                      <th className="px-4 py-3">وضعیت</th>
+                      <th className="px-4 py-3">تاریخ</th>
+                      <th className="px-4 py-3 text-left">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-theme">
+                    {filtered.map((order) => {
+                      const itemCount = (order.items ?? []).reduce((s, i) => s + (i.quantity || 1), 0);
+                      return (
+                        <tr
+                          key={order.id}
+                          className="transition hover:bg-theme-surface/40"
+                        >
+                          {/* شماره پیگیری با دکمه کپی */}
+                          <td className="px-4 py-3 font-mono font-bold text-theme">
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(order.order_number)}
+                              className="group flex items-center gap-1 hover:text-accent"
+                              title="کپی شماره پیگیری"
+                            >
+                              <span>{order.order_number}</span>
+                              <span className="text-[10px] opacity-0 transition group-hover:opacity-100">
+                                {copiedText === order.order_number ? "✓" : "📋"}
+                              </span>
+                            </button>
+                          </td>
+
+                          {/* اطلاعات مشتری و تلفن */}
+                          <td className="px-4 py-3">
+                            <p className="font-bold text-theme">
+                              {order.first_name} {order.last_name}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(order.phone)}
+                              className="text-[10px] font-mono text-theme-muted hover:text-accent"
+                            >
+                              {order.phone}
+                            </button>
+                          </td>
+
+                          {/* اقلام سفارش (خلاصه) */}
+                          <td className="px-4 py-3 text-theme-muted">
+                            <span className="font-bold text-theme">{itemCount} کالا</span>
+                            <span className="block text-[10px] truncate max-w-[140px]">
+                              {(order.items ?? []).map((i) => i.name).join("، ")}
+                            </span>
+                          </td>
+
+                          {/* مبلغ کل */}
+                          <td className="px-4 py-3 font-bold text-theme">
+                            {formatPrice(order.total)}
+                          </td>
+
+                          {/* تغییر وضعیت سفارش */}
+                          <td className="px-4 py-3">
+                            <select
+                              value={order.status}
+                              onChange={(e) =>
+                                handleStatusChange(
+                                  order.id,
+                                  e.target.value as Order["status"]
+                                )
+                              }
+                              className={`cursor-pointer rounded-lg border px-2 py-1 text-[11px] font-bold outline-none transition ${
+                                STATUS_COLORS[order.status]
+                              }`}
+                            >
+                              {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                                <option
+                                  key={k}
+                                  value={k}
+                                  className="bg-theme-card text-theme"
+                                >
+                                  {v}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+
+                          {/* تاریخ */}
+                          <td className="px-4 py-3 text-theme-muted">
+                            {formatDate(order.created_at)}
+                          </td>
+
+                          {/* دکمه‌های عملیات */}
+                          <td className="px-4 py-3 text-left">
+                            <div className="flex justify-end gap-1.5">
+                              <a
+                                href={`/admin/orders/${order.id}`}
+                                className="rounded-lg border border-theme bg-theme-surface px-2.5 py-1.5 font-bold text-theme transition hover:border-accent"
+                                title="مشاهده فاکتور و جزئیات"
+                              >
+                                👁
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleDelete(order.id, order.order_number)
+                                }
+                                className="rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 font-bold text-red-500 transition hover:bg-red-500/20"
+                                title="حذف سفارش"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

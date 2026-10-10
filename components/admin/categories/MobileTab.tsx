@@ -23,17 +23,22 @@ export default function MobileTab() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function load() {
     setLoading(true);
     const data = await getAppContent<MobileMenuCategory[]>("mobile_menu");
-    setItems(data && data.length > 0 ? data : (defaultMenu as MobileMenuCategory[]));
+    setItems(
+      data && data.length > 0 ? data : (defaultMenu as MobileMenuCategory[])
+    );
     setLoading(false);
   }
 
   function updateCat(i: number, field: keyof MobileMenuCategory, value: any) {
-    setItems((p) => p.map((c, idx) => (idx === i ? { ...c, [field]: value } : c)));
+    setItems((p) =>
+      p.map((c, idx) => (idx === i ? { ...c, [field]: value } : c))
+    );
   }
 
   function addCat() {
@@ -79,7 +84,9 @@ export default function MobileTab() {
         idx === ci
           ? {
               ...c,
-              groups: c.groups.map((g, i) => (i === gi ? { ...g, title } : g)),
+              groups: c.groups.map((g, i) =>
+                i === gi ? { ...g, title } : g
+              ),
             }
           : c
       )
@@ -94,7 +101,13 @@ export default function MobileTab() {
               ...c,
               groups: c.groups.map((g, i) =>
                 i === gi
-                  ? { ...g, items: [...g.items, { label: "آیتم جدید", href: "/products" }] }
+                  ? {
+                      ...g,
+                      items: [
+                        ...g.items,
+                        { label: "آیتم جدید", href: "/products" },
+                      ],
+                    }
                   : g
               ),
             }
@@ -110,7 +123,9 @@ export default function MobileTab() {
           ? {
               ...c,
               groups: c.groups.map((g, i) =>
-                i === gi ? { ...g, items: g.items.filter((_, j) => j !== ii) } : g
+                i === gi
+                  ? { ...g, items: g.items.filter((_, j) => j !== ii) }
+                  : g
               ),
             }
           : c
@@ -159,29 +174,36 @@ export default function MobileTab() {
     setItems(defaultMenu as MobileMenuCategory[]);
   }
 
-  if (loading) return <div className="p-12 text-center text-gray-500">در حال بارگذاری...</div>;
+  if (loading) {
+    return (
+      <div className="p-12 text-center text-xs text-theme-muted">
+        در حال بارگذاری...
+      </div>
+    );
+  }
 
   const inp =
-    "w-full rounded-md border border-[#D4C5A0] bg-white px-2 py-1.5 text-xs";
+    "w-full rounded-lg border border-theme bg-theme-surface px-2 py-1.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent";
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600">
-          {items.length} دسته در منوی موبایل
+      {/* هدر */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-theme-muted">
+          {items.length.toLocaleString("fa-IR")} دسته در منوی موبایل
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={reset}
-            className="rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-xs font-bold text-gray-600"
+            className="rounded-xl border border-theme bg-theme-card px-3 py-2 text-xs font-bold text-theme-muted transition hover:text-theme"
           >
             🔄 ریست
           </button>
           <button
             type="button"
             onClick={addCat}
-            className="rounded-lg bg-[#E84C4C] px-4 py-2 text-sm font-bold text-white hover:bg-[#D63F3F]"
+            className="rounded-xl bg-accent px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:opacity-90"
           >
             ➕ دسته
           </button>
@@ -189,21 +211,27 @@ export default function MobileTab() {
             type="button"
             onClick={save}
             disabled={saving}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50"
           >
             {saving ? "..." : "💾 ذخیره"}
           </button>
         </div>
       </div>
 
+      {/* لیست دسته‌ها */}
       <div className="space-y-2">
         {items.map((cat, ci) => (
-          <div key={ci} className="rounded-xl border border-[#D4C5A0] bg-white">
-            <div className="flex items-center gap-2 border-b border-[#EDE4CE] p-3">
+          <div
+            key={ci}
+            className="rounded-xl border border-theme bg-theme-card shadow-sm"
+          >
+            {/* هدر دسته */}
+            <div className="flex items-center gap-2 border-b border-theme p-3">
               <button
                 type="button"
                 onClick={() => setOpen(open === ci ? null : ci)}
-                className="flex h-6 w-6 items-center justify-center rounded text-gray-500 hover:bg-gray-100"
+                className="flex h-6 w-6 items-center justify-center rounded text-theme-muted transition hover:bg-theme-surface hover:text-theme"
+                aria-label="باز کردن"
               >
                 {open === ci ? "▼" : "◄"}
               </button>
@@ -211,7 +239,6 @@ export default function MobileTab() {
                 value={cat.label}
                 onChange={(e) => updateCat(ci, "label", e.target.value)}
                 placeholder="نام دسته"
-                style={{ color: "#111827", colorScheme: "light" }}
                 className={`${inp} flex-1 font-bold`}
               />
               <input
@@ -219,14 +246,14 @@ export default function MobileTab() {
                 onChange={(e) => updateCat(ci, "key", e.target.value)}
                 placeholder="key"
                 dir="ltr"
-                style={{ color: "#111827", colorScheme: "light" }}
                 className={`${inp} max-w-[120px] font-mono`}
               />
               <button
                 type="button"
                 onClick={() => moveCat(ci, -1)}
                 disabled={ci === 0}
-                className="px-2 text-xs hover:bg-gray-100 disabled:opacity-30"
+                className="rounded p-1 text-xs text-theme-muted transition hover:bg-theme-surface hover:text-theme disabled:opacity-30"
+                aria-label="بالا"
               >
                 ↑
               </button>
@@ -234,28 +261,31 @@ export default function MobileTab() {
                 type="button"
                 onClick={() => moveCat(ci, 1)}
                 disabled={ci === items.length - 1}
-                className="px-2 text-xs hover:bg-gray-100 disabled:opacity-30"
+                className="rounded p-1 text-xs text-theme-muted transition hover:bg-theme-surface hover:text-theme disabled:opacity-30"
+                aria-label="پایین"
               >
                 ↓
               </button>
               <button
                 type="button"
                 onClick={() => removeCat(ci)}
-                className="rounded bg-red-50 px-2 py-1 text-xs text-red-600"
+                className="rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs font-bold text-red-500 transition hover:bg-red-500/20"
+                aria-label="حذف"
               >
                 🗑
               </button>
             </div>
 
+            {/* محتوای باز شده */}
             {open === ci && (
               <div className="space-y-3 p-3">
+                {/* Icon + Photo */}
                 <div className="grid gap-2 sm:grid-cols-2">
                   <input
                     value={cat.icon}
                     onChange={(e) => updateCat(ci, "icon", e.target.value)}
                     placeholder="آیکون (URL)"
                     dir="ltr"
-                    style={{ color: "#111827", colorScheme: "light" }}
                     className={inp}
                   />
                   <input
@@ -263,50 +293,56 @@ export default function MobileTab() {
                     onChange={(e) => updateCat(ci, "photo", e.target.value)}
                     placeholder="عکس (URL)"
                     dir="ltr"
-                    style={{ color: "#111827", colorScheme: "light" }}
                     className={inp}
                   />
                 </div>
 
+                {/* Groups */}
                 <div className="space-y-2">
                   {cat.groups.map((group, gi) => (
                     <div
                       key={gi}
-                      className="rounded-lg border border-[#EDE4CE] bg-[#F7F1E3]/30 p-2"
+                      className="rounded-lg border border-theme bg-theme-surface/50 p-2"
                     >
                       <div className="mb-2 flex items-center gap-2">
                         <input
                           value={group.title}
                           onChange={(e) => updateGroup(ci, gi, e.target.value)}
                           placeholder="عنوان گروه"
-                          style={{ color: "#111827", colorScheme: "light" }}
                           className={`${inp} flex-1 font-bold`}
                         />
                         <button
                           type="button"
                           onClick={() => addItem(ci, gi)}
-                          className="rounded bg-emerald-50 px-2 py-1 text-xs text-emerald-700"
+                          className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-500 transition hover:bg-emerald-500/20"
                         >
                           ➕ آیتم
                         </button>
                         <button
                           type="button"
                           onClick={() => removeGroup(ci, gi)}
-                          className="rounded bg-red-50 px-2 py-1 text-xs text-red-600"
+                          className="rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs font-bold text-red-500 transition hover:bg-red-500/20"
                         >
                           🗑
                         </button>
                       </div>
+
+                      {/* Items */}
                       <div className="space-y-1">
                         {group.items.map((item, ii) => (
                           <div key={ii} className="flex gap-1">
                             <input
                               value={item.label}
                               onChange={(e) =>
-                                updateItem(ci, gi, ii, "label", e.target.value)
+                                updateItem(
+                                  ci,
+                                  gi,
+                                  ii,
+                                  "label",
+                                  e.target.value
+                                )
                               }
                               placeholder="عنوان"
-                              style={{ color: "#111827", colorScheme: "light" }}
                               className={`${inp} flex-1`}
                             />
                             <input
@@ -316,13 +352,13 @@ export default function MobileTab() {
                               }
                               placeholder="/products"
                               dir="ltr"
-                              style={{ color: "#111827", colorScheme: "light" }}
                               className={`${inp} flex-1 font-mono`}
                             />
                             <button
                               type="button"
                               onClick={() => removeItem(ci, gi, ii)}
-                              className="rounded bg-red-50 px-2 text-xs text-red-600"
+                              className="rounded-lg border border-red-500/30 bg-red-500/10 px-2 text-xs font-bold text-red-500 transition hover:bg-red-500/20"
+                              aria-label="حذف"
                             >
                               ✕
                             </button>
@@ -331,10 +367,12 @@ export default function MobileTab() {
                       </div>
                     </div>
                   ))}
+
+                  {/* افزودن گروه */}
                   <button
                     type="button"
                     onClick={() => addGroup(ci)}
-                    className="w-full rounded-lg border border-dashed border-[#D4C5A0] py-2 text-xs font-bold text-gray-500 hover:bg-gray-50"
+                    className="w-full rounded-lg border border-dashed border-theme py-2 text-xs font-bold text-theme-muted transition hover:bg-theme-surface hover:text-theme"
                   >
                     ➕ افزودن گروه
                   </button>

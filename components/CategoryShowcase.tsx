@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { getAppContent } from "@/lib/supabase/appContent";
 
 const ASPECT = 0.7;
 
@@ -18,16 +19,24 @@ export type CategoryShowcaseData = {
   items: CategoryShowcaseItem[];
 };
 
+// 🆕 تایپ عکس دسته‌بندی
+type CategoryPhoto = {
+  name: string;
+  url: string;
+};
+
+type PhotoMap = Record<string, string>;
+
 export const DEFAULT_CATEGORY_SHOWCASE: CategoryShowcaseData = {
   items: [
-    { key: "stove", label: "اجاق گاز", subtitle: "بلک داگ CBD2300CW013", iconKey: "cooking", href: "/products?cat=cooking", image: "/images/categories/photos/cooking.jpg" },
-    { key: "spice-set", label: "ست ادویه", subtitle: "بلک داگ CBD2450XB019", iconKey: "cooking", href: "/products?cat=cooking", image: "/images/categories/photos/bottle.jpg" },
-    { key: "tent-auto", label: "چادر اتوماتیک", subtitle: "Xianju 2.1 — CBD2450WS029", iconKey: "tent", href: "/products?cat=tent", image: "/images/categories/photos/tent.jpg" },
-    { key: "cool-box", label: "کول باکس", subtitle: "بلک داگ BD-BWX003", iconKey: "tools", href: "/products?cat=tools", image: "/images/categories/photos/backpack.jpg" },
-    { key: "enamel-mug", label: "لیوان لعابی", subtitle: "بلک داگ CBD2450CF018", iconKey: "cooking", href: "/products?cat=cooking", image: "/images/categories/photos/bottle.jpg" },
-    { key: "camp-table", label: "میز کمپینگ", subtitle: "بلک داگ CBD2550JJ025", iconKey: "lighting", href: "/products?cat=lighting", image: "/images/categories/photos/lighting.jpg" },
-    { key: "folding-shovel", label: "بیل تاشو چندکاره", subtitle: "بلک داگ CBD2450PJ018", iconKey: "tools", href: "/products?cat=tools", image: "/images/categories/photos/backpack.jpg" },
-    { key: "tent-family", label: "چادر مسافرتی", subtitle: "بلک داگ CBD2550WS018", iconKey: "tent", href: "/products?cat=tent", image: "/images/categories/photos/tent.jpg" },
+    { key: "stove", label: "اجاق گاز", subtitle: "بلک داگ CBD2300CW013", iconKey: "cooking", href: "/products?cat=cooking", image: "cooking" },
+    { key: "spice-set", label: "ست ادویه", subtitle: "بلک داگ CBD2450XB019", iconKey: "cooking", href: "/products?cat=cooking", image: "bottle" },
+    { key: "tent-auto", label: "چادر اتوماتیک", subtitle: "Xianju 2.1 — CBD2450WS029", iconKey: "tent", href: "/products?cat=tent", image: "tent" },
+    { key: "cool-box", label: "کول باکس", subtitle: "بلک داگ BD-BWX003", iconKey: "tools", href: "/products?cat=tools", image: "backpack" },
+    { key: "enamel-mug", label: "لیوان لعابی", subtitle: "بلک داگ CBD2450CF018", iconKey: "cooking", href: "/products?cat=cooking", image: "bottle" },
+    { key: "camp-table", label: "میز کمپینگ", subtitle: "بلک داگ CBD2550JJ025", iconKey: "lighting", href: "/products?cat=lighting", image: "lighting" },
+    { key: "folding-shovel", label: "بیل تاشو چندکاره", subtitle: "بلک داگ CBD2450PJ018", iconKey: "tools", href: "/products?cat=tools", image: "backpack" },
+    { key: "tent-family", label: "چادر مسافرتی", subtitle: "بلک داگ CBD2550WS018", iconKey: "tent", href: "/products?cat=tent", image: "tent" },
   ],
 };
 
@@ -58,6 +67,26 @@ export default function CategoryShowcase({
   onImagePick,
 }: Props) {
   const items = data.items;
+  // 🆕 map عکس‌ها
+  const [photoMap, setPhotoMap] = useState<PhotoMap>({});
+
+  // 🆕 لود عکس‌ها از category_photos
+  useEffect(() => {
+    (async () => {
+      try {
+        const photos = await getAppContent<CategoryPhoto[]>("category_photos");
+        if (photos && photos.length > 0) {
+          const map: PhotoMap = {};
+          photos.forEach((p) => {
+            if (p.name && p.url) map[p.name] = p.url;
+          });
+          setPhotoMap(map);
+        }
+      } catch (e) {
+        console.error("category_photos load error", e);
+      }
+    })();
+  }, []);
 
   return (
     <section dir="rtl" className="overflow-hidden py-12 md:py-24">
@@ -66,15 +95,13 @@ export default function CategoryShowcase({
         <SectionHeading />
       </div>
 
-      {/* 🆕 دو کاروسل یکسان کنار هم */}
-      <div className="mx-auto w-full max-w-[1400px] px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:gap-6">
-          <div className="min-w-0">
-            <CategoryCarousel items={items} />
-          </div>
-          <div className="min-w-0">
-            <CategoryCarousel items={items} />
-          </div>
+      {/* 🆕 دو کاروسل کنار هم — بدون gap */}
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="min-w-0 overflow-hidden">
+          <CategoryCarousel items={items} photoMap={photoMap} />
+        </div>
+        <div className="min-w-0 overflow-hidden">
+          <CategoryCarousel items={items} mirror photoMap={photoMap} />
         </div>
       </div>
 
@@ -95,7 +122,10 @@ export default function CategoryShowcase({
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-black/40">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={item.image}
+                      src={
+                        photoMap[item.image] ||
+                        `/images/categories/photos/${item.image}.jpg`
+                      }
                       alt={item.label}
                       className="h-full w-full object-cover"
                     />
@@ -158,7 +188,16 @@ function SectionHeading() {
   );
 }
 
-function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
+// 🆕 photoMap به props اضافه شد
+function CategoryCarousel({
+  items,
+  mirror = false,
+  photoMap,
+}: {
+  items: CategoryShowcaseItem[];
+  mirror?: boolean;
+  photoMap: PhotoMap;
+}) {
   const [wrapW, setWrapW] = useState(900);
   const [activeKey, setActiveKey] = useState<string>(items[0]?.key ?? "");
 
@@ -175,10 +214,9 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
   const n = items.length;
   const isMobile = wrapW < 640;
 
-  // 🆕 سایز کارت — موبایل کوچیک‌تر
   const cardW = isMobile
-    ? Math.round(Math.min(150, wrapW * 0.4))
-    : Math.round(Math.min(260, Math.max(180, wrapW * 0.45)));
+    ? Math.round(Math.min(240, wrapW * 0.55))
+    : Math.round(Math.min(384, Math.max(220, wrapW * 0.3)));
   const cardH = Math.round(cardW / ASPECT);
 
   const nRef = useRef(n);
@@ -211,7 +249,7 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
       const a = Math.abs(p);
       const sign = p < 0 ? -1 : 1;
 
-      const x = sign * lerpTable(a, X_TABLE) * W;
+      const x = sign * lerpTable(a, X_TABLE) * W * (mirror ? -1 : 1);
       const scale = lerpTable(a, SCALE_TABLE);
       const opacity = a <= 2.4 ? 1 : Math.max(0, 1 - (a - 2.4) / 0.6);
 
@@ -237,7 +275,7 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
 
   useLayoutEffect(() => {
     applyRef.current();
-  }, [cardW, n, items]);
+  }, [cardW, n, items, mirror]);
 
   useEffect(() => {
     let raf = 0;
@@ -293,14 +331,16 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
   };
 
   return (
-    <div className="mx-auto mt-10 w-full px-4 md:mt-0 md:px-6">
+    <div className="mx-auto mt-10 max-w-[1400px] px-4 md:mt-0 md:px-6 lg:px-8">
       <div
         dir="ltr"
-        className="relative mb-24 flex flex-col items-stretch gap-6 md:mt-44 md:block md:pr-44"
+        className="relative mb-24 flex flex-col items-stretch gap-6 md:mt-44 md:block"
       >
         <ul
           dir="rtl"
-          className="hidden shrink-0 flex-row flex-wrap justify-center gap-x-5 gap-y-2 md:absolute md:right-0 md:top-1/2 md:z-[200] md:flex md:w-40 md:-translate-y-1/2 md:flex-col md:justify-start md:gap-3"
+          className={`hidden shrink-0 flex-row flex-wrap justify-center gap-x-5 gap-y-2 md:absolute md:top-1/2 md:z-[200] md:flex md:w-40 md:-translate-y-1/2 md:flex-col md:justify-start md:gap-3 ${
+            mirror ? "md:left-0" : "md:right-0"
+          }`}
         >
           {items.map((cat, i) => {
             const active = cat.key === activeKey;
@@ -337,7 +377,10 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
           </div>
 
           {items.map((cat, i) => {
-            const image = cat.image || "/images/categories/photos/tent.jpg";
+            // 🆕 استفاده از photoMap — اگه override داشت
+            const imageSrc =
+              photoMap[cat.image] ||
+              `/images/categories/photos/${cat.image}.jpg`;
 
             return (
               <a
@@ -370,7 +413,7 @@ function CategoryCarousel({ items }: { items: CategoryShowcaseItem[] }) {
                 <div className="h-full w-full overflow-hidden rounded-2xl bg-theme-card shadow-xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={image}
+                    src={imageSrc}
                     alt={cat.label}
                     loading="lazy"
                     draggable={false}

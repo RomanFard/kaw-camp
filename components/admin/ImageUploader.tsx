@@ -19,7 +19,6 @@ type Area = {
   height: number;
 };
 
-// ─── بارگذاری عکس ───
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -30,7 +29,6 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-// ─── محاسبه ابعاد بعد از چرخش ───
 function rotateSize(width: number, height: number, rotation: number) {
   const rotRad = (rotation * Math.PI) / 180;
   return {
@@ -41,7 +39,6 @@ function rotateSize(width: number, height: number, rotation: number) {
   };
 }
 
-// ─── برش و ساخت Blob ───
 async function getCroppedBlob(
   imageSrc: string,
   pixelCrop: Area,
@@ -144,7 +141,6 @@ export default function ImageUploader({
     };
     reader.readAsDataURL(file);
 
-    // پاک کردن input
     e.target.value = "";
   }
 
@@ -168,9 +164,7 @@ export default function ImageUploader({
 
       if (error) throw error;
 
-      const { data } = supabase.storage
-        .from("products")
-        .getPublicUrl(fileName);
+      const { data } = supabase.storage.from("products").getPublicUrl(fileName);
 
       onChange(data.publicUrl);
       toast.success("عکس با موفقیت آپلود شد");
@@ -187,7 +181,7 @@ export default function ImageUploader({
   return (
     <div>
       {label && (
-        <label className="mb-1.5 block text-sm font-bold text-gray-700">
+        <label className="mb-1.5 block text-xs font-bold text-theme-muted">
           {label}
         </label>
       )}
@@ -199,9 +193,9 @@ export default function ImageUploader({
           onChange={(e) => onChange(e.target.value)}
           dir="ltr"
           placeholder="/images/... یا https://..."
-          className="min-w-0 flex-1 rounded-lg border border-[#D4C5A0] px-4 py-2.5 font-mono text-left text-xs outline-none focus:border-amber-500"
+          className="min-w-0 flex-1 rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-left font-mono text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
         />
-        <label className="shrink-0 cursor-pointer rounded-lg bg-[#1E40AF] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-blue-900">
+        <label className="shrink-0 cursor-pointer rounded-xl bg-accent px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90">
           📤 آپلود
           <input
             type="file"
@@ -213,7 +207,7 @@ export default function ImageUploader({
       </div>
 
       {value && (
-        <div className="mt-2 h-24 w-24 overflow-hidden rounded-lg border border-[#EDE4CE] bg-gray-50">
+        <div className="mt-2 h-24 w-24 overflow-hidden rounded-lg border border-theme bg-theme-surface">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
@@ -225,13 +219,12 @@ export default function ImageUploader({
 
       {/* ─── Modal کراپ ─── */}
       {modalOpen && srcImage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-2xl rounded-2xl bg-white p-5">
-            <h3 className="mb-3 text-lg font-black text-gray-900">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-2xl border border-theme bg-theme-card p-5 shadow-2xl">
+            <h3 className="mb-3 text-lg font-black text-theme">
               ✂️ ویرایش و آپلود عکس
             </h3>
 
-            {/* ناحیه کراپ */}
             <div className="relative h-80 w-full overflow-hidden rounded-xl bg-black">
               <Cropper
                 image={srcImage}
@@ -246,10 +239,9 @@ export default function ImageUploader({
               />
             </div>
 
-            {/* کنترل‌ها */}
             <div className="mt-4 space-y-3">
               <div>
-                <label className="mb-1 block text-xs font-bold text-gray-600">
+                <label className="mb-1 block text-xs font-bold text-theme-muted">
                   بزرگ‌نمایی ({zoom.toFixed(1)}x)
                 </label>
                 <input
@@ -259,12 +251,12 @@ export default function ImageUploader({
                   step={0.1}
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
-                  className="w-full accent-amber-500"
+                  className="w-full accent-accent"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-bold text-gray-600">
+                <label className="mb-1 block text-xs font-bold text-theme-muted">
                   چرخش ({rotation}°)
                 </label>
                 <input
@@ -274,7 +266,7 @@ export default function ImageUploader({
                   step={1}
                   value={rotation}
                   onChange={(e) => setRotation(Number(e.target.value))}
-                  className="w-full accent-amber-500"
+                  className="w-full accent-accent"
                 />
               </div>
 
@@ -282,14 +274,14 @@ export default function ImageUploader({
                 <button
                   type="button"
                   onClick={() => setRotation((r) => (r + 90) % 360)}
-                  className="rounded-lg border border-[#D4C5A0] bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50"
+                  className="rounded-lg border border-theme bg-theme-surface px-3 py-1.5 text-xs font-bold text-theme transition hover:border-accent"
                 >
                   ↻ چرخش ۹۰°
                 </button>
                 <button
                   type="button"
                   onClick={() => setRotation((r) => (r - 90 + 360) % 360)}
-                  className="rounded-lg border border-[#D4C5A0] bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50"
+                  className="rounded-lg border border-theme bg-theme-surface px-3 py-1.5 text-xs font-bold text-theme transition hover:border-accent"
                 >
                   ↺ چرخش -۹۰°
                 </button>
@@ -300,20 +292,19 @@ export default function ImageUploader({
                     setRotation(0);
                     setCrop({ x: 0, y: 0 });
                   }}
-                  className="rounded-lg border border-[#D4C5A0] bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50"
+                  className="rounded-lg border border-theme bg-theme-surface px-3 py-1.5 text-xs font-bold text-theme transition hover:border-accent"
                 >
                   🔄 بازنشانی
                 </button>
               </div>
             </div>
 
-            {/* دکمه‌ها */}
             <div className="mt-5 flex gap-2">
               <button
                 type="button"
                 onClick={handleCropSave}
                 disabled={uploading}
-                className="flex-1 rounded-lg bg-[#E84C4C] py-2.5 text-sm font-bold text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
+                className="flex-1 rounded-xl bg-accent py-2.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90 disabled:opacity-50"
               >
                 {uploading ? "در حال آپلود..." : "✅ تأیید و آپلود"}
               </button>
@@ -324,7 +315,7 @@ export default function ImageUploader({
                   setSrcImage(null);
                 }}
                 disabled={uploading}
-                className="rounded-lg border border-[#D4C5A0] px-5 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50"
+                className="rounded-xl border border-theme bg-theme-card px-5 py-2.5 text-xs font-bold text-theme-muted transition hover:text-theme"
               >
                 انصراف
               </button>
@@ -335,4 +326,3 @@ export default function ImageUploader({
     </div>
   );
 }
-

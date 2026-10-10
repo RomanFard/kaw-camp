@@ -5,6 +5,7 @@ import BlackDogSteps, {
   BlackDogStepsData,
   DEFAULT_BLACK_DOG_STEPS,
 } from "@/components/BlackDogSteps";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import { getAppContent, setAppContent } from "@/lib/supabase/appContent";
 import { createClient } from "@/lib/supabase/client";
 
@@ -16,6 +17,7 @@ export default function AdminBlackDogStepsPage() {
   const [data, setData] = useState<BlackDogStepsData>(DEFAULT_BLACK_DOG_STEPS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const stepIndexRef = useRef<number | null>(null);
 
@@ -76,56 +78,99 @@ export default function AdminBlackDogStepsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] text-white">
-        در حال بارگذاری…
-      </div>
-    );
-  }
+  const handleReset = () => {
+    if (confirm("بازگردانی به حالت پیش‌فرض؟")) {
+      setData(DEFAULT_BLACK_DOG_STEPS);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      {/* ─── Admin bar ─── */}
-      <div className="sticky top-0 z-50 flex items-center justify-between gap-3 border-b border-white/10 bg-black/80 px-4 py-3 backdrop-blur">
-        <h1 className="text-xs font-bold text-white md:text-sm">
-          ویرایش «چقدر سریع برپاش می‌کنی؟»
-        </h1>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (confirm("بازگردانی به حالت پیش‌فرض؟")) {
-                setData(DEFAULT_BLACK_DOG_STEPS);
-              }
-            }}
-            className="rounded-lg border border-white/20 px-3 py-1.5 text-xs text-white/80 transition hover:bg-white/10"
-          >
-            بازگردانی
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="rounded-lg bg-amber-500 px-4 py-1.5 text-xs font-bold text-black transition hover:bg-amber-400 disabled:opacity-50"
-          >
-            {saving ? "در حال ذخیره…" : "ذخیره"}
-          </button>
-        </div>
-      </div>
+    <div dir="rtl" className="flex min-h-screen bg-theme text-theme">
+      {/* Backdrop موبایل */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+        />
+      )}
 
-      {/* ─── Hint ─── */}
-      <p className="border-b border-white/5 bg-amber-500/10 px-4 py-2 text-center text-[11px] text-amber-200">
-        روی متن‌ها کلیک کن و ویرایش کن · برای تغییر عکس، روی تصویر هاور کن
-      </p>
-
-      {/* ─── Live preview (exactly like the public page) ─── */}
-      <BlackDogSteps
-        data={data}
-        editable
-        onChange={setData}
-        onImagePick={handleImagePick}
+      {/* سایدبار */}
+      <AdminSidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
       />
+
+      {/* محتوای اصلی */}
+      <main className="flex-1 overflow-x-hidden">
+        {/* Admin bar - sticky */}
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-theme bg-theme-card/80 px-4 py-3 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            {/* دکمه منو موبایل */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-theme bg-theme-card text-theme transition hover:bg-theme-surface md:hidden"
+              aria-label="باز کردن منو"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.2}
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+                />
+              </svg>
+            </button>
+
+            <h1 className="text-xs font-bold text-theme md:text-sm">
+              🏕️ ویرایش «چقدر سریع برپاش می‌کنی؟»
+            </h1>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="rounded-lg border border-theme bg-theme-card px-3 py-1.5 text-xs font-bold text-theme-muted transition hover:text-theme"
+            >
+              بازگردانی
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="rounded-lg bg-accent px-4 py-1.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90 disabled:opacity-50"
+            >
+              {saving ? "در حال ذخیره…" : "💾 ذخیره"}
+            </button>
+          </div>
+        </div>
+
+        {/* راهنما */}
+        <p className="border-b border-theme bg-accent/10 px-4 py-2 text-center text-[11px] text-accent">
+          روی متن‌ها کلیک کن و ویرایش کن · برای تغییر عکس، روی تصویر هاور کن
+        </p>
+
+        {/* لودینگ */}
+        {loading ? (
+          <div className="flex min-h-[60vh] items-center justify-center text-xs text-theme-muted">
+            در حال بارگذاری…
+          </div>
+        ) : (
+          <BlackDogSteps
+            data={data}
+            editable
+            onChange={setData}
+            onImagePick={handleImagePick}
+          />
+        )}
+      </main>
 
       <input
         ref={fileRef}

@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import { useToast } from "@/components/context/ToastContext";
+import { getAllProducts } from "@/lib/supabase/products";
+import type { Product } from "@/data/products";
 
-// ─── تایپ ───
+// ─── تایپ‌ها ───
 type DiscountCode = {
   id: string;
   code: string;
@@ -16,6 +19,8 @@ type DiscountCode = {
   is_active: boolean;
   usage_limit: number | null;
   used_count: number;
+  per_user_limit: number | null;
+  product_id: string | null;
   expires_at: string | null;
   created_at: string;
 };
@@ -29,6 +34,8 @@ type FormData = {
   description: string;
   is_active: boolean;
   usage_limit: string;
+  per_user_limit: string;
+  product_id: string;
   expires_at: string;
 };
 
@@ -41,6 +48,8 @@ const EMPTY_FORM: FormData = {
   description: "",
   is_active: true,
   usage_limit: "",
+  per_user_limit: "1",
+  product_id: "",
   expires_at: "",
 };
 
@@ -49,9 +58,11 @@ export default function DiscountsPage() {
   const toast = useToast();
 
   const [codes, setCodes] = useState<DiscountCode[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // مودال
   const [modalOpen, setModalOpen] = useState(false);
@@ -60,33 +71,32 @@ export default function DiscountsPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
-  // ─── لود دیتا ───
-  async function loadCodes() {
+  // ─── لود دیتا و محصولات ───
+  async function loadData() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("discount_codes")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const [codesRes, prodsData] = await Promise.all([
+      supabase.from("discount_codes").select("*").order("created_at", { ascending: false }),
+      getAllProducts(),
+    ]);
 
-    if (error) {
-      setError("خطا در بارگذاری کدها: " + error.message);
+    if (codesRes.error) {
+      setError("خطا در بارگذاری کدها: " + codesRes.error.message);
     } else {
-      setCodes(data ?? []);
+      setCodes(codesRes.data ?? []);
     }
+    setProducts(prodsData);
     setLoading(false);
   }
 
   useEffect(() => {
-    loadCodes();
+    loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── فیلتر جستجو ───
   const filtered = codes.filter((c) =>
     c.code.toLowerCase().includes(search.toLowerCase())
   );
 
-  // ─── باز کردن مودال افزودن ───
   function openAddModal() {
     setEditingId(null);
     setForm(EMPTY_FORM);
@@ -94,7 +104,6 @@ export default function DiscountsPage() {
     setModalOpen(true);
   }
 
-  // ─── باز کردن مودال ویرایش ───
   function openEditModal(code: DiscountCode) {
     setEditingId(code.id);
     setForm({
@@ -106,6 +115,8 @@ export default function DiscountsPage() {
       description: code.description ?? "",
       is_active: code.is_active,
       usage_limit: code.usage_limit ? String(code.usage_limit) : "",
+      per_user_limit: code.per_user_limit ? String(code.per_user_limit) : "1",
+      product_id: code.product_id ?? "",
       expires_at: code.expires_at
         ? new Date(code.expires_at).toISOString().split("T")[0]
         : "",
@@ -114,12 +125,10 @@ export default function DiscountsPage() {
     setModalOpen(true);
   }
 
-  // ─── ذخیره (افزودن یا ویرایش) ───
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setFormError("");
 
-    // اعتبارسنجی
     if (!form.code.trim()) {
       setFormError("کد تخفیف الزامی است");
       return;
@@ -145,9 +154,9 @@ export default function DiscountsPage() {
       description: form.description.trim() || null,
       is_active: form.is_active,
       usage_limit: form.usage_limit ? Number(form.usage_limit) : null,
-      expires_at: form.expires_at
-        ? new Date(form.expires_at).toISOString()
-        : null,
+      per_user_limit: form.per_user_limit ? Number(form.per_user_limit) : 1,
+      product_id: form.product_id || null,
+      expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null,
     };
 
     let result;
@@ -173,27 +182,21 @@ export default function DiscountsPage() {
     setSaving(false);
     setModalOpen(false);
     toast.success(editingId ? "کد با موفقیت ویرایش شد" : "کد جدید اضافه شد");
-    loadCodes();
+    loadData();
   }
 
-  // ─── حذف ───
   async function handleDelete(id: string, code: string) {
     if (!confirm(`آیا مطمئنی می‌خوای کد "${code}" رو حذف کنی؟`)) return;
 
-    const { error } = await supabase
-      .from("discount_codes")
-      .delete()
-      .eq("id", id);
-
+    const { error } = await supabase.from("discount_codes").delete().eq("id", id);
     if (error) {
       toast.error("خطا در حذف: " + error.message);
       return;
     }
     toast.success(`کد «${code}» حذف شد`);
-    loadCodes();
+    loadData();
   }
 
-  // ─── Toggle فعال/غیرفعال ───
   async function handleToggle(id: string, current: boolean) {
     const { error } = await supabase
       .from("discount_codes")
@@ -211,360 +214,378 @@ export default function DiscountsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E3]">
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <a
-              href="/admin"
-              className="text-sm text-gray-500 hover:text-amber-600"
-            >
-              ← بازگشت به داشبورد
-            </a>
-            <h1 className="mt-2 text-3xl font-black text-gray-900">
-              🎟️ مدیریت کدهای تخفیف
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {codes.length.toLocaleString("fa-IR")} کد ثبت شده
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={openAddModal}
-            className="rounded-lg bg-[#E84C4C] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#D63F3F]"
-          >
-            ➕ کد جدید
-          </button>
-        </div>
+    <div dir="rtl" className="flex min-h-screen bg-theme text-theme">
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+        />
+      )}
 
-        {/* جستجو */}
-        <div className="mb-4">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="🔍 جستجو در کدها..."
-            className="w-full max-w-md rounded-lg border border-[#D4C5A0] bg-white px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-          />
-        </div>
+      <AdminSidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
+      />
 
-        {/* خطا */}
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
-            ⚠️ {error}
-          </div>
-        )}
-
-        {/* جدول */}
-        <div className="overflow-hidden rounded-2xl border border-[#D4C5A0] bg-white">
-          {loading ? (
-            <div className="p-12 text-center text-gray-500">
-              در حال بارگذاری...
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              {search ? "کدی با این عبارت پیدا نشد" : "هنوز کدی ثبت نشده"}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-right text-sm">
-                <thead className="border-b border-[#EDE4CE] bg-[#F7F1E3]/50">
-                  <tr className="text-xs font-bold text-gray-600">
-                    <th className="px-4 py-3">کد</th>
-                    <th className="px-4 py-3">نوع</th>
-                    <th className="px-4 py-3">مقدار</th>
-                    <th className="px-4 py-3">حداقل خرید</th>
-                    <th className="px-4 py-3">سقف تخفیف</th>
-                    <th className="px-4 py-3">استفاده</th>
-                    <th className="px-4 py-3">وضعیت</th>
-                    <th className="px-4 py-3 text-left">عملیات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((code) => (
-                    <tr
-                      key={code.id}
-                      className="border-b border-[#EDE4CE] last:border-0 transition hover:bg-[#F7F1E3]/30"
-                    >
-                      <td className="px-4 py-3">
-                        <span className="font-mono font-bold text-gray-900">
-                          {code.code}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {code.type === "percent" ? "درصدی" : "مبلغ ثابت"}
-                      </td>
-                      <td className="px-4 py-3 font-bold">
-                        {code.type === "percent"
-                          ? `${code.value.toLocaleString("fa-IR")}٪`
-                          : `${code.value.toLocaleString("fa-IR")} تومان`}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {code.min_purchase
-                          ? code.min_purchase.toLocaleString("fa-IR")
-                          : "—"}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {code.max_discount
-                          ? code.max_discount.toLocaleString("fa-IR")
-                          : "—"}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {code.used_count.toLocaleString("fa-IR")}
-                        {code.usage_limit && (
-                          <span className="text-xs text-gray-400">
-                            {" "}
-                            / {code.usage_limit.toLocaleString("fa-IR")}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          onClick={() => handleToggle(code.id, code.is_active)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                            code.is_active ? "bg-green-500" : "bg-gray-300"
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${
-                              code.is_active
-                                ? "translate-x-1"
-                                : "translate-x-6"
-                            }`}
-                          />
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 text-left">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            type="button"
-                            onClick={() => openEditModal(code)}
-                            className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 transition hover:bg-amber-100"
-                          >
-                            ✏️ ویرایش
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(code.id, code.code)}
-                            className="rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ─── مودال افزودن/ویرایش ─── */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-black text-gray-900">
-                {editingId ? "✏️ ویرایش کد" : "➕ کد تخفیف جدید"}
-              </h2>
+      <main className="flex-1 overflow-x-hidden p-4 pb-12 sm:p-8">
+        <div className="mx-auto max-w-7xl space-y-6">
+          
+          {/* هدر */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setModalOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-theme bg-theme-card text-theme md:hidden"
               >
-                ✕
+                ☰
               </button>
+              <div>
+                <h1 className="text-xl font-black text-theme">
+                  🎟️ مدیریت کدهای تخفیف پیشرفته
+                </h1>
+                <p className="mt-0.5 text-xs text-theme-muted">
+                  {codes.length.toLocaleString("fa-IR")} کد تخفیف ثبت شده
+                </p>
+              </div>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4">
-              {/* کد */}
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                  کد تخفیف *
-                </label>
-                <input
-                  type="text"
-                  required
-                  dir="ltr"
-                  value={form.code}
-                  onChange={(e) =>
-                    setForm({ ...form, code: e.target.value.toUpperCase() })
-                  }
-                  placeholder="KAW10"
-                  className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-left font-mono text-sm outline-none focus:border-amber-500"
-                />
+            <button
+              type="button"
+              onClick={openAddModal}
+              className="rounded-xl bg-accent px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90"
+            >
+              ➕ کد تخفیف جدید
+            </button>
+          </div>
+
+          {/* جستجو */}
+          <div>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="🔍 جستجو در کدها..."
+              className="w-full max-w-md rounded-xl border border-theme bg-theme-card px-4 py-2.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+            />
+          </div>
+
+          {error && (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs font-bold text-red-500">
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* جدول */}
+          <div className="overflow-hidden rounded-2xl border border-theme bg-theme-card shadow-sm">
+            {loading ? (
+              <div className="p-12 text-center text-xs text-theme-muted">
+                در حال بارگذاری کدهای تخفیف...
               </div>
-
-              {/* نوع + مقدار */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    نوع *
-                  </label>
-                  <select
-                    value={form.type}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        type: e.target.value as "percent" | "fixed",
-                      })
-                    }
-                    className="w-full rounded-lg border border-[#D4C5A0] bg-white px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  >
-                    <option value="percent">درصدی (٪)</option>
-                    <option value="fixed">مبلغ ثابت (تومان)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    مقدار * {form.type === "percent" ? "(٪)" : "(تومان)"}
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={form.value}
-                    onChange={(e) => setForm({ ...form, value: e.target.value })}
-                    placeholder="10"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
+            ) : filtered.length === 0 ? (
+              <div className="p-12 text-center text-xs text-theme-muted">
+                {search ? "کدی با این عبارت پیدا نشد" : "هنوز کدی ثبت نشده است"}
               </div>
-
-              {/* حداقل خرید + سقف */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    حداقل خرید (تومان)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.min_purchase}
-                    onChange={(e) =>
-                      setForm({ ...form, min_purchase: e.target.value })
-                    }
-                    placeholder="0"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    سقف تخفیف (تومان)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.max_discount}
-                    onChange={(e) =>
-                      setForm({ ...form, max_discount: e.target.value })
-                    }
-                    placeholder="اختیاری"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-right text-xs">
+                  <thead className="border-b border-theme bg-theme-surface font-bold text-theme-muted">
+                    <tr>
+                      <th className="px-4 py-3">کد تخفیف</th>
+                      <th className="px-4 py-3">مقدار</th>
+                      <th className="px-4 py-3">محدود به محصول</th>
+                      <th className="px-4 py-3">مصرف کل / سقف</th>
+                      <th className="px-4 py-3">سهم هر کاربر</th>
+                      <th className="px-4 py-3">وضعیت</th>
+                      <th className="px-4 py-3 text-left">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-theme">
+                    {filtered.map((code) => {
+                      const targetProduct = products.find((p) => p.id === code.product_id);
+                      return (
+                        <tr key={code.id} className="transition hover:bg-theme-surface/40">
+                          <td className="px-4 py-3 font-mono font-bold text-theme">
+                            {code.code}
+                          </td>
+                          <td className="px-4 py-3 font-bold text-theme">
+                            {code.type === "percent"
+                              ? `${code.value.toLocaleString("fa-IR")}٪`
+                              : `${code.value.toLocaleString("fa-IR")} تومان`}
+                          </td>
+                          <td className="px-4 py-3 text-theme-muted">
+                            {targetProduct ? (
+                              <span className="font-bold text-accent">
+                                📦 {targetProduct.name}
+                              </span>
+                            ) : (
+                              <span className="text-theme-muted">🌐 کل محصولات (سبد خرید)</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 font-mono">
+                            {code.used_count.toLocaleString("fa-IR")} /{" "}
+                            {code.usage_limit ? code.usage_limit.toLocaleString("fa-IR") : "∞"}
+                          </td>
+                          <td className="px-4 py-3 font-mono">
+                            {code.per_user_limit ? `${code.per_user_limit} بار` : "نامحدود"}
+                          </td>
+                          <td className="px-4 py-3">
+                            <button
+                              type="button"
+                              onClick={() => handleToggle(code.id, code.is_active)}
+                              className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${
+                                code.is_active
+                                  ? "bg-green-500"
+                                  : "border border-theme bg-theme-surface"
+                              }`}
+                            >
+                              <span
+                                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition ${
+                                  code.is_active ? "translate-x-0.5" : "translate-x-5"
+                                }`}
+                              />
+                            </button>
+                          </td>
+                          <td className="px-4 py-3 text-left">
+                            <div className="flex justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => openEditModal(code)}
+                                className="rounded-lg border border-theme bg-theme-surface px-2.5 py-1.5 font-bold text-theme transition hover:border-accent"
+                                title="ویرایش"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(code.id, code.code)}
+                                className="rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 font-bold text-red-500 transition hover:bg-red-500/20"
+                                title="حذف"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
+            )}
+          </div>
+        </div>
 
-              {/* توضیحات */}
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                  توضیحات
-                </label>
-                <textarea
-                  rows={2}
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
-                  placeholder="مثلاً: ۱۰٪ تخفیف روی کل سبد خرید"
-                  className="w-full resize-none rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                />
-              </div>
-
-              {/* سقف استفاده + انقضا */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    محدودیت تعداد استفاده
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.usage_limit}
-                    onChange={(e) =>
-                      setForm({ ...form, usage_limit: e.target.value })
-                    }
-                    placeholder="اختیاری"
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-bold text-gray-700">
-                    تاریخ انقضا
-                  </label>
-                  <input
-                    type="date"
-                    value={form.expires_at}
-                    onChange={(e) =>
-                      setForm({ ...form, expires_at: e.target.value })
-                    }
-                    className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-sm outline-none focus:border-amber-500"
-                  />
-                </div>
-              </div>
-
-              {/* فعال */}
-              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#D4C5A0] p-3">
-                <input
-                  type="checkbox"
-                  checked={form.is_active}
-                  onChange={(e) =>
-                    setForm({ ...form, is_active: e.target.checked })
-                  }
-                  className="h-4 w-4 accent-amber-500"
-                />
-                <span className="text-sm font-bold text-gray-700">
-                  کد فعال باشد
-                </span>
-              </label>
-
-              {/* خطا */}
-              {formError && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
-                  ⚠️ {formError}
-                </div>
-              )}
-
-              {/* دکمه‌ها */}
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 rounded-lg bg-[#E84C4C] py-3 text-sm font-bold text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
-                >
-                  {saving
-                    ? "در حال ذخیره..."
-                    : editingId
-                    ? "ذخیره تغییرات"
-                    : "افزودن کد"}
-                </button>
+        {/* ─── مودال پیشرفته افزودن/ویرایش ─── */}
+        {modalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+            <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-theme bg-theme-card p-6 shadow-2xl">
+              <div className="mb-5 flex items-center justify-between">
+                <h2 className="text-lg font-black text-theme">
+                  {editingId ? "✏️ ویرایش کد تخفیف" : "➕ ایجاد کد تخفیف جدید"}
+                </h2>
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="rounded-lg border border-[#D4C5A0] px-6 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
+                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-theme-surface text-theme-muted transition hover:text-theme"
                 >
-                  انصراف
+                  ✕
                 </button>
               </div>
-            </form>
+
+              <form onSubmit={handleSave} className="space-y-4">
+                {/* کد */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold text-theme-muted">
+                    عبارت کد تخفیف *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    dir="ltr"
+                    value={form.code}
+                    onChange={(e) =>
+                      setForm({ ...form, code: e.target.value.toUpperCase() })
+                    }
+                    placeholder="SUMMER1405"
+                    className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-left font-mono text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+                  />
+                </div>
+
+                {/* نوع + مقدار */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold text-theme-muted">
+                      نوع تخفیف *
+                    </label>
+                    <select
+                      value={form.type}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          type: e.target.value as "percent" | "fixed",
+                        })
+                      }
+                      className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-xs text-theme outline-none transition focus:border-accent"
+                    >
+                      <option value="percent">درصدی (٪)</option>
+                      <option value="fixed">مبلغ ثابت (تومان)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold text-theme-muted">
+                      مقدار * {form.type === "percent" ? "(٪)" : "(تومان)"}
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={form.value}
+                      onChange={(e) =>
+                        setForm({ ...form, value: e.target.value })
+                      }
+                      placeholder="15"
+                      className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+                    />
+                  </div>
+                </div>
+
+                {/* 🆕 محدودسازی به محصول خاص */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold text-theme-muted">
+                    محدودسازی به محصول خاص (اختیاری)
+                  </label>
+                  <select
+                    value={form.product_id}
+                    onChange={(e) =>
+                      setForm({ ...form, product_id: e.target.value })
+                    }
+                    className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-xs text-theme outline-none transition focus:border-accent"
+                  >
+                    <option value="">🌐 قابل استفاده روی کل سبد خرید (بدون محدودیت محصول)</option>
+                    {products.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        📦 {p.name} ({p.id})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-[10px] text-theme-muted">
+                    اگر محصولی انتخاب شود، کد فقط در صورتی اعمال می‌شود که آن محصول در سبد خرید باشد.
+                  </p>
+                </div>
+
+                {/* محدودیت تعداد کل استفاده + سهم هر کاربر */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold text-theme-muted">
+                      سقف کل استفاده (تعداد کل)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={form.usage_limit}
+                      onChange={(e) =>
+                        setForm({ ...form, usage_limit: e.target.value })
+                      }
+                      placeholder="مثلاً 100 بار (خالی = نامحدود)"
+                      className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold text-theme-muted">
+                      حداکثر استفاده برای هر کاربر
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={form.per_user_limit}
+                      onChange={(e) =>
+                        setForm({ ...form, per_user_limit: e.target.value })
+                      }
+                      placeholder="مثلاً 1 بار"
+                      className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+                    />
+                  </div>
+                </div>
+
+                {/* حداقل خرید + تاریخ انقضا */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold text-theme-muted">
+                      حداقل مبلغ خرید (تومان)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={form.min_purchase}
+                      onChange={(e) =>
+                        setForm({ ...form, min_purchase: e.target.value })
+                      }
+                      placeholder="0"
+                      className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold text-theme-muted">
+                      تاریخ انقضا
+                    </label>
+                    <input
+                      type="date"
+                      value={form.expires_at}
+                      onChange={(e) =>
+                        setForm({ ...form, expires_at: e.target.value })
+                      }
+                      className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-xs text-theme outline-none transition focus:border-accent"
+                    />
+                  </div>
+                </div>
+
+                {/* فعال */}
+                <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-theme bg-theme-surface p-3 transition hover:border-accent">
+                  <input
+                    type="checkbox"
+                    checked={form.is_active}
+                    onChange={(e) =>
+                      setForm({ ...form, is_active: e.target.checked })
+                    }
+                    className="h-4 w-4 accent-accent"
+                  />
+                  <span className="text-xs font-bold text-theme">
+                    کد تخفیف فعال باشد
+                  </span>
+                </label>
+
+                {formError && (
+                  <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs font-bold text-red-500">
+                    ⚠️ {formError}
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="flex-1 rounded-xl bg-accent py-3 text-xs font-bold text-white shadow-sm transition hover:opacity-90 disabled:opacity-50"
+                  >
+                    {saving
+                      ? "در حال ذخیره..."
+                      : editingId
+                      ? "ذخیره تغییرات"
+                      : "افزودن کد تخفیف"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModalOpen(false)}
+                    className="rounded-xl border border-theme bg-theme-card px-6 py-3 text-xs font-bold text-theme-muted transition hover:text-theme"
+                  >
+                    انصراف
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
-    </main>
+        )}
+      </main>
+    </div>
   );
 }
-

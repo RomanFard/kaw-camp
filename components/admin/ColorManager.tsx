@@ -14,7 +14,6 @@ type Props = {
   onChange: (colors: ColorItem[]) => void;
 };
 
-// ─── رنگ‌های پیشنهادی (برای autocomplete) ───
 const PRESET_COLORS = [
   { label: "مشکی", value: "black" },
   { label: "سفید", value: "white" },
@@ -58,27 +57,24 @@ export default function ColorManager({ colors, onChange }: Props) {
     onChange(next);
   }
 
-  // انتخاب از پیشنهادها
   function applyPreset(index: number, preset: { label: string; value: string }) {
     updateColor(index, { label: preset.label, value: preset.value });
   }
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-bold text-gray-700">
+      <label className="mb-1.5 block text-xs font-bold text-theme-muted">
         رنگ‌بندی محصول
       </label>
 
-      <p className="mb-3 text-xs text-gray-500">
+      <p className="mb-3 text-[11px] text-theme-muted">
         می‌تونی چند رنگ اضافه کنی. برای هر رنگ می‌تونی یه عکس اختصاصی آپلود
         کنی که توی صفحه محصول با انتخاب اون رنگ نمایش داده بشه.
       </p>
 
       {colors.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-[#D4C5A0] bg-[#F7F1E3]/30 p-6 text-center">
-          <p className="text-sm text-gray-500">
-            هنوز رنگی اضافه نشده
-          </p>
+        <div className="rounded-xl border-2 border-dashed border-theme bg-theme-surface/50 p-6 text-center">
+          <p className="text-xs text-theme-muted">هنوز رنگی اضافه نشده</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -87,23 +83,20 @@ export default function ColorManager({ colors, onChange }: Props) {
             return (
               <div
                 key={index}
-                className="rounded-lg border border-[#EDE4CE] bg-[#F7F1E3]/30"
+                className="rounded-xl border border-theme bg-theme-surface/50"
               >
-                {/* هدر رنگ */}
-                <div className="flex items-center justify-between gap-2 border-b border-[#EDE4CE] p-3">
+                <div className="flex items-center justify-between gap-2 border-b border-theme p-3">
                   <button
                     type="button"
-                    onClick={() =>
-                      setExpandedIndex(isExpanded ? null : index)
-                    }
+                    onClick={() => setExpandedIndex(isExpanded ? null : index)}
                     className="flex flex-1 items-center gap-3 text-right"
                   >
-                    <span className="text-lg">
+                    <span className="text-lg text-theme-muted">
                       {isExpanded ? "▼" : "▶"}
                     </span>
                     <div className="flex items-center gap-2">
                       {color.image ? (
-                        <div className="h-8 w-8 overflow-hidden rounded border border-[#D4C5A0] bg-white">
+                        <div className="h-8 w-8 overflow-hidden rounded border border-theme bg-theme-card">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={color.image}
@@ -112,16 +105,16 @@ export default function ColorManager({ colors, onChange }: Props) {
                           />
                         </div>
                       ) : (
-                        <div className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-[#D4C5A0] bg-white text-xs text-gray-400">
+                        <div className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-theme bg-theme-card text-xs text-theme-muted">
                           —
                         </div>
                       )}
-                      <span className="text-sm font-bold text-gray-800">
+                      <span className="text-xs font-bold text-theme">
                         {color.label || "(بدون نام)"}
                       </span>
                       {color.value && (
                         <span
-                          className="text-xs text-gray-400"
+                          className="text-[11px] text-theme-muted"
                           dir="ltr"
                         >
                           {color.value}
@@ -133,18 +126,16 @@ export default function ColorManager({ colors, onChange }: Props) {
                   <button
                     type="button"
                     onClick={() => removeColor(index)}
-                    className="rounded-lg border border-red-300 bg-red-50 px-2 py-1 text-[11px] font-bold text-red-700 transition hover:bg-red-100"
+                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1 text-[11px] font-bold text-red-500 transition hover:bg-red-500/20"
                   >
                     🗑️
                   </button>
                 </div>
 
-                {/* محتوای گسترده */}
                 {isExpanded && (
                   <div className="space-y-3 p-3">
-                    {/* پیشنهادها */}
                     <div>
-                      <label className="mb-1 block text-[11px] font-bold text-gray-500">
+                      <label className="mb-1 block text-[11px] font-bold text-theme-muted">
                         پیشنهاد سریع:
                       </label>
                       <div className="flex flex-wrap gap-1.5">
@@ -153,7 +144,7 @@ export default function ColorManager({ colors, onChange }: Props) {
                             key={preset.value}
                             type="button"
                             onClick={() => applyPreset(index, preset)}
-                            className="rounded-full border border-[#D4C5A0] bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-700"
+                            className="rounded-full border border-theme bg-theme-card px-2.5 py-1 text-[11px] font-semibold text-theme transition hover:border-accent hover:bg-accent/10 hover:text-accent"
                           >
                             {preset.label}
                           </button>
@@ -161,10 +152,9 @@ export default function ColorManager({ colors, onChange }: Props) {
                       </div>
                     </div>
 
-                    {/* نام + مقدار */}
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-gray-600">
+                        <label className="mb-1 block text-[11px] font-bold text-theme-muted">
                           نام رنگ (فارسی) *
                         </label>
                         <input
@@ -174,11 +164,11 @@ export default function ColorManager({ colors, onChange }: Props) {
                             updateColor(index, { label: e.target.value })
                           }
                           placeholder="مشکی"
-                          className="w-full rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-sm outline-none focus:border-amber-500"
+                          className="w-full rounded-lg border border-theme bg-theme-surface px-3 py-2 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-gray-600">
+                        <label className="mb-1 block text-[11px] font-bold text-theme-muted">
                           کد رنگ (انگلیسی)
                         </label>
                         <input
@@ -193,12 +183,11 @@ export default function ColorManager({ colors, onChange }: Props) {
                             })
                           }
                           placeholder="black"
-                          className="w-full rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 font-mono text-left text-sm outline-none focus:border-amber-500"
+                          className="w-full rounded-lg border border-theme bg-theme-surface px-3 py-2 text-left font-mono text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
                         />
                       </div>
                     </div>
 
-                    {/* عکس رنگ */}
                     <div>
                       <ImageUploader
                         value={color.image ?? ""}
@@ -219,7 +208,7 @@ export default function ColorManager({ colors, onChange }: Props) {
       <button
         type="button"
         onClick={addColor}
-        className="mt-3 w-full rounded-lg border-2 border-dashed border-[#D4C5A0] bg-white py-3 text-sm font-bold text-gray-600 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-700"
+        className="mt-3 w-full rounded-xl border-2 border-dashed border-theme bg-theme-card py-3 text-xs font-bold text-theme-muted transition hover:border-accent hover:bg-accent/10 hover:text-accent"
       >
         ➕ افزودن رنگ جدید
       </button>

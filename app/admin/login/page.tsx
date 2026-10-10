@@ -4,14 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-const inputStyle: React.CSSProperties = {
-  color: "#111827",
-  backgroundColor: "#ffffff",
-  WebkitTextFillColor: "#111827",
-  caretColor: "#111827",
-  colorScheme: "light",
-};
-
 export default function AdminLoginPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -42,25 +34,21 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main
-      className="flex min-h-screen items-center justify-center bg-[#F7F1E3] px-4"
-      style={{ colorScheme: "light" }}
-    >
-      <div
-        className="w-full max-w-md rounded-2xl border border-[#D4C5A0] bg-white p-8 shadow-lg"
-        style={{ colorScheme: "light" }}
-      >
+    <main className="flex min-h-screen items-center justify-center bg-theme px-4">
+      <div className="w-full max-w-md rounded-2xl border border-theme bg-theme-card p-8 shadow-lg">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#E84C4C] text-3xl">
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-3xl">
             🔐
           </div>
-          <h1 className="text-2xl font-black text-gray-900">ورود ادمین</h1>
-          <p className="mt-1 text-sm text-gray-500">پنل مدیریت KAW CAMP</p>
+          <h1 className="text-2xl font-black text-theme">ورود ادمین</h1>
+          <p className="mt-1 text-xs text-theme-muted">
+            پنل مدیریت KAW CAMP
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-bold text-gray-700">
+            <label className="mb-1.5 block text-xs font-bold text-theme-muted">
               ایمیل
             </label>
             <input
@@ -71,13 +59,12 @@ export default function AdminLoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@kawcamp.com"
               autoComplete="email"
-              style={inputStyle}
-              className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-left text-sm outline-none focus:border-amber-500"
+              className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-left text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-bold text-gray-700">
+            <label className="mb-1.5 block text-xs font-bold text-theme-muted">
               رمز عبور
             </label>
             <input
@@ -88,13 +75,12 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               autoComplete="current-password"
-              style={inputStyle}
-              className="w-full rounded-lg border border-[#D4C5A0] px-4 py-2.5 text-left text-sm outline-none focus:border-amber-500"
+              className="w-full rounded-xl border border-theme bg-theme-surface px-4 py-2.5 text-left text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
             />
           </div>
 
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs font-bold text-red-500">
               ⚠️ {error}
             </div>
           )}
@@ -102,13 +88,13 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-[#E84C4C] py-3 text-sm font-bold text-white transition hover:bg-[#D63F3F] disabled:opacity-50"
+            className="w-full rounded-xl bg-accent py-3 text-xs font-bold text-white shadow-sm transition hover:opacity-90 disabled:opacity-50"
           >
             {loading ? "در حال ورود..." : "ورود به پنل"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-gray-400">
+        <p className="mt-6 text-center text-[10px] text-theme-muted">
           دسترسی محدود به مدیران سیستم
         </p>
       </div>

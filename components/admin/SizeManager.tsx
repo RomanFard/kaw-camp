@@ -14,15 +14,12 @@ type Props = {
   onChange: (sizes: SizeItem[]) => void;
 };
 
-// ─── سایزهای پیشنهادی ───
 const PRESET_SIZES = [
-  // پوشاک
   { label: "S", value: "s" },
   { label: "M", value: "m" },
   { label: "L", value: "l" },
   { label: "XL", value: "xl" },
   { label: "XXL", value: "xxl" },
-  // کفش
   { label: "۳۸", value: "38" },
   { label: "۳۹", value: "39" },
   { label: "۴۰", value: "40" },
@@ -30,11 +27,9 @@ const PRESET_SIZES = [
   { label: "۴۲", value: "42" },
   { label: "۴۳", value: "43" },
   { label: "۴۴", value: "44" },
-  // عمومی
   { label: "کوچک", value: "small" },
   { label: "متوسط", value: "medium" },
   { label: "بزرگ", value: "large" },
-  // چادر
   { label: "۱ نفره", value: "1-person" },
   { label: "۲ نفره", value: "2-person" },
   { label: "۳ نفره", value: "3-person" },
@@ -73,18 +68,18 @@ export default function SizeManager({ sizes, onChange }: Props) {
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-bold text-gray-700">
+      <label className="mb-1.5 block text-xs font-bold text-theme-muted">
         سایز‌بندی محصول
       </label>
 
-      <p className="mb-3 text-xs text-gray-500">
+      <p className="mb-3 text-[11px] text-theme-muted">
         اگه محصولت سایز یا ظرفیت مختلف داره (مثل پوشاک، کفش، چادر)، اینجا
         اضافه کن. برای هر سایز می‌تونی یه عکس اختصاصی هم آپلود کنی.
       </p>
 
       {sizes.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-[#D4C5A0] bg-[#F7F1E3]/30 p-6 text-center">
-          <p className="text-sm text-gray-500">هنوز سایزی اضافه نشده</p>
+        <div className="rounded-xl border-2 border-dashed border-theme bg-theme-surface/50 p-6 text-center">
+          <p className="text-xs text-theme-muted">هنوز سایزی اضافه نشده</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -93,23 +88,20 @@ export default function SizeManager({ sizes, onChange }: Props) {
             return (
               <div
                 key={index}
-                className="rounded-lg border border-[#EDE4CE] bg-[#F7F1E3]/30"
+                className="rounded-xl border border-theme bg-theme-surface/50"
               >
-                {/* هدر سایز */}
-                <div className="flex items-center justify-between gap-2 border-b border-[#EDE4CE] p-3">
+                <div className="flex items-center justify-between gap-2 border-b border-theme p-3">
                   <button
                     type="button"
-                    onClick={() =>
-                      setExpandedIndex(isExpanded ? null : index)
-                    }
+                    onClick={() => setExpandedIndex(isExpanded ? null : index)}
                     className="flex flex-1 items-center gap-3 text-right"
                   >
-                    <span className="text-lg">
+                    <span className="text-lg text-theme-muted">
                       {isExpanded ? "▼" : "▶"}
                     </span>
                     <div className="flex items-center gap-2">
                       {size.image ? (
-                        <div className="h-8 w-8 overflow-hidden rounded border border-[#D4C5A0] bg-white">
+                        <div className="h-8 w-8 overflow-hidden rounded border border-theme bg-theme-card">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={size.image}
@@ -118,15 +110,15 @@ export default function SizeManager({ sizes, onChange }: Props) {
                           />
                         </div>
                       ) : (
-                        <div className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-[#D4C5A0] bg-white text-xs text-gray-400">
+                        <div className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-theme bg-theme-card text-xs text-theme-muted">
                           —
                         </div>
                       )}
-                      <span className="text-sm font-bold text-gray-800">
+                      <span className="text-xs font-bold text-theme">
                         {size.label || "(بدون نام)"}
                       </span>
                       {size.value && (
-                        <span className="text-xs text-gray-400" dir="ltr">
+                        <span className="text-[11px] text-theme-muted" dir="ltr">
                           {size.value}
                         </span>
                       )}
@@ -136,18 +128,16 @@ export default function SizeManager({ sizes, onChange }: Props) {
                   <button
                     type="button"
                     onClick={() => removeSize(index)}
-                    className="rounded-lg border border-red-300 bg-red-50 px-2 py-1 text-[11px] font-bold text-red-700 transition hover:bg-red-100"
+                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1 text-[11px] font-bold text-red-500 transition hover:bg-red-500/20"
                   >
                     🗑️
                   </button>
                 </div>
 
-                {/* محتوای گسترده */}
                 {isExpanded && (
                   <div className="space-y-3 p-3">
-                    {/* پیشنهادها */}
                     <div>
-                      <label className="mb-1 block text-[11px] font-bold text-gray-500">
+                      <label className="mb-1 block text-[11px] font-bold text-theme-muted">
                         پیشنهاد سریع:
                       </label>
                       <div className="flex flex-wrap gap-1.5">
@@ -156,7 +146,7 @@ export default function SizeManager({ sizes, onChange }: Props) {
                             key={preset.value}
                             type="button"
                             onClick={() => applyPreset(index, preset)}
-                            className="rounded-full border border-[#D4C5A0] bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-700"
+                            className="rounded-full border border-theme bg-theme-card px-2.5 py-1 text-[11px] font-semibold text-theme transition hover:border-accent hover:bg-accent/10 hover:text-accent"
                           >
                             {preset.label}
                           </button>
@@ -164,10 +154,9 @@ export default function SizeManager({ sizes, onChange }: Props) {
                       </div>
                     </div>
 
-                    {/* نام + مقدار */}
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-gray-600">
+                        <label className="mb-1 block text-[11px] font-bold text-theme-muted">
                           نام سایز (نمایش) *
                         </label>
                         <input
@@ -177,11 +166,11 @@ export default function SizeManager({ sizes, onChange }: Props) {
                             updateSize(index, { label: e.target.value })
                           }
                           placeholder="XL یا ۴۲"
-                          className="w-full rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 text-sm outline-none focus:border-amber-500"
+                          className="w-full rounded-lg border border-theme bg-theme-surface px-3 py-2 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-gray-600">
+                        <label className="mb-1 block text-[11px] font-bold text-theme-muted">
                           کد سایز
                         </label>
                         <input
@@ -196,12 +185,11 @@ export default function SizeManager({ sizes, onChange }: Props) {
                             })
                           }
                           placeholder="xl"
-                          className="w-full rounded-lg border border-[#D4C5A0] bg-white px-3 py-2 font-mono text-left text-sm outline-none focus:border-amber-500"
+                          className="w-full rounded-lg border border-theme bg-theme-surface px-3 py-2 text-left font-mono text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
                         />
                       </div>
                     </div>
 
-                    {/* عکس سایز */}
                     <div>
                       <ImageUploader
                         value={size.image ?? ""}
@@ -222,7 +210,7 @@ export default function SizeManager({ sizes, onChange }: Props) {
       <button
         type="button"
         onClick={addSize}
-        className="mt-3 w-full rounded-lg border-2 border-dashed border-[#D4C5A0] bg-white py-3 text-sm font-bold text-gray-600 transition hover:border-amber-500 hover:bg-amber-50 hover:text-amber-700"
+        className="mt-3 w-full rounded-xl border-2 border-dashed border-theme bg-theme-card py-3 text-xs font-bold text-theme-muted transition hover:border-accent hover:bg-accent/10 hover:text-accent"
       >
         ➕ افزودن سایز جدید
       </button>

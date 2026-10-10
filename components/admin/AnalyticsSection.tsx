@@ -22,48 +22,32 @@ export default function AnalyticsSection() {
   const [groupBy, setGroupBy] = useState<GroupBy>("date");
   const [metric, setMetric] = useState<Metric>("revenue");
 
-  // ─── لود همه سفارشات ───
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error loading orders for analytics:", error);
-      } else {
-        setAllOrders((data ?? []) as Order[]);
-      }
+      const { data } = await supabase.from("orders").select("*");
+      setAllOrders((data ?? []) as Order[]);
       setLoading(false);
     }
-
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── فیلتر بر اساس بازه ───
   const filtered = filterByRange(allOrders, range);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-black text-gray-900">
-            📊 داشبورد تحلیلی
-          </h2>
-          <p className="mt-1 text-xs text-gray-500">
-            تحلیل پیشرفته فروش بر اساس فیلترهای دلخواه
-          </p>
-        </div>
-        <div className="text-left text-xs text-gray-500">
-          {filtered.length.toLocaleString("fa-IR")} سفارش در بازه انتخابی
-        </div>
+    <div className="space-y-4">
+      {/* هدر بسیار مینیمال */}
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-sm font-black text-theme flex items-center gap-1.5">
+          <span>📈</span> آمار و عملکرد فروشگاه
+        </h2>
+        <span className="text-[11px] text-theme-muted">
+          {filtered.length.toLocaleString("fa-IR")} سفارش
+        </span>
       </div>
 
-      {/* فیلترها */}
+      {/* فیلترهای خلوت */}
       <AnalyticsFilters
         range={range}
         groupBy={groupBy}
@@ -73,7 +57,7 @@ export default function AnalyticsSection() {
         onMetricChange={setMetric}
       />
 
-      {/* نمودار */}
+      {/* نمودار تمیز */}
       <DynamicChart
         orders={filtered}
         groupBy={groupBy}

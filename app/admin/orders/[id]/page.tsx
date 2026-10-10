@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import { formatPrice } from "@/lib/utils";
-import { useToast } from "@/components/context/ToastContext";
 
 type OrderItem = {
   id: string;
@@ -20,22 +20,19 @@ type Order = {
   first_name: string;
   last_name: string;
   phone: string;
-  email: string | null;
   province: string | null;
   city: string | null;
-  address: string | null;
-  postal_code: string | null;
+  address?: string | null;
+  postal_code?: string | null;
+  note?: string | null;
   items: OrderItem[];
   subtotal: number;
   discount_amount: number;
-  discount_code: string | null;
   shipping_cost: number;
   total: number;
-  shipping_method: string;
-  payment_method: string;
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
-  note: string | null;
   created_at: string;
+  discount_code?: string | null;
 };
 
 const STATUS_LABELS: Record<Order["status"], string> = {
@@ -47,38 +44,31 @@ const STATUS_LABELS: Record<Order["status"], string> = {
 };
 
 const STATUS_COLORS: Record<Order["status"], string> = {
-  pending: "bg-amber-100 text-amber-700 border-amber-300",
-  confirmed: "bg-blue-100 text-blue-700 border-blue-300",
-  shipped: "bg-purple-100 text-purple-700 border-purple-300",
-  delivered: "bg-green-100 text-green-700 border-green-300",
-  cancelled: "bg-red-100 text-red-700 border-red-300",
+  pending: "border-amber-500/40 bg-amber-500/10 text-amber-500",
+  confirmed: "border-blue-500/40 bg-blue-500/10 text-blue-500",
+  shipped: "border-purple-500/40 bg-purple-500/10 text-purple-500",
+  delivered: "border-green-500/40 bg-green-500/10 text-green-500",
+  cancelled: "border-red-500/40 bg-red-500/10 text-red-500",
 };
 
-const SHIPPING_LABELS: Record<string, string> = {
-  post: "پست پیشتاز",
-  pickup: "تحویل حضوری",
-};
-
-const PAYMENT_LABELS: Record<string, string> = {
-  online: "پرداخت آنلاین",
-  cash: "پرداخت در محل",
-};
-
-export default function OrderDetailPage() {
-  const params = useParams();
-  const id = params.id as string;
+export default function OrderDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const router = useRouter();
   const supabase = createClient();
-  const toast = useToast();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
 
   async function loadOrder() {
     setLoading(true);
     setError("");
-
     const { data, error } = await supabase
       .from("orders")
       .select("*")
@@ -100,32 +90,29 @@ export default function OrderDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  function handleCopy(text: string, key: string) {
+    navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 2000);
+  }
+
   async function handleStatusChange(newStatus: Order["status"]) {
     if (!order) return;
-    setUpdatingStatus(true);
-
     const { error } = await supabase
       .from("orders")
       .update({ status: newStatus })
       .eq("id", order.id);
 
     if (error) {
-      toast.error("خطا: " + error.message);
-    } else {
-      setOrder({ ...order, status: newStatus });
-      toast.success("وضعیت سفارش بروزرسانی شد");
+      alert("خطا: " + error.message);
+      return;
     }
-    setUpdatingStatus(false);
+    setOrder({ ...order, status: newStatus });
   }
 
   async function handleDelete() {
     if (!order) return;
-    if (
-      !confirm(
-        `آیا از حذف سفارش "${order.order_number}" مطمئنی؟ این عمل قابل بازگشت نیست.`
-      )
-    )
-      return;
+    if (!confirm(`آیا از حذف سفارش "${order.order_number}" مطمئنی؟`)) return;
 
     const { error } = await supabase
       .from("orders")
@@ -133,13 +120,14 @@ export default function OrderDetailPage() {
       .eq("id", order.id);
 
     if (error) {
-      toast.error("خطا: " + error.message);
+      alert("خطا: " + error.message);
       return;
     }
-    toast.success(`سفارش «${order.order_number}» حذف شد`);
-    setTimeout(() => {
-      window.location.href = "/admin/orders";
-    }, 500);
+    router.push("/admin/orders");
+  }
+
+  function handlePrint() {
+    window.print();
   }
 
   function formatDate(iso: string) {
@@ -152,322 +140,330 @@ export default function OrderDetailPage() {
     });
   }
 
-  // ─── حالت لودینگ ───
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-[#F7F1E3] p-8">
-        <div className="mx-auto max-w-5xl">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 w-64 rounded bg-gray-200" />
-            <div className="h-64 rounded-2xl bg-gray-200" />
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  // ─── حالت خطا ───
-  if (error || !order) {
-    return (
-      <main className="min-h-screen bg-[#F7F1E3] p-8">
-        <div className="mx-auto max-w-5xl">
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
-            <p className="text-4xl">❌</p>
-            <p className="mt-3 text-lg font-bold text-red-700">
-              {error || "سفارش پیدا نشد"}
-            </p>
-            <a
-              href="/admin/orders"
-              className="mt-5 inline-block rounded-lg bg-amber-500 px-5 py-2 text-sm font-bold text-white"
-            >
-              بازگشت به لیست
-            </a>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-[#F7F1E3]">
-      <div className="mx-auto max-w-5xl px-6 py-8">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <a
-              href="/admin/orders"
-              className="text-sm text-gray-500 hover:text-amber-600"
-            >
-              ← بازگشت به لیست سفارشات
-            </a>
-            <h1 className="mt-2 flex items-center gap-3 text-3xl font-black text-gray-900">
-              <span className="font-mono">{order.order_number}</span>
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {formatDate(order.created_at)}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="rounded-lg border border-[#D4C5A0] bg-white px-4 py-2 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
-            >
-              🖨️ پرینت
-            </button>
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-bold text-red-700 transition hover:bg-red-100"
-            >
-              🗑️ حذف
-            </button>
-          </div>
-        </div>
+    <div dir="rtl" className="flex min-h-screen bg-theme text-theme">
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden print:hidden"
+        />
+      )}
 
-        {/* وضعیت */}
-        <div className="mb-6 rounded-2xl border border-[#D4C5A0] bg-white p-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold text-gray-500">وضعیت سفارش</p>
-              <div className="mt-2 flex items-center gap-2">
-                <span
-                  className={`rounded-lg border px-3 py-1 text-sm font-bold ${
-                    STATUS_COLORS[order.status]
-                  }`}
+      <div className="print:hidden">
+        <AdminSidebar
+          isMobileMenuOpen={isMobileMenuOpen}
+          onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
+        />
+      </div>
+
+      <main className="flex-1 overflow-x-hidden p-4 pb-12 sm:p-8 print:p-0">
+        <div className="mx-auto max-w-5xl space-y-6">
+          {/* هدر */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-theme bg-theme-card text-theme transition hover:bg-theme-surface md:hidden"
+                aria-label="باز کردن منو"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.2}
+                  stroke="currentColor"
+                  className="h-5 w-5"
                 >
-                  {STATUS_LABELS[order.status]}
-                </span>
-                {updatingStatus && (
-                  <span className="text-xs text-gray-400">
-                    در حال بروزرسانی...
-                  </span>
-                )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+                  />
+                </svg>
+              </button>
+
+              <div>
+                <a
+                  href="/admin/orders"
+                  className="text-xs font-bold text-theme-muted transition hover:text-accent"
+                >
+                  ← بازگشت به سفارشات
+                </a>
+                <h1 className="mt-1 text-xl font-black text-theme sm:text-2xl">
+                  🧾 جزئیات سفارش
+                </h1>
               </div>
             </div>
 
-            <div>
-              <p className="mb-2 text-xs font-bold text-gray-500">تغییر سریع</p>
-              <div className="flex flex-wrap gap-2">
-                {(Object.keys(STATUS_LABELS) as Order["status"][]).map(
-                  (status) => (
-                    <button
-                      key={status}
-                      type="button"
-                      disabled={order.status === status || updatingStatus}
-                      onClick={() => handleStatusChange(status)}
-                      className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition disabled:cursor-not-allowed disabled:opacity-40 ${
-                        order.status === status
-                          ? STATUS_COLORS[status]
-                          : "border-[#D4C5A0] bg-white text-gray-600 hover:border-amber-400 hover:bg-amber-50"
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="rounded-xl border border-theme bg-theme-card px-4 py-2.5 text-xs font-bold text-theme transition hover:border-accent"
+              >
+                🖨️ چاپ فاکتور
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-xs font-bold text-red-500 transition hover:bg-red-500/20"
+              >
+                🗑️ حذف
+              </button>
+            </div>
+          </div>
+
+          {/* خطا */}
+          {error && (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-bold text-red-500">
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* لودینگ */}
+          {loading ? (
+            <div className="rounded-2xl border border-theme bg-theme-card p-12 text-center text-xs text-theme-muted">
+              در حال بارگذاری...
+            </div>
+          ) : !order ? null : (
+            <>
+              {/* شماره + وضعیت */}
+              <div className="rounded-2xl border border-theme bg-theme-card p-5 sm:p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold text-theme-muted">
+                      شماره پیگیری
+                    </p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <h2 className="font-mono text-2xl font-black text-theme">
+                        {order.order_number}
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleCopy(order.order_number, "order_number")
+                        }
+                        className="rounded-lg border border-theme bg-theme-surface px-2 py-1 text-[10px] font-bold text-theme-muted transition hover:border-accent hover:text-accent print:hidden"
+                      >
+                        {copied === "order_number" ? "✓ کپی شد" : "📋 کپی"}
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs text-theme-muted">
+                      ثبت: {formatDate(order.created_at)}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-start gap-2 sm:items-end">
+                    <p className="text-[11px] font-bold text-theme-muted">
+                      وضعیت سفارش
+                    </p>
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleStatusChange(e.target.value as Order["status"])
+                      }
+                      className={`cursor-pointer rounded-xl border px-4 py-2 text-sm font-bold outline-none transition ${
+                        STATUS_COLORS[order.status]
                       }`}
                     >
-                      {STATUS_LABELS[status]}
-                    </button>
-                  )
-                )}
+                      {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                        <option
+                          key={k}
+                          value={k}
+                          className="bg-theme-card text-theme"
+                        >
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* اطلاعات مشتری */}
-          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
-            <h2 className="mb-4 text-lg font-black text-gray-900">
-              👤 اطلاعات مشتری
-            </h2>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between border-b border-[#EDE4CE] pb-2">
-                <span className="text-gray-500">نام</span>
-                <span className="font-bold text-gray-900">
-                  {order.first_name} {order.last_name}
-                </span>
+              {/* اطلاعات مشتری + آدرس */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-2xl border border-theme bg-theme-card p-5">
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme">
+                    👤 مشتری
+                  </h3>
+                  <div className="space-y-2.5 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-theme-muted">نام:</span>
+                      <span className="font-bold text-theme">
+                        {order.first_name} {order.last_name}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-theme-muted">تلفن:</span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(order.phone, "phone")}
+                        className="font-mono font-bold text-theme transition hover:text-accent"
+                      >
+                        {order.phone}
+                        {copied === "phone" && (
+                          <span className="mr-1 text-[9px] text-green-500">
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-theme bg-theme-card p-5">
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme">
+                    📍 آدرس ارسال
+                  </h3>
+                  <div className="space-y-2.5 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-theme-muted">استان:</span>
+                      <span className="font-bold text-theme">
+                        {order.province || "—"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-theme-muted">شهر:</span>
+                      <span className="font-bold text-theme">
+                        {order.city || "—"}
+                      </span>
+                    </div>
+                    {order.address && (
+                      <div className="flex flex-col gap-1 border-t border-theme pt-2">
+                        <span className="text-theme-muted">نشانی:</span>
+                        <span className="font-bold leading-6 text-theme">
+                          {order.address}
+                        </span>
+                      </div>
+                    )}
+                    {order.postal_code && (
+                      <div className="flex justify-between">
+                        <span className="text-theme-muted">کد پستی:</span>
+                        <span className="font-mono font-bold text-theme">
+                          {order.postal_code}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between border-b border-[#EDE4CE] pb-2">
-                <span className="text-gray-500">تلفن</span>
-                <span className="font-mono font-bold text-gray-900" dir="ltr">
-                  {order.phone}
-                </span>
+
+              {/* اقلام سفارش */}
+              <div className="rounded-2xl border border-theme bg-theme-card p-5">
+                <h3 className="mb-4 flex items-center gap-2 text-sm font-black text-theme">
+                  📦 اقلام سفارش
+                  <span className="rounded-full bg-theme-surface px-2 py-0.5 text-[10px] font-bold text-theme-muted">
+                    {(order.items ?? []).length.toLocaleString("fa-IR")} قلم
+                  </span>
+                </h3>
+
+                <div className="overflow-hidden rounded-xl border border-theme">
+                  <table className="w-full text-right text-xs">
+                    <thead className="bg-theme-surface font-bold text-theme-muted">
+                      <tr>
+                        <th className="px-3 py-2.5">تصویر</th>
+                        <th className="px-3 py-2.5">نام کالا</th>
+                        <th className="px-3 py-2.5">قیمت واحد</th>
+                        <th className="px-3 py-2.5">تعداد</th>
+                        <th className="px-3 py-2.5">جمع</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-theme">
+                      {(order.items ?? []).map((item, i) => (
+                        <tr key={`${item.id}-${i}`}>
+                          <td className="px-3 py-2.5">
+                            <div className="h-10 w-10 overflow-hidden rounded-lg border border-theme bg-theme-surface">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={item.image || "/images/placeholder.jpg"}
+                                alt={item.name}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                          </td>
+                          <td className="px-3 py-2.5 font-bold text-theme">
+                            {item.name}
+                          </td>
+                          <td className="px-3 py-2.5 text-theme-muted">
+                            {formatPrice(item.price)}
+                          </td>
+                          <td className="px-3 py-2.5 font-bold text-theme">
+                            {item.quantity.toLocaleString("fa-IR")}
+                          </td>
+                          <td className="px-3 py-2.5 font-bold text-theme">
+                            {formatPrice(item.price * item.quantity)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              {order.email && (
-                <div className="flex justify-between border-b border-[#EDE4CE] pb-2">
-                  <span className="text-gray-500">ایمیل</span>
-                  <span className="font-mono text-xs text-gray-900" dir="ltr">
-                    {order.email}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
 
-          {/* آدرس */}
-          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
-            <h2 className="mb-4 text-lg font-black text-gray-900">
-              🏠 آدرس تحویل
-            </h2>
-            <div className="space-y-3 text-sm">
-              {order.province && (
-                <div className="flex justify-between border-b border-[#EDE4CE] pb-2">
-                  <span className="text-gray-500">استان</span>
-                  <span className="font-bold text-gray-900">
-                    {order.province}
-                  </span>
-                </div>
-              )}
-              {order.city && (
-                <div className="flex justify-between border-b border-[#EDE4CE] pb-2">
-                  <span className="text-gray-500">شهر</span>
-                  <span className="font-bold text-gray-900">{order.city}</span>
-                </div>
-              )}
-              {order.postal_code && (
-                <div className="flex justify-between border-b border-[#EDE4CE] pb-2">
-                  <span className="text-gray-500">کد پستی</span>
-                  <span className="font-mono text-gray-900" dir="ltr">
-                    {order.postal_code}
-                  </span>
-                </div>
-              )}
-              {order.address && (
-                <div>
-                  <span className="text-gray-500">آدرس کامل</span>
-                  <p className="mt-1 rounded-lg bg-[#F7F1E3]/50 p-3 text-sm text-gray-800">
-                    {order.address}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+              {/* خلاصه مالی */}
+              <div className="rounded-2xl border border-theme bg-theme-card p-5">
+                <h3 className="mb-4 flex items-center gap-2 text-sm font-black text-theme">
+                  💰 خلاصه مالی
+                </h3>
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-theme-muted">جمع کالاها:</span>
+                    <span className="font-bold text-theme">
+                      {formatPrice(order.subtotal)}
+                    </span>
+                  </div>
 
-        {/* روش ارسال و پرداخت */}
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
-            <h2 className="mb-4 text-lg font-black text-gray-900">
-              🚚 روش ارسال
-            </h2>
-            <p className="text-sm text-gray-700">
-              {SHIPPING_LABELS[order.shipping_method] ?? order.shipping_method}
-            </p>
-            <p className="mt-1 text-xs text-gray-500">
-              هزینه:{" "}
-              {order.shipping_cost === 0
-                ? "رایگان"
-                : formatPrice(order.shipping_cost)}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-[#D4C5A0] bg-white p-6">
-            <h2 className="mb-4 text-lg font-black text-gray-900">
-              💳 روش پرداخت
-            </h2>
-            <p className="text-sm text-gray-700">
-              {PAYMENT_LABELS[order.payment_method] ?? order.payment_method}
-            </p>
-          </div>
-        </div>
-
-        {/* اقلام */}
-        <div className="mt-6 rounded-2xl border border-[#D4C5A0] bg-white p-6">
-          <h2 className="mb-4 text-lg font-black text-gray-900">
-            📦 اقلام سفارش ({order.items.length.toLocaleString("fa-IR")} قلم)
-          </h2>
-
-          <div className="space-y-3">
-            {order.items.map((item, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-4 border-b border-[#EDE4CE] pb-3 last:border-0"
-              >
-                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-[#EDE4CE] bg-gray-50">
-                  {item.image ? (
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-2xl">
-                      📦
+                  {order.discount_amount > 0 && (
+                    <div className="flex justify-between text-green-500">
+                      <span>
+                        تخفیف
+                        {order.discount_code && (
+                          <span className="mr-2 font-mono text-[10px] opacity-70">
+                            ({order.discount_code})
+                          </span>
+                        )}
+                        :
+                      </span>
+                      <span className="font-bold">
+                        − {formatPrice(order.discount_amount)}
+                      </span>
                     </div>
                   )}
+
+                  <div className="flex justify-between">
+                    <span className="text-theme-muted">هزینه ارسال:</span>
+                    <span className="font-bold text-theme">
+                      {order.shipping_cost > 0
+                        ? formatPrice(order.shipping_cost)
+                        : "رایگان"}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex justify-between border-t border-theme pt-3 text-base">
+                    <span className="font-black text-theme">مبلغ نهایی:</span>
+                    <span className="font-black text-accent">
+                      {formatPrice(order.total)}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-bold text-gray-900">{item.name}</p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {item.quantity.toLocaleString("fa-IR")} ×{" "}
-                    {formatPrice(item.price)}
+              </div>
+
+              {/* یادداشت مشتری */}
+              {order.note && (
+                <div className="rounded-2xl border border-accent/30 bg-accent/5 p-5">
+                  <h3 className="mb-2 flex items-center gap-2 text-sm font-black text-accent">
+                    📝 یادداشت مشتری
+                  </h3>
+                  <p className="text-xs leading-6 text-theme">
+                    {order.note}
                   </p>
                 </div>
-                <div className="text-sm font-black text-gray-900">
-                  {formatPrice(item.price * item.quantity)}
-                </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </>
+          )}
         </div>
-
-        {/* خلاصه مالی */}
-        <div className="mt-6 rounded-2xl border border-[#D4C5A0] bg-white p-6">
-          <h2 className="mb-4 text-lg font-black text-gray-900">
-            💰 خلاصه مالی
-          </h2>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-500">جمع کالاها</span>
-              <span className="font-bold text-gray-900">
-                {formatPrice(order.subtotal)}
-              </span>
-            </div>
-
-            {order.discount_amount > 0 && (
-              <div className="flex justify-between text-green-700">
-                <span>
-                  تخفیف {order.discount_code && `(${order.discount_code})`}
-                </span>
-                <span className="font-bold">
-                  − {formatPrice(order.discount_amount)}
-                </span>
-              </div>
-            )}
-
-            <div className="flex justify-between">
-              <span className="text-gray-500">هزینه ارسال</span>
-              <span
-                className={
-                  order.shipping_cost === 0
-                    ? "font-bold text-green-600"
-                    : "font-bold text-gray-900"
-                }
-              >
-                {order.shipping_cost === 0
-                  ? "رایگان"
-                  : formatPrice(order.shipping_cost)}
-              </span>
-            </div>
-
-            <div className="mt-3 flex justify-between border-t border-[#EDE4CE] pt-3">
-              <span className="text-base font-black text-gray-900">
-                مبلغ کل
-              </span>
-              <span className="text-lg font-black text-amber-700">
-                {formatPrice(order.total)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* یادداشت */}
-        {order.note && (
-          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-6">
-            <h2 className="mb-2 text-sm font-black text-amber-800">
-              📝 یادداشت مشتری
-            </h2>
-            <p className="text-sm text-amber-900">{order.note}</p>
-          </div>
-        )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

@@ -34,6 +34,7 @@ export type Product = {
   slug: string;
   price: number;
   oldPrice?: number;
+  costPrice?: number;   // 🆕 قیمت خرید (برای محاسبه سود)
   category: Category;
   image: string;
   images?: string[];
@@ -419,7 +420,7 @@ export const products: Product[] = [
     name: "پروژکتور کمپینگ نیرچرهایک مدل CNK2300BI012",
     slug: "naturehike-camping-lantern-cnk2300bi012",
     price: 8_280_000,
-        oldPrice: 9_500_000,
+    oldPrice: 9_500_000,
     category: "lighting",
     image: "https://picsum.photos/seed/projector1/800/800",
     rating: 4,
@@ -444,14 +445,14 @@ export const products: Product[] = [
       { label: "سفید و قرمز", value: "white-red" },
     ],
   },
-    {
+  {
     id: "19",
     name: "چادر بادی ۴ نفره نیچرهایک مدل CNK2550WS017",
     slug: "naturehike-inflatable-tent-cnk2550ws017",
     price: 15_500_000,
     oldPrice: 18_000_000,
     category: "tent",
-       image: "/images/products/tent-naturehike-1.jpg",
+    image: "/images/products/tent-naturehike-1.jpg",
     images: [
       "/images/products/tent-naturehike-1.jpg",
       "/images/products/tent-naturehike-2.jpg",

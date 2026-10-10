@@ -19,15 +19,7 @@ type Props = {
 };
 
 const RANGES: RangeKey[] = ["7d", "30d", "90d", "all"];
-const GROUPS: GroupBy[] = [
-  "date",
-  "product",
-  "city",
-  "brand",
-  "shipping",
-  "payment",
-  "discount",
-];
+const GROUPS: GroupBy[] = ["date", "product", "city", "brand"];
 const METRICS: Metric[] = ["revenue", "orders", "items"];
 
 export default function AnalyticsFilters({
@@ -39,78 +31,73 @@ export default function AnalyticsFilters({
   onMetricChange,
 }: Props) {
   return (
-    <div className="rounded-2xl border border-[#D4C5A0] bg-white p-5">
-      <div className="grid gap-5 lg:grid-cols-3">
+    <div className="rounded-2xl border border-theme bg-theme-card p-4 shadow-sm">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        
         {/* بازه زمانی */}
-        <div>
-          <p className="mb-2 text-xs font-bold text-gray-500">📆 بازه زمانی</p>
-          <div className="flex flex-wrap gap-1.5">
-            {RANGES.map((r) => (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+          <span className="text-[11px] font-bold text-theme-muted ml-1">بازه:</span>
+          {RANGES.map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => onRangeChange(r)}
+              className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
+                range === r
+                  ? "bg-accent text-white"
+                  : "bg-theme-surface text-theme-muted hover:text-theme"
+              }`}
+            >
+              {RANGE_LABELS[r]}
+            </button>
+          ))}
+        </div>
+
+        {/* گروه‌بندی (فقط ۴ مورد کلیدی) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+          <span className="text-[11px] font-bold text-theme-muted ml-1">گروه:</span>
+          {GROUPS.map((g) => {
+            const meta = GROUP_META[g];
+            return (
               <button
-                key={r}
+                key={g}
                 type="button"
-                onClick={() => onRangeChange(r)}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
-                  range === r
-                    ? "border-amber-500 bg-amber-500 text-white shadow-sm"
-                    : "border-[#D4C5A0] bg-white text-gray-600 hover:border-amber-400 hover:bg-amber-50"
+                onClick={() => onGroupByChange(g)}
+                className={`rounded-lg px-2.5 py-1 text-xs font-bold transition flex items-center gap-1 ${
+                  groupBy === g
+                    ? "bg-accent text-white"
+                    : "bg-theme-surface text-theme-muted hover:text-theme"
                 }`}
               >
-                {RANGE_LABELS[r]}
+                <span>{meta.icon}</span>
+                <span>{meta.label}</span>
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
-        {/* گروه‌بندی */}
-        <div>
-          <p className="mb-2 text-xs font-bold text-gray-500">📊 گروه‌بندی</p>
-          <div className="flex flex-wrap gap-1.5">
-            {GROUPS.map((g) => {
-              const meta = GROUP_META[g];
-              return (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => onGroupByChange(g)}
-                  className={`rounded-lg border px-2.5 py-1.5 text-xs font-bold transition ${
-                    groupBy === g
-                      ? "border-amber-500 bg-amber-500 text-white shadow-sm"
-                      : "border-[#D4C5A0] bg-white text-gray-600 hover:border-amber-400 hover:bg-amber-50"
-                  }`}
-                >
-                  <span className="ml-1">{meta.icon}</span>
-                  <span>{meta.label}</span>
-                </button>
-              );
-            })}
-          </div>
+        {/* شاخص */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] font-bold text-theme-muted ml-1">شاخص:</span>
+          {METRICS.map((m) => {
+            const meta = METRIC_LABELS[m];
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => onMetricChange(m)}
+                className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
+                  metric === m
+                    ? "bg-accent text-white"
+                    : "bg-theme-surface text-theme-muted hover:text-theme"
+                }`}
+              >
+                {meta.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* متریک */}
-        <div>
-          <p className="mb-2 text-xs font-bold text-gray-500">🎯 شاخص</p>
-          <div className="flex flex-wrap gap-1.5">
-            {METRICS.map((m) => {
-              const meta = METRIC_LABELS[m];
-              return (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => onMetricChange(m)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
-                    metric === m
-                      ? "border-amber-500 bg-amber-500 text-white shadow-sm"
-                      : "border-[#D4C5A0] bg-white text-gray-600 hover:border-amber-400 hover:bg-amber-50"
-                  }`}
-                >
-                  <span className="ml-1">{meta.icon}</span>
-                  <span>{meta.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
       </div>
     </div>
   );

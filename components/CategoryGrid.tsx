@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getAppContent } from "@/lib/supabase/appContent";
 import type { CategoryGridFilter } from "@/lib/contentTypes";
 
@@ -30,35 +30,434 @@ const LABELS: Record<string, string> = {
   accessories: "لوازم جانبی",
 };
 
-const PEEK = 18;
-const BEHIND_OPACITY = 0.35;
-const PAD = 20;
+const SPEED = 0.5;
+const STEP_DEG = 26;
+const GAP = 1.04;
+const PERSPECTIVE = 2400;
 
-const AUTOPLAY_MS = 4500;      // فاصله بین اسلایدها در حالت خودکار
-const IDLE_RESUME_MS = 300;   // بعد از نیم ثانیه بی‌کاری، حرکت ادامه پیدا می‌کند
+const MOBILE_MAX = 640;
+const RESUME_DELAY = 2000;
+
+const mod = (a: number, m: number) => ((a % m) + m) % m;
+const wrapP = (x: number, n: number) => mod(x + n / 2, n) - n / 2;
+
+// 🆕 تایپ عکس دسته‌بندی
+type CategoryPhoto = {
+  name: string;
+  url: string;
+};
+
+type PhotoMap = Record<string, string>;
+
+type RowProps = {
+  photos: string[];
+  reverse?: boolean;
+  photoMap: PhotoMap;
+};
+
+function Carousel3D({ photos, reverse = false, photoMap }: RowProps) {
+  const [wrapW, setWrapW] = useState(1200);
+  const [dot, setDot] = useState(0);
+
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+
+  const posRef = useRef(0);
+  const velRef = useRef(0);
+  const targetRef = useRef<number | null>(null);
+  const dotRef = useRef(0);
+  const dragStartX = useRef<number | null>(null);
+  const dragged = useRef(false);
+
+  const hoverRef = useRef(false);
+  const pauseUntilRef = useRef(0);
+  const activeCardIdxRef = useRef<number | null>(null);
+
+  const reverseRef = useRef(reverse);
+  reverseRef.current = reverse;
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => setWrapW(el.offsetWidth || 1200);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const n = photos.length;
+  const isMobile = wrapW < MOBILE_MAX;
+
+  const size = isMobile
+    ? Math.round(Math.min(130, Math.max(80, wrapW * 0.28)))
+    : Math.round(Math.min(240, Math.max(100, wrapW * 0.2)));
+
+  const radius = (size * GAP) / 2 / Math.tan((STEP_DEG / 2) * (Math.PI / 180));
+
+  const nRef = useRef(n);
+  const radiusRef = useRef(radius);
+  nRef.current = n;
+  radiusRef.current = radius;
+
+  const applyRef = useRef<() => void>(() => {});
+  applyRef.current = () => {
+    const nn = nRef.current;
+    const R = radiusRef.current;
+    const pos = posRef.current;
+    if (nn === 0) return;
+
+    const fadeEnd = Math.min(2.9, nn / 2 - 0.05);
+    const fadeStart = fadeEnd - 0.6;
+
+    for (let i = 0; i < nn; i++) {
+      const el = cardRefs.current[i];
+      if (!el) continue;
+
+      const p = wrapP(i - pos - 0.5, nn);
+      const a = Math.abs(p);
+      const beyond = Math.max(0, a - 0.5);
+
+      const opacity =
+        a <= fadeStart
+          ? 1
+          : Math.max(0, 1 - (a - fadeStart) / (fadeEnd - fadeStart));
+      const textOpacity = 1 - Math.min(1, beyond / 0.6);
+
+      const angle = (p * STEP_DEG).toFixed(3);
+      el.style.transform = `translate(-50%, -50%) rotateY(${angle}deg) translateZ(${R.toFixed(1)}px)`;
+      el.style.filter =
+        beyond > 0.02 ? `blur(${(beyond * 3.2).toFixed(2)}px)` : "none";
+      el.style.opacity = opacity.toFixed(3);
+      el.style.pointerEvents = opacity > 0.3 ? "auto" : "none";
+      el.style.setProperty("--t", textOpacity.toFixed(3));
+
+      const inner = el.firstElementChild as HTMLElement | null;
+      if (inner) {
+        const isActive =
+          activeCardIdxRef.current === i && dragStartX.current === null;
+        if (isActive) {
+          if (!inner.classList.contains("is-active"))
+            inner.classList.add("is-active");
+        } else {
+          if (inner.classList.contains("is-active"))
+            inner.classList.remove("is-active");
+        }
+      }
+    }
+
+    const d = mod(Math.round(pos), nn);
+    if (d !== dotRef.current) {
+      dotRef.current = d;
+      setDot(d);
+    }
+  };
+
+  useLayoutEffect(() => {
+    applyRef.current();
+  }, [size, n]);
+
+  useEffect(() => {
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0;
+    let last = performance.now();
+
+    const loop = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+
+      if (targetRef.current !== null) {
+        const diff = targetRef.current - posRef.current;
+        if (Math.abs(diff) < 0.0005) {
+          posRef.current = targetRef.current;
+          targetRef.current = null;
+        } else {
+          posRef.current += diff * (1 - Math.exp(-dt * 5));
+        }
+        velRef.current = 0;
+      } else {
+        const canMove =
+          !hoverRef.current &&
+          dragStartX.current === null &&
+          Date.now() >= pauseUntilRef.current;
+
+        const dir = reverseRef.current ? -1 : 1;
+        const goal =
+          !canMove || reduced || nRef.current < 2 ? 0 : SPEED * dir;
+        velRef.current += (goal - velRef.current) * (1 - Math.exp(-dt * 3));
+        posRef.current += velRef.current * dt;
+      }
+
+      applyRef.current();
+      raf = requestAnimationFrame(loop);
+    };
+
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const goNext = () => {
+    targetRef.current = (targetRef.current ?? Math.floor(posRef.current)) + 1;
+  };
+  const goPrev = () => {
+    targetRef.current = (targetRef.current ?? Math.ceil(posRef.current)) - 1;
+  };
+  const goTo = (i: number) => {
+    targetRef.current = posRef.current + wrapP(i - posRef.current, nRef.current);
+  };
+
+  const edge = `calc(50% - ${Math.round(size * GAP)}px)`;
+  const fadeMask = `linear-gradient(to right,
+    transparent 0%,
+    rgba(0,0,0,0.12) calc(${edge} * 0.25),
+    rgba(0,0,0,0.35) calc(${edge} * 0.5),
+    rgba(0,0,0,0.65) calc(${edge} * 0.78),
+    black ${edge},
+    black calc(100% - ${edge}),
+    rgba(0,0,0,0.65) calc(100% - ${edge} * 0.78),
+    rgba(0,0,0,0.35) calc(100% - ${edge} * 0.5),
+    rgba(0,0,0,0.12) calc(100% - ${edge} * 0.25),
+    transparent 100%)`;
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    dragStartX.current = e.clientX;
+    dragged.current = false;
+    hoverRef.current = true;
+    activeCardIdxRef.current = null;
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (dragStartX.current !== null) {
+      const dx = e.clientX - dragStartX.current;
+      if (Math.abs(dx) > 50) {
+        dragged.current = true;
+        if (dx < 0) goNext();
+        else goPrev();
+      }
+    }
+    dragStartX.current = null;
+    pauseUntilRef.current = Date.now() + RESUME_DELAY;
+  };
+
+  return (
+    <div>
+      <div
+        ref={wrapRef}
+        dir="ltr"
+        className="relative w-full select-none touch-pan-y"
+        style={{
+          height: size + 90,
+          perspective: `${PERSPECTIVE}px`,
+          WebkitMaskImage: fadeMask,
+          maskImage: fadeMask,
+        }}
+        onPointerEnter={(e) => {
+          if (e.pointerType !== "mouse") return;
+          hoverRef.current = true;
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType !== "mouse") return;
+          hoverRef.current = false;
+          pauseUntilRef.current = Date.now() + RESUME_DELAY;
+          activeCardIdxRef.current = null;
+        }}
+        onTouchStart={() => {
+          hoverRef.current = true;
+        }}
+        onTouchEnd={() => {
+          hoverRef.current = false;
+          pauseUntilRef.current = Date.now() + RESUME_DELAY;
+          activeCardIdxRef.current = null;
+        }}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={() => {
+          dragStartX.current = null;
+          hoverRef.current = false;
+          pauseUntilRef.current = Date.now() + RESUME_DELAY;
+          activeCardIdxRef.current = null;
+        }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            transformStyle: "preserve-3d",
+            transform: `translateZ(${-radius}px)`,
+          }}
+        >
+          {photos.map((photoName, i) => {
+            // 🆕 استفاده از map — اگه override داشته باشه، از اون، وگرنه از مسیر سخت‌کد
+            const imageSrc =
+              photoMap[photoName] ||
+              `/images/categories/photos/${photoName}.jpg`;
+            const label = LABELS[photoName] || photoName;
+
+            return (
+              <a
+                key={`${photoName}-${i}`}
+                ref={(el) => {
+                  cardRefs.current[i] = el;
+                }}
+                href="/products"
+                onPointerEnter={(e) => {
+                  if (e.pointerType !== "mouse") return;
+                  activeCardIdxRef.current = i;
+                }}
+                onPointerLeave={(e) => {
+                  if (e.pointerType !== "mouse") return;
+                  if (activeCardIdxRef.current === i)
+                    activeCardIdxRef.current = null;
+                }}
+                onTouchStart={() => {
+                  activeCardIdxRef.current = i;
+                }}
+                onTouchEnd={() => {
+                  if (activeCardIdxRef.current === i)
+                    activeCardIdxRef.current = null;
+                }}
+                onClick={(e) => {
+                  if (dragged.current) {
+                    e.preventDefault();
+                    dragged.current = false;
+                    return;
+                  }
+                  const p = wrapP(i - posRef.current - 0.5, nRef.current);
+                  if (Math.abs(p) > 0.55) {
+                    e.preventDefault();
+                    if (p < 0) goTo(i);
+                    else goTo(i - 1);
+                  }
+                }}
+                draggable={false}
+                className="group absolute left-1/2 top-1/2 block"
+                style={{
+                  width: size,
+                  height: size,
+                  willChange: "transform, filter, opacity",
+                }}
+              >
+                <div className="kaw-card-inner">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imageSrc}
+                    alt={label}
+                    loading="lazy"
+                    draggable={false}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.style.display = "none";
+                      const parent = target.parentElement;
+                      if (parent && !parent.querySelector(".fallback-emoji")) {
+                        const wrapper = document.createElement("div");
+                        wrapper.className =
+                          "fallback-emoji absolute inset-0 flex flex-col items-center justify-center gap-2 bg-theme-surface";
+                        wrapper.innerHTML = `<span style="font-size: 2rem">📦</span>`;
+                        parent.appendChild(wrapper);
+                      }
+                    }}
+                    className="h-full w-full object-cover object-center"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                  <div
+                    dir="rtl"
+                    className="absolute bottom-0 left-0 right-0 p-2 md:p-3"
+                    style={{ opacity: "var(--t, 1)" }}
+                  >
+                    <div className="mb-1 h-[2px] w-6 bg-accent md:mb-1.5" />
+                    <h3 className="text-[10px] font-black text-white md:text-xs">
+                      {label}
+                    </h3>
+                    <p className="mt-0.5 text-[8px] font-bold text-accent md:text-[10px]">
+                      مشاهده محصولات
+                    </p>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+
+        <button
+          type="button"
+          aria-label="قبلی"
+          onClick={goPrev}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
+          className="absolute left-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-accent hover:text-accent md:left-6 md:h-9 md:w-9"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          aria-label="بعدی"
+          onClick={goNext}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
+          className="absolute right-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-accent hover:text-accent md:right-6 md:h-9 md:w-9"
+        >
+          ›
+        </button>
+      </div>
+
+      <div className="mt-4 flex items-center justify-center gap-2">
+        {photos.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`عکس ${i + 1}`}
+            onClick={() => goTo(i)}
+            className={
+              "h-1.5 rounded-full transition-all duration-500 " +
+              (i === dot ? "w-8 bg-accent" : "w-2 bg-white/25 hover:bg-white/50")
+            }
+          />
+        ))}
+      </div>
+
+      <style jsx>{`
+        .kaw-card-inner {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          border-radius: 0.75rem;
+          transform: scale(1);
+          transform-origin: center center;
+          transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+            box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+          box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.85);
+          will-change: transform;
+        }
+        .kaw-card-inner.is-active {
+          transform: scale(1.18);
+          box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.85),
+            0 0 28px rgba(232, 76, 76, 0.45);
+          z-index: 10;
+        }
+        @media (max-width: 640px) {
+          .kaw-card-inner.is-active {
+            transform: scale(1.2);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .kaw-card-inner {
+            transition: none;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 export default function CategoryGrid() {
   const [filters, setFilters] = useState<CategoryGridFilter[]>(DEFAULT_FILTERS);
-  const [index, setIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
+  // 🆕 map عکس‌ها (name → url)
+  const [photoMap, setPhotoMap] = useState<PhotoMap>({});
 
-  // وضعیت کشیدن
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const [w, setW] = useState(0);
-  const [dx, setDx] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const startX = useRef<number | null>(null);
-  const moved = useRef(false);
-
-  // زمان آخرین تعامل کاربر
-  const lastInteractRef = useRef(Date.now());
-
-  function markInteraction() {
-    lastInteractRef.current = Date.now();
-  }
-
-  // ─── لود فیلترها ───
+  // لود فیلترها
   useEffect(() => {
     (async () => {
       const data = await getAppContent<CategoryGridFilter[]>("category_grid");
@@ -66,151 +465,31 @@ export default function CategoryGrid() {
     })();
   }, []);
 
-  // ─── تشخیص موبایل ───
+  // 🆕 لود عکس‌ها
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  // ─── اندازه عرض ───
-  useEffect(() => {
-    const measure = () => setW(wrapRef.current?.offsetWidth || 0);
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-
-  // ─── autoplay فقط در موبایل ───
-  useEffect(() => {
-    if (!isMobile) return;
-    if (filters.length <= 1) return;
-
-    const id = setInterval(() => {
-      // اگه کاربر اخیراً تعامل داشته، جلو نرو
-      if (Date.now() - lastInteractRef.current < IDLE_RESUME_MS) return;
-      // اگه در حال کشیدنه، جلو نرو
-      if (dragging) return;
-      // اگه موس روی کاروسله (فقط دسکتاپ، ولی برای اطمینان)، جلو نرو
-      if (isHovering) return;
-
-      setIndex((i) => (i + 1) % filters.length);
-    }, AUTOPLAY_MS);
-
-    return () => clearInterval(id);
-  }, [isMobile, filters.length, dragging, isHovering]);
-
-  const last = filters.length - 1;
-  const goTo = (i: number) => {
-    markInteraction();
-    setIndex(Math.max(0, Math.min(last, i)));
-  };
-
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-    markInteraction();
-    startX.current = e.clientX;
-    moved.current = false;
-  };
-
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (startX.current === null) return;
-    const d = e.clientX - startX.current;
-    if (!moved.current) {
-      if (Math.abs(d) < 6) return;
-      moved.current = true;
-      setDragging(true);
-      markInteraction();
+    (async () => {
       try {
-        e.currentTarget.setPointerCapture(e.pointerId);
-      } catch {}
-    }
-    markInteraction();
-    setDx(d);
-  };
-
-  const endDrag = () => {
-    if (startX.current === null) return;
-    const d = dx;
-    startX.current = null;
-    setDragging(false);
-    setDx(0);
-    markInteraction();
-    if (!moved.current) return;
-    const threshold = Math.max(60, w * 0.2);
-    if (d < -threshold) goTo(index + 1);
-    else if (d > threshold) goTo(index - 1);
-  };
-
-  const onClickCapture = (e: React.MouseEvent) => {
-    if (moved.current) {
-      e.preventDefault();
-      e.stopPropagation();
-      moved.current = false;
-    }
-  };
-
-  // استایل هر صفحه
-  const pageStyle = (rel: number): React.CSSProperties => {
-    const p = w ? Math.min(Math.abs(dx) / w, 1) : 0;
-    const toNext = dragging && dx < 0 && index < last;
-    const toPrev = dragging && dx > 0 && index > 0;
-
-    let tx: number | string = 0;
-    let ty = 0;
-    let op = 1;
-
-    if (rel > 0) {
-      tx = "calc(100% + 40px)";
-      if (toNext && rel === 1) tx = Math.max(0, w + dx);
-    } else if (rel === 0) {
-      if (toNext) {
-        tx = -PEEK * p;
-        ty = -PEEK * p;
-        op = 1 - (1 - BEHIND_OPACITY) * p;
-      } else if (toPrev) {
-        tx = dx;
+        const photos = await getAppContent<CategoryPhoto[]>("category_photos");
+        if (photos && photos.length > 0) {
+          const map: PhotoMap = {};
+          photos.forEach((p) => {
+            if (p.name && p.url) map[p.name] = p.url;
+          });
+          setPhotoMap(map);
+        }
+      } catch (e) {
+        console.error("category_photos load error", e);
       }
-    } else if (rel === -1) {
-      tx = -PEEK;
-      ty = -PEEK;
-      op = BEHIND_OPACITY;
-      if (toPrev) {
-        tx = -PEEK * (1 - p);
-        ty = -PEEK * (1 - p);
-        op = BEHIND_OPACITY + (1 - BEHIND_OPACITY) * p;
-      } else if (toNext) {
-        op = BEHIND_OPACITY * (1 - p);
-      }
-    } else {
-      tx = -PEEK;
-      ty = -PEEK;
-      op = 0;
-      if (toPrev && rel === -2) op = BEHIND_OPACITY * p;
-    }
+    })();
+  }, []);
 
-    const txs = typeof tx === "number" ? `${tx}px` : tx;
-
-    return {
-      zIndex: rel + 1000,
-      opacity: op,
-      transform: `translate(${txs}, ${ty}px)`,
-      pointerEvents: rel === 0 ? "auto" : "none",
-      transition: dragging
-        ? "none"
-        : "transform 0.75s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.75s ease",
-    };
-  };
+  const photos = filters[0]?.photos || [];
 
   return (
-    <section
-      className="relative py-12 md:py-16"
-      style={{ isolation: "isolate", zIndex: 1 }}
-    >
-      <div className="relative w-full bg-theme py-12 md:py-16">
+    <section className="relative py-12 md:py-16">
+      <div className="relative w-full overflow-hidden bg-theme py-12 md:py-16">
         <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
-          <div className="mb-8 text-center">
+          <div className="mb-10 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3.5 py-1.5 backdrop-blur-sm">
               <span className="text-[11px] font-bold tracking-[0.15em] text-accent md:text-xs">
                 OUR WORK
@@ -218,143 +497,17 @@ export default function CategoryGrid() {
             </div>
 
             <h2 className="text-2xl font-black tracking-tight text-theme md:text-3xl lg:text-4xl">
-              دسته‌بندی‌های <span className="text-accent">محبوب</span>
+              <span className="text-accent">جدیدترین</span> ها
             </h2>
 
             <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-accent" />
           </div>
+        </div>
 
-          <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
-            {filters.map((f, i) => (
-              <button
-                key={f.key}
-                type="button"
-                onClick={() => goTo(i)}
-                className={
-                  "rounded-full border px-4 py-1.5 text-[11px] font-bold tracking-wider transition md:text-xs " +
-                  (index === i
-                    ? "border-accent bg-accent text-white shadow-lg shadow-accent/20"
-                    : "border-theme bg-transparent text-theme-muted hover:border-accent/50 hover:text-accent")
-                }
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-
-          <div
-            ref={wrapRef}
-            dir="ltr"
-            className="relative select-none overflow-hidden px-5 pt-5"
-            style={{
-              touchAction: "pan-y",
-              cursor: dragging ? "grabbing" : "grab",
-              paddingLeft: PAD,
-              paddingRight: PAD,
-              paddingTop: PAD,
-            }}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={endDrag}
-            onPointerCancel={endDrag}
-            onClickCapture={onClickCapture}
-            onPointerEnter={(e) => {
-              if (e.pointerType !== "mouse") return;
-              setIsHovering(true);
-            }}
-            onPointerLeave={(e) => {
-              if (e.pointerType !== "mouse") return;
-              setIsHovering(false);
-            }}
-          >
-            <div className="grid">
-              {filters.map((f, pageIdx) => {
-                const rel = pageIdx - index;
-                return (
-                  <div
-                    key={f.key}
-                    dir="rtl"
-                    aria-hidden={rel !== 0}
-                    className="col-start-1 row-start-1 grid w-full grid-cols-2 gap-2 rounded-xl bg-theme shadow-[-10px_10px_40px_rgba(0,0,0,0.45)] sm:grid-cols-3 md:gap-4"
-                    style={pageStyle(rel)}
-                  >
-                    {f.photos.map((photoName, idx) => {
-                      const imageSrc = `/images/categories/photos/${photoName}.jpg`;
-                      const label = LABELS[photoName] || photoName;
-                      const href =
-                        f.key === "best" ? "/products" : `/products?cat=${f.key}`;
-
-                      return (
-                        <a
-                          key={`${f.key}-${idx}`}
-                          href={href}
-                          draggable={false}
-                          tabIndex={rel === 0 ? 0 : -1}
-                          className="group relative block aspect-[4/3] overflow-hidden rounded-lg bg-theme-card transition duration-500"
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={imageSrc}
-                            alt={label}
-                            loading="lazy"
-                            draggable={false}
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              target.style.display = "none";
-                              const parent = target.parentElement;
-                              if (parent && !parent.querySelector(".fallback-emoji")) {
-                                const wrapper = document.createElement("div");
-                                wrapper.className =
-                                  "fallback-emoji absolute inset-0 flex flex-col items-center justify-center gap-2 bg-theme-surface";
-                                wrapper.innerHTML = `<span style="font-size: 3rem">📦</span>`;
-                                parent.appendChild(wrapper);
-                              }
-                            }}
-                            className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-110"
-                          />
-
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition duration-500 group-hover:from-black/90 group-hover:via-black/60" />
-
-                          <div className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border-2 border-accent opacity-0 transition duration-500 group-hover:opacity-100">
-                            <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-                          </div>
-
-                          <div className="absolute bottom-0 right-0 left-0 p-4">
-                            <div className="mb-2.5 h-[3px] w-0 bg-accent transition-all duration-500 group-hover:w-8" />
-
-                            <h3 className="translate-y-2 text-sm font-black text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:text-base">
-                              {label}
-                            </h3>
-
-                            <p className="mt-0.5 translate-y-2 text-[10px] font-bold text-accent opacity-0 transition-all duration-500 delay-75 group-hover:translate-y-0 group-hover:opacity-100 md:text-[11px]">
-                              مشاهده محصولات
-                            </p>
-                          </div>
-
-                          <div className="absolute bottom-0 right-0 left-0 h-[3px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
-                        </a>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-6 flex items-center justify-center gap-2">
-            {filters.map((f, i) => (
-              <button
-                key={f.key}
-                type="button"
-                aria-label={f.label}
-                onClick={() => goTo(i)}
-                className={
-                  "h-1.5 rounded-full transition-all duration-500 " +
-                  (index === i ? "w-6 bg-accent" : "w-1.5 bg-accent/30")
-                }
-              />
-            ))}
-          </div>
+        {/* 🆕 پاس دادن photoMap */}
+        <Carousel3D photos={photos} photoMap={photoMap} />
+        <div className="mt-2 md:mt-4">
+          <Carousel3D photos={photos} reverse photoMap={photoMap} />
         </div>
       </div>
     </section>
