@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -25,7 +25,14 @@ export default function ThemeToggle() {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "حالت روشن" : "حالت تاریک"}
       title={isDark ? "حالت روشن" : "حالت تاریک"}
-      className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-transparent text-zinc-300 transition hover:border-[#E84C4C] hover:bg-[#E84C4C] hover:text-white"
+      className={
+        "flex h-10 w-10 items-center justify-center rounded-lg border transition " +
+        (isDark
+          ? // 🆕 دارک مود → دکمه روشن
+            "border-white/20 bg-white text-zinc-900 hover:border-accent hover:bg-accent hover:text-white"
+          : // 🆕 لایت مود → دکمه تیره
+            "border-zinc-700 bg-zinc-900 text-zinc-100 hover:border-accent hover:bg-accent hover:text-white")
+      }
     >
       {isDark ? (
         // آیکون خورشید (برای رفتن به light)
