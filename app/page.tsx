@@ -115,16 +115,15 @@ export default function Home() {
       )}
 
       <div className="relative z-10">
-        <Header />
-        <HeroVideo />
-        <LatestProducts />
-        <SpecialDiscountSlot />
-<BrandShowcase />
+        <Header /> 
+        <HeroVideo /> 
+        <LatestProducts /> 
+         <BlackDogSteps data={blackDogData} />
+<BrandShowcase /> 
 <CategoryGrid />
-        <BlackDogSteps data={blackDogData} />
-        <CategoryShowcase data={categoryShowcaseData} />
+       
+        <CategoryShowcase data={categoryShowcaseData} /> //
         <SpecialDiscountSlot />
-        <CategoryGrid />
         <ContactSection />
         <NewsletterSection />
         <Footer />
