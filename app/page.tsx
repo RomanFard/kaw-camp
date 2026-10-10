@@ -15,7 +15,7 @@ import BlackDogSteps, {
   DEFAULT_BLACK_DOG_STEPS,
 } from "@/components/BlackDogSteps";
 import { getAppContent } from "@/lib/supabase/appContent";
-import DiscountProducts from "@/components/DiscountProducts";
+import SpecialDiscountSlot from "@/components/SpecialDiscountSlot";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import LiveBackground from "@/components/LiveBackground";
@@ -119,7 +119,7 @@ export default function Home() {
         <LatestProducts />
         <BlackDogSteps data={blackDogData} />
         <CategoryShowcase data={categoryShowcaseData} />
-        <DiscountProducts />
+        <SpecialDiscountSlot />
         <CategoryGrid />
         <ContactSection />
         <NewsletterSection />

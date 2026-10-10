@@ -17,6 +17,7 @@ html:not(.dark):not(.light) body {
   --muted-light: #9CA3AF;
   --accent: #E84C4C;
   --accent-hover: #D63F3F;
+  color-scheme: light;
 }
 /* ═══ Dark Theme ═══ */
 .dark {
@@ -29,6 +30,7 @@ html:not(.dark):not(.light) body {
   --muted-light: #71717A;
   --accent: #E84C4C;
   --accent-hover: #D63F3F;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -67,45 +69,52 @@ html:not(.dark):not(.light) body {
   }
 }
 
-/* ═══ متن مشکی روی input ═══ */
+/* ═══ Inputs — پیرو تم ═══ */
 input,
 textarea,
 select {
-  color: #111827 !important;
-  -webkit-text-fill-color: #111827 !important;
-  caret-color: #111827 !important;
-  color-scheme: light !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground) !important;
+  color-scheme: inherit;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #9ca3af !important;
-  -webkit-text-fill-color: #9ca3af !important;
+  color: var(--muted) !important;
+  -webkit-text-fill-color: var(--muted) !important;
   opacity: 1 !important;
 }
 
 input:disabled,
 textarea:disabled,
 select:disabled {
-  color: #6b7280 !important;
-  -webkit-text-fill-color: #6b7280 !important;
-  background-color: #f3f4f6 !important;
+  color: var(--muted) !important;
+  -webkit-text-fill-color: var(--muted) !important;
+  opacity: 0.6 !important;
 }
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-text-fill-color: #111827 !important;
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: var(--foreground) !important;
   transition: background-color 5000s ease-in-out 0s !important;
-  caret-color: #111827 !important;
+  caret-color: var(--foreground) !important;
 }
 
+/* ادمین — همیشه تم روشن */
 .admin-modal {
-  color-scheme: light !important;
-  isolation: isolate !important;
+  color-scheme: light;
+  isolation: isolate;
+}
+
+.admin-modal input,
+.admin-modal textarea,
+.admin-modal select {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827 !important;
 }
 
 /* ═══ Scrollbar — استفاده از accent ═══ */
@@ -223,27 +232,4 @@ body.menu-drawer-open nav[dir="rtl"].pb-safe {
 /* جلوگیری از اسکرول بک‌گراند وقتی منو بازه */
 body.menu-drawer-open {
   overflow: hidden !important;
-}
-/* ═══ Override: متن input پیرو تم ═══ */
-input,
-textarea,
-select {
-  color: var(--foreground) !important;
-  -webkit-text-fill-color: var(--foreground) !important;
-  caret-color: var(--foreground) !important;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: var(--muted) !important;
-  -webkit-text-fill-color: var(--muted) !important;
-  opacity: 1 !important;
-}
-
-input:disabled,
-textarea:disabled,
-select:disabled {
-  color: var(--muted) !important;
-  -webkit-text-fill-color: var(--muted) !important;
-  opacity: 0.6 !important;
 }
