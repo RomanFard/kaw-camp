@@ -205,7 +205,7 @@ const LED_BOX_STYLE: React.CSSProperties = {
   boxShadow: "inset 0 0 10px rgba(0,0,0,0.95)",
 };
 const LED_BOX_CLASS =
-  "w-full rounded border border-black px-1 py-1 text-center font-mono text-xs font-bold tracking-wider md:px-2 md:py-1.5 md:text-2xl lg:py-1.5 lg:text-xl";
+  "w-full rounded border border-black px-1 py-0.5 text-center font-mono text-xs font-bold tracking-wider md:px-2 md:py-1.5 md:text-2xl lg:py-1.5 lg:text-xl";
 
 function CodeInput({
   label,
@@ -276,7 +276,7 @@ function Led({ label, value }: { label: string; value: string }) {
 }
 
 const GEM_BTN =
-  "relative flex items-center justify-center overflow-hidden rounded-full px-1 py-2 text-center text-[10px] font-black text-white transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 md:py-3 md:text-sm";
+  "relative flex items-center justify-center overflow-hidden rounded-full px-1 py-1.5 text-center text-[10px] font-black text-white transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 md:py-3 md:text-sm";
 
 function Gem({ className, from, to }: { className: string; from: string; to: string }) {
   return (
@@ -644,7 +644,7 @@ export default function DiscountProducts({
   useEffect(() => {
     const md = window.matchMedia("(min-width: 768px)");
     const lg = window.matchMedia("(min-width: 1024px)");
-    const update = () => setCardH(lg.matches ? 140 : md.matches ? 170 : 118);
+    const update = () => setCardH(lg.matches ? 140 : md.matches ? 170 : 104);
     update();
     md.addEventListener("change", update);
     lg.addEventListener("change", update);
@@ -845,7 +845,7 @@ export default function DiscountProducts({
   const faceH = H - 6;
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden py-20 md:py-24 lg:py-20">
+    <section ref={sectionRef} className="relative overflow-hidden py-14 md:py-24 lg:py-20">
       <CasinoBackdrop />
       <style>{`
         @keyframes dpTwinkle{0%,100%{opacity:.15;transform:scale(.6) rotate(0deg)}50%{opacity:1;transform:scale(1.2) rotate(20deg)}}
@@ -924,7 +924,7 @@ export default function DiscountProducts({
           <Gem className="-bottom-1.5 right-5 h-4 w-4 md:-bottom-2 md:right-8 md:h-5 md:w-5" from="#d9a6ff" to="#4a1380" />
 
           <div
-            className="relative rounded-t-[38px] rounded-b-[21px] p-2.5 pt-5 md:rounded-t-[64px] md:rounded-b-[26px] md:p-4 md:pt-8 lg:rounded-t-[76px] lg:rounded-b-[28px] lg:p-4 lg:pt-9"
+            className="relative rounded-t-[38px] rounded-b-[21px] p-2 pt-4 md:rounded-t-[64px] md:rounded-b-[26px] md:p-4 md:pt-8 lg:rounded-t-[76px] lg:rounded-b-[28px] lg:p-4 lg:pt-9"
             style={{
               background:
                 "radial-gradient(120% 80% at 50% 0%, #3a1a5c 0%, #1c0d30 55%, #0f0719 100%)",
@@ -950,7 +950,7 @@ export default function DiscountProducts({
                 }}
               />
               <div
-                className="relative z-10 rounded-md px-3 py-2 text-center md:py-3.5"
+                className="relative z-10 rounded-md px-3 py-1.5 text-center md:py-3.5"
                 style={{
                   background: "linear-gradient(180deg,#a3213f,#5c0f2a)",
                   boxShadow:
@@ -958,7 +958,7 @@ export default function DiscountProducts({
                 }}
               >
                 <h2
-                  className="text-2xl font-black leading-tight md:text-5xl lg:text-4xl"
+                  className="text-xl font-black leading-tight md:text-5xl lg:text-4xl"
                   style={{
                     backgroundImage:
                       "linear-gradient(180deg,#fff7c2 0%,#ffd56b 45%,#c98f10 100%)",
@@ -970,15 +970,12 @@ export default function DiscountProducts({
                 >
                   تخفیف‌های ویژه
                 </h2>
-                <span className="mt-1 block text-[9px] font-bold tracking-[0.25em] text-[#ffe58a]/90 md:text-xs">
-                  ✦ گنجینه‌ی پیشنهادهای شگفت‌انگیز ✦
-                </span>
               </div>
             </div>
 
             {/* قاب حلقه‌ها */}
             <div
-              className="relative mt-3.5 rounded-lg p-1.5 md:mt-6 md:rounded-xl md:p-2.5 lg:mt-4"
+              className="relative mt-3 rounded-lg p-1.5 md:mt-6 md:rounded-xl md:p-2.5 lg:mt-4"
               style={{
                 background: GOLD,
                 boxShadow: "inset 0 0 6px rgba(0,0,0,0.6)",
@@ -1008,7 +1005,7 @@ export default function DiscountProducts({
                       <div
                         className="relative flex-1 overflow-hidden bg-[#0b0614]"
                         style={{
-                          height: H * 2.5,
+                          height: H * (H < 110 ? 2.3 : 2.5),
                           perspective: H * 3.2,
                           touchAction: "pan-y",
                         }}
@@ -1127,7 +1124,7 @@ export default function DiscountProducts({
 
             {/* پنل پایین */}
             <div
-              className="mt-3 rounded-lg border border-[#f7d56b]/25 p-2 md:mt-5 md:rounded-xl md:p-3.5 lg:mt-5 lg:grid lg:grid-cols-3 lg:gap-3 lg:p-3.5"
+              className="mt-2.5 rounded-lg border border-[#f7d56b]/25 p-1.5 md:mt-5 md:rounded-xl md:p-3.5 lg:mt-5 lg:grid lg:grid-cols-3 lg:gap-3 lg:p-3.5"
               style={{
                 background: "linear-gradient(180deg,#1b0d2e,#12081f)",
                 boxShadow: "inset 0 2px 10px rgba(0,0,0,0.7)",
@@ -1156,7 +1153,7 @@ export default function DiscountProducts({
                 />
               </div>
 
-              <div className="mt-2.5 grid grid-cols-3 gap-2 md:mt-4 md:gap-3 lg:col-span-2 lg:mt-0">
+              <div className="mt-2 grid grid-cols-3 gap-2 md:mt-4 md:gap-3 lg:col-span-2 lg:mt-0">
                 <div ref={catRef} className="relative">
                   <button
                     type="button"
@@ -1259,7 +1256,7 @@ export default function DiscountProducts({
                 type="button"
                 onClick={spin}
                 disabled={spinning}
-                className="dp-anim relative mt-3.5 flex w-full items-center justify-center gap-2 overflow-hidden rounded-full py-2.5 text-sm font-black tracking-wider text-white transition active:translate-y-[3px] disabled:cursor-not-allowed disabled:opacity-70 md:mt-5 md:py-4 md:text-xl lg:col-span-1 lg:mt-0 lg:py-3 lg:text-lg"
+                className="dp-anim relative mt-2.5 flex w-full items-center justify-center gap-2 overflow-hidden rounded-full py-2 text-sm font-black tracking-wider text-white transition active:translate-y-[3px] disabled:cursor-not-allowed disabled:opacity-70 md:mt-5 md:py-4 md:text-xl lg:col-span-1 lg:mt-0 lg:py-3 lg:text-lg"
                 style={{
                   background:
                     "radial-gradient(120% 140% at 50% 0%,#ff7a7a 0%,#e02828 45%,#8f0f1a 100%)",
