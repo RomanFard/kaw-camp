@@ -39,40 +39,39 @@ export default function ProductFilterSidebar({
   onOnlyOnSaleChange,
   onReset,
 }: Props) {
-  // درصد موقعیت thumb روی اسلایدر
   const percent = ((maxPrice - 100_000) / (MAX_PRICE - 100_000)) * 100;
 
   return (
     <div className="space-y-4">
       {/* Search */}
-      <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-4">
+      <div className="rounded-2xl border border-theme bg-theme-card p-4">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="جستجو در محصولات..."
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-zinc-600"
+          className="w-full rounded-lg border border-theme bg-theme-surface px-4 py-2.5 text-sm text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
         />
       </div>
 
-      {/* Categories — بدون محدودیت ارتفاع */}
-      <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-4">
-        <h3 className="mb-3 text-xs font-black text-white">دسته‌بندی‌ها</h3>
+      {/* Categories */}
+      <div className="rounded-2xl border border-theme bg-theme-card p-4">
+        <h3 className="mb-3 text-xs font-black text-theme">دسته‌بندی‌ها</h3>
         <div className="space-y-2.5">
           {categories.map((cat) => {
             const isActive = selectedCategories.includes(cat.key);
             return (
               <label
                 key={cat.key}
-                className="group flex cursor-pointer items-center gap-2.5 text-xs text-zinc-400 transition hover:text-white"
+                className="group flex cursor-pointer items-center gap-2.5 text-xs text-theme-muted transition hover:text-theme"
               >
                 <span
                   className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded-full border transition ${
-                    isActive ? "border-[#E84C4C]" : "border-zinc-600"
+                    isActive ? "border-accent" : "border-theme"
                   }`}
                 >
                   {isActive && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#E84C4C]" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                   )}
                 </span>
                 <input
@@ -88,27 +87,30 @@ export default function ProductFilterSidebar({
         </div>
       </div>
 
-      {/* Price — اسلایدر سفارشی */}
-      <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-4">
-        <h3 className="mb-3 text-xs font-black text-white">محدوده قیمت</h3>
+      {/* Price */}
+      <div className="rounded-2xl border border-theme bg-theme-card p-4">
+        <h3 className="mb-3 text-xs font-black text-theme">محدوده قیمت</h3>
 
-        <div className="relative pt-1 pb-1">
+        <div className="relative pb-1 pt-1">
           {/* Track خاکستری */}
-          <div className="absolute left-0 right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-zinc-700" />
+          <div className="absolute left-0 right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-theme-surface" />
 
-          {/* Track پر شده (کورال) */}
-          <div
-            className="absolute right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-[#E84C4C]"
-            style={{ width: `${100 - percent}%` }}
-          />
+{/* Track پر شده */}
+<div
+  className="absolute right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-accent transition-[width] duration-75"
+  style={{ width: `${percent}%` }}
+/>
 
-          {/* Thumb (دایره نارنجی) */}
-          <div
-            className="pointer-events-none absolute top-1/2 h-3 w-3 -translate-y-1/2 translate-x-1/2 rounded-full bg-[#E84C4C] shadow-lg shadow-[#E84C4C]/40"
-            style={{ right: `${100 - percent}%` }}
-          />
+{/* Thumb */}
+<div
+  className="pointer-events-none absolute top-1/2 h-4 w-4 rounded-full bg-accent shadow-lg shadow-accent/40 ring-2 ring-theme-card"
+  style={{
+    right: `${percent}%`,
+    transform: "translate(50%, -50%)",
+  }}
+/>
 
-          {/* Input نامرئی برای گرفتن کاربر */}
+          {/* Input نامرئی */}
           <input
             type="range"
             min={100_000}
@@ -121,25 +123,25 @@ export default function ProductFilterSidebar({
         </div>
 
         <div className="mt-2 flex items-center justify-between text-[11px]">
-          <span className="text-zinc-400">۰ تومان</span>
-          <span className="font-bold text-[#E84C4C]">
+          <span className="text-theme-muted">۰ تومان</span>
+          <span className="font-bold text-accent">
             {formatShort(maxPrice)} تومان
           </span>
         </div>
       </div>
 
       {/* Availability */}
-      <div className="rounded-2xl border border-zinc-800 bg-[#0A0A0A] p-4">
-        <h3 className="mb-3 text-xs font-black text-white">وضعیت کالا</h3>
+      <div className="rounded-2xl border border-theme bg-theme-card p-4">
+        <h3 className="mb-3 text-xs font-black text-theme">وضعیت کالا</h3>
         <div className="space-y-2.5">
-          <label className="group flex cursor-pointer items-center gap-2.5 text-xs text-zinc-400 transition hover:text-white">
+          <label className="group flex cursor-pointer items-center gap-2.5 text-xs text-theme-muted transition hover:text-theme">
             <span
               className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded border transition ${
-                onlyInStock ? "border-[#E84C4C]" : "border-zinc-600"
+                onlyInStock ? "border-accent" : "border-theme"
               }`}
             >
               {onlyInStock && (
-                <span className="h-1.5 w-1.5 rounded-sm bg-[#E84C4C]" />
+                <span className="h-1.5 w-1.5 rounded-sm bg-accent" />
               )}
             </span>
             <input
@@ -151,14 +153,14 @@ export default function ProductFilterSidebar({
             فقط کالاهای موجود
           </label>
 
-          <label className="group flex cursor-pointer items-center gap-2.5 text-xs text-zinc-400 transition hover:text-white">
+          <label className="group flex cursor-pointer items-center gap-2.5 text-xs text-theme-muted transition hover:text-theme">
             <span
               className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded border transition ${
-                onlyOnSale ? "border-[#E84C4C]" : "border-zinc-600"
+                onlyOnSale ? "border-accent" : "border-theme"
               }`}
             >
               {onlyOnSale && (
-                <span className="h-1.5 w-1.5 rounded-sm bg-[#E84C4C]" />
+                <span className="h-1.5 w-1.5 rounded-sm bg-accent" />
               )}
             </span>
             <input
@@ -175,11 +177,10 @@ export default function ProductFilterSidebar({
       {/* Reset */}
       <button
         onClick={onReset}
-        className="w-full rounded-lg border border-zinc-800 bg-[#0A0A0A] py-2.5 text-xs font-bold text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-white"
+        className="w-full rounded-lg border border-theme bg-theme-card py-2.5 text-xs font-bold text-theme-muted transition hover:bg-theme-surface hover:text-theme"
       >
         🔄 حذف فیلترها
       </button>
     </div>
   );
 }
-

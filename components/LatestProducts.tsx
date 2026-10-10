@@ -37,6 +37,9 @@ const PERSPECTIVE = 2400;
 
 const MOBILE_MAX = 640;
 
+// 🆕 تأخیر شروع حرکت بعد از برداشتن دست/موس (میلی‌ثانیه)
+const RESUME_DELAY = 2000;
+
 const mod = (a: number, m: number) => ((a % m) + m) % m;
 const wrapP = (x: number, n: number) => mod(x + n / 2, n) - n / 2;
 
@@ -55,11 +58,15 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
   const posRef = useRef(0);
   const velRef = useRef(0);
   const targetRef = useRef<number | null>(null);
-  const pausedRef = useRef(false);
   const dotRef = useRef(0);
   const dragStartX = useRef<number | null>(null);
   const dragged = useRef(false);
+
+  // 🆕 پاز هوشمند
   const hoverRef = useRef(false);
+  const pauseUntilRef = useRef(0);
+  const activeCardIdxRef = useRef<number | null>(null);
+
   const reverseRef = useRef(reverse);
   reverseRef.current = reverse;
 
@@ -76,7 +83,6 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
   const n = photos.length;
   const isMobile = wrapW < MOBILE_MAX;
 
-  // 🆕 سایز کوچیک‌تر برای هر دو حالت
   const size = isMobile
     ? Math.round(Math.min(130, Math.max(80, wrapW * 0.28)))
     : Math.round(Math.min(240, Math.max(100, wrapW * 0.2)));
@@ -114,10 +120,25 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
 
       const angle = (p * STEP_DEG).toFixed(3);
       el.style.transform = `translate(-50%, -50%) rotateY(${angle}deg) translateZ(${R.toFixed(1)}px)`;
-      el.style.filter = beyond > 0.02 ? `blur(${(beyond * 3.2).toFixed(2)}px)` : "none";
+      el.style.filter =
+        beyond > 0.02 ? `blur(${(beyond * 3.2).toFixed(2)}px)` : "none";
       el.style.opacity = opacity.toFixed(3);
       el.style.pointerEvents = opacity > 0.3 ? "auto" : "none";
       el.style.setProperty("--t", textOpacity.toFixed(3));
+
+      // 🆕 زوم کارت فعال (فقط وقتی drag نمی‌کنیم)
+      const inner = el.firstElementChild as HTMLElement | null;
+      if (inner) {
+        const isActive =
+          activeCardIdxRef.current === i && dragStartX.current === null;
+        if (isActive) {
+          if (!inner.classList.contains("is-active"))
+            inner.classList.add("is-active");
+        } else {
+          if (inner.classList.contains("is-active"))
+            inner.classList.remove("is-active");
+        }
+      }
     }
 
     const d = mod(Math.round(pos), nn);
@@ -152,9 +173,15 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
         }
         velRef.current = 0;
       } else {
+        // 🆕 حرکت فقط وقتی hover نیست، drag نیست، و ۲ ثانیه گذشته
+        const canMove =
+          !hoverRef.current &&
+          dragStartX.current === null &&
+          Date.now() >= pauseUntilRef.current;
+
         const dir = reverseRef.current ? -1 : 1;
         const goal =
-          pausedRef.current || reduced || nRef.current < 2 ? 0 : SPEED * dir;
+          !canMove || reduced || nRef.current < 2 ? 0 : SPEED * dir;
         velRef.current += (goal - velRef.current) * (1 - Math.exp(-dt * 3));
         posRef.current += velRef.current * dt;
       }
@@ -193,7 +220,8 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
   const onPointerDown = (e: React.PointerEvent) => {
     dragStartX.current = e.clientX;
     dragged.current = false;
-    pausedRef.current = true;
+    hoverRef.current = true;
+    activeCardIdxRef.current = null; // 🆕 لغو زوم هنگام drag
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
@@ -206,7 +234,8 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
       }
     }
     dragStartX.current = null;
-    pausedRef.current = hoverRef.current;
+    // 🆕 بعد از drag، ۲ ثانیه صبر
+    pauseUntilRef.current = Date.now() + RESUME_DELAY;
   };
 
   return (
@@ -221,11 +250,33 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
           WebkitMaskImage: fadeMask,
           maskImage: fadeMask,
         }}
+        // 🆕 carousel-level hover
+        onPointerEnter={(e) => {
+          if (e.pointerType !== "mouse") return;
+          hoverRef.current = true;
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType !== "mouse") return;
+          hoverRef.current = false;
+          pauseUntilRef.current = Date.now() + RESUME_DELAY;
+          activeCardIdxRef.current = null;
+        }}
+        // 🆕 touch: شروع/پایان لمس روی کل carousel
+        onTouchStart={() => {
+          hoverRef.current = true;
+        }}
+        onTouchEnd={() => {
+          hoverRef.current = false;
+          pauseUntilRef.current = Date.now() + RESUME_DELAY;
+          activeCardIdxRef.current = null;
+        }}
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onPointerCancel={() => {
           dragStartX.current = null;
-          pausedRef.current = hoverRef.current;
+          hoverRef.current = false;
+          pauseUntilRef.current = Date.now() + RESUME_DELAY;
+          activeCardIdxRef.current = null;
         }}
       >
         <div
@@ -246,15 +297,22 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
                   cardRefs.current[i] = el;
                 }}
                 href="/products"
+                // 🆕 hover/touch روی هر کارت → بزرگ شه
                 onPointerEnter={(e) => {
                   if (e.pointerType !== "mouse") return;
-                  hoverRef.current = true;
-                  pausedRef.current = true;
+                  activeCardIdxRef.current = i;
                 }}
                 onPointerLeave={(e) => {
                   if (e.pointerType !== "mouse") return;
-                  hoverRef.current = false;
-                  pausedRef.current = dragStartX.current !== null;
+                  if (activeCardIdxRef.current === i)
+                    activeCardIdxRef.current = null;
+                }}
+                onTouchStart={() => {
+                  activeCardIdxRef.current = i;
+                }}
+                onTouchEnd={() => {
+                  if (activeCardIdxRef.current === i)
+                    activeCardIdxRef.current = null;
                 }}
                 onClick={(e) => {
                   if (dragged.current) {
@@ -270,49 +328,51 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
                   }
                 }}
                 draggable={false}
-                className="group absolute left-1/2 top-1/2 block overflow-hidden rounded-xl bg-theme-card"
+                className="group absolute left-1/2 top-1/2 block"
                 style={{
                   width: size,
                   height: size,
                   willChange: "transform, filter, opacity",
-                  boxShadow: "0 24px 50px -22px rgba(0,0,0,0.85)",
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imageSrc}
-                  alt={label}
-                  loading="lazy"
-                  draggable={false}
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    target.style.display = "none";
-                    const parent = target.parentElement;
-                    if (parent && !parent.querySelector(".fallback-emoji")) {
-                      const wrapper = document.createElement("div");
-                      wrapper.className =
-                        "fallback-emoji absolute inset-0 flex flex-col items-center justify-center gap-2 bg-theme-surface";
-                      wrapper.innerHTML = `<span style="font-size: 2rem">📦</span>`;
-                      parent.appendChild(wrapper);
-                    }
-                  }}
-                  className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
-                />
+                {/* 🆕 inner wrapper برای زوم نرم */}
+                <div className="kaw-card-inner">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imageSrc}
+                    alt={label}
+                    loading="lazy"
+                    draggable={false}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.style.display = "none";
+                      const parent = target.parentElement;
+                      if (parent && !parent.querySelector(".fallback-emoji")) {
+                        const wrapper = document.createElement("div");
+                        wrapper.className =
+                          "fallback-emoji absolute inset-0 flex flex-col items-center justify-center gap-2 bg-theme-surface";
+                        wrapper.innerHTML = `<span style="font-size: 2rem">📦</span>`;
+                        parent.appendChild(wrapper);
+                      }
+                    }}
+                    className="h-full w-full object-cover object-center"
+                  />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-                <div
-                  dir="rtl"
-                  className="absolute bottom-0 left-0 right-0 p-2 md:p-3"
-                  style={{ opacity: "var(--t, 1)" }}
-                >
-                  <div className="mb-1 h-[2px] w-6 bg-accent md:mb-1.5" />
-                  <h3 className="text-[10px] font-black text-white md:text-xs">
-                    {label}
-                  </h3>
-                  <p className="mt-0.5 text-[8px] font-bold text-accent md:text-[10px]">
-                    مشاهده محصولات
-                  </p>
+                  <div
+                    dir="rtl"
+                    className="absolute bottom-0 left-0 right-0 p-2 md:p-3"
+                    style={{ opacity: "var(--t, 1)" }}
+                  >
+                    <div className="mb-1 h-[2px] w-6 bg-accent md:mb-1.5" />
+                    <h3 className="text-[10px] font-black text-white md:text-xs">
+                      {label}
+                    </h3>
+                    <p className="mt-0.5 text-[8px] font-bold text-accent md:text-[10px]">
+                      مشاهده محصولات
+                    </p>
+                  </div>
                 </div>
               </a>
             );
@@ -355,6 +415,38 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
           />
         ))}
       </div>
+
+      {/* 🆕 استایل inner card */}
+      <style jsx>{`
+        .kaw-card-inner {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          border-radius: 0.75rem;
+          transform: scale(1);
+          transform-origin: center center;
+          transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+            box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+          box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.85);
+          will-change: transform;
+        }
+        .kaw-card-inner.is-active {
+          transform: scale(1.18);
+          box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.85),
+            0 0 28px rgba(232, 76, 76, 0.45);
+          z-index: 10;
+        }
+        @media (max-width: 640px) {
+          .kaw-card-inner.is-active {
+            transform: scale(1.2);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .kaw-card-inner {
+            transition: none;
+          }
+        }
+      `}</style>
     </div>
   );
 }

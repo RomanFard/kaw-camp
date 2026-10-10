@@ -1,10 +1,10 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ProductPageClient from "@/components/ProductPageClient";
+import ProductPageClient from "@/components/products/ProductPageClient";
 import { useProducts } from "@/components/context/ProductsContext";
 
 export default function ProductPage({
@@ -16,6 +16,11 @@ export default function ProductPage({
   const { products, loading } = useProducts();
 
   const product = products.find((p) => p.id === id);
+
+  // 🆕 اسکرول به بالا هر بار که id عوض می‌شه
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   if (loading) {
     return (
@@ -40,7 +45,7 @@ export default function ProductPage({
           </p>
           <Link
             href="/products"
-            className="mt-6 inline-block rounded-lg bg-[#E84C4C] px-6 py-3 font-bold text-white transition hover:bg-[#D63F3F]"
+            className="mt-6 inline-block rounded-lg bg-accent px-6 py-3 font-bold text-white transition hover:bg-accent-hover"
           >
             بازگشت به محصولات
           </Link>
@@ -56,11 +61,11 @@ export default function ProductPage({
 
       <div className="mx-auto max-w-7xl px-6 py-6 md:px-8 md:py-10">
         <nav className="mb-5 text-sm text-theme-muted">
-          <Link href="/" className="transition hover:text-[#E84C4C]">
+          <Link href="/" className="transition hover:text-accent">
             خانه
           </Link>
           <span className="mx-2">/</span>
-          <Link href="/products" className="transition hover:text-[#E84C4C]">
+          <Link href="/products" className="transition hover:text-accent">
             محصولات
           </Link>
           <span className="mx-2">/</span>

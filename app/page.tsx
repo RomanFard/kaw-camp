@@ -120,7 +120,7 @@ export default function Home() {
         <LatestProducts />
         <BlackDogSteps data={blackDogData} />
         <BrandShowcase />
-        <CategoryShowcase data={categoryShowcaseData} />
+        
         <SpecialDiscountSlot />
         <CategoryGrid />
         <ContactSection />

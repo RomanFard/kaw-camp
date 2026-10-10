@@ -50,7 +50,6 @@ export default function ProductGridCard({ product }: { product: Product }) {
     e.preventDefault();
     e.stopPropagation();
 
-    // اگه داشت اضافه میشد، انیمیشن نشون بده
     if (!inWishlist && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const target = getTargetPosition();
@@ -72,10 +71,10 @@ export default function ProductGridCard({ product }: { product: Product }) {
     <>
       <a
         href={`/product/${product.id}`}
-        className="group relative block overflow-hidden rounded-xl border border-zinc-800 bg-[#0A0A0A] transition duration-300 hover:border-zinc-700"
+        className="group relative block overflow-hidden rounded-xl border border-theme bg-theme-card transition duration-300 hover:border-accent/60 hover:shadow-lg hover:shadow-accent/10"
       >
         {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden bg-zinc-950">
+        <div className="relative aspect-[4/3] overflow-hidden bg-theme-surface">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image}
@@ -85,7 +84,7 @@ export default function ProductGridCard({ product }: { product: Product }) {
           />
 
           {discount > 0 && (
-            <span className="absolute right-2 top-2 rounded bg-[#E84C4C] px-2 py-0.5 text-[10px] font-black text-white shadow-lg">
+            <span className="absolute right-2 top-2 rounded bg-accent px-2 py-0.5 text-[10px] font-black text-white shadow-lg">
               {discount}٪
             </span>
           )}
@@ -99,21 +98,21 @@ export default function ProductGridCard({ product }: { product: Product }) {
 
         {/* Content */}
         <div className="p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-500">
+          <p className="text-[9px] font-bold uppercase tracking-wider text-theme-muted">
             {product.brand || product.category}
           </p>
-          <h3 className="mt-1 line-clamp-1 text-xs font-bold text-white md:text-sm">
+          <h3 className="mt-1 line-clamp-1 text-xs font-bold text-theme md:text-sm">
             {product.name}
           </h3>
 
           <div className="mt-2.5 flex items-center justify-between gap-2">
             <div className="flex flex-col">
               {product.oldPrice && (
-                <span className="text-[10px] text-zinc-600 line-through">
+                <span className="text-[10px] text-theme-muted line-through">
                   {formatPrice(product.oldPrice)}
                 </span>
               )}
-              <span className="text-xs font-black text-white md:text-sm">
+              <span className="text-xs font-black text-theme md:text-sm">
                 {formatPrice(product.price)}
               </span>
             </div>
@@ -127,7 +126,7 @@ export default function ProductGridCard({ product }: { product: Product }) {
               className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border transition ${
                 inWishlist
                   ? "border-red-500 bg-red-500 text-white"
-                  : "border-zinc-700 bg-transparent text-zinc-400 hover:border-red-500 hover:text-red-500"
+                  : "border-theme bg-transparent text-theme-muted hover:border-red-500 hover:text-red-500"
               }`}
             >
               <svg
@@ -198,4 +197,3 @@ export default function ProductGridCard({ product }: { product: Product }) {
     </>
   );
 }
-

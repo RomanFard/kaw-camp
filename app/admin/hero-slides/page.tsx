@@ -192,7 +192,7 @@ export default function HeroSlidesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050505]">
+    <main className="min-h-screen bg-theme">
       <div className="mx-auto max-w-6xl px-6 py-8">
         {/* Header */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">

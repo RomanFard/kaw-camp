@@ -7,22 +7,54 @@ export default function ScrollToHash() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const cat = searchParams.get("cat");
+  const sort = searchParams.get("sort");
+  const search = searchParams.get("q");
 
   useEffect(() => {
-    // فقط در موبایل و وقتی cat داریم
-    if (typeof window === "undefined") return;
-    if (window.innerWidth >= 768) return;
-    if (!cat) return;
+    const hasFilter = cat || sort || search;
+    if (!hasFilter) return;
 
-    const timer = setTimeout(() => {
+    let cancelled = false;
+    let attempts = 0;
+
+    function tryScroll() {
+      if (cancelled) return;
+
       const el = document.getElementById("products-list");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 300);
+      console.log("🔍 Attempt", attempts, "| found:", !!el);
 
-    return () => clearTimeout(timer);
-  }, [pathname, cat]);
+      if (el) {
+        const isMobile = window.innerWidth < 768;
+        const offset = isMobile ? 90 : 20;
+        const targetY =
+          el.getBoundingClientRect().top + window.scrollY - offset;
+
+        console.log("📏 targetY:", targetY, "| scrollY before:", window.scrollY);
+
+        // خاموش کردن smooth موقتاً
+        const html = document.documentElement;
+        html.style.scrollBehavior = "auto";
+        window.scrollTo(0, targetY);
+        console.log("✅ scrollY after:", window.scrollY);
+
+        setTimeout(() => {
+          html.style.scrollBehavior = "";
+        }, 300);
+        return;
+      }
+
+      attempts++;
+      if (attempts < 30) {
+        setTimeout(tryScroll, 100);
+      }
+    }
+
+    setTimeout(tryScroll, 300);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname, cat, sort, search]);
 
   return null;
 }

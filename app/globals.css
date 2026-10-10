@@ -52,13 +52,13 @@ html:not(.dark):not(.light) body {
     box-sizing: border-box;
     min-width: 0;
   }
-  html {
+    html {
     scroll-behavior: smooth;
-    overflow-x: clip;
+    overflow-x: hidden;   /* 🆕 به جای clip */
     scrollbar-color: var(--accent) var(--background);
   }
   body {
-    overflow-x: clip;
+    overflow-x: hidden;   /* 🆕 به جای clip */
     width: 100%;
     max-width: 100%;
     position: relative;

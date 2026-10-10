@@ -53,6 +53,7 @@ export default function ThemeAdminPage() {
     root.style.setProperty("--accent", data.accent_color);
     root.style.setProperty("--accent-hover", data.accent_hover);
   }, [data?.accent_color, data?.accent_hover]);
+  
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -76,7 +77,7 @@ export default function ThemeAdminPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#050505] p-12 text-center text-zinc-500">
+      <main className="min-h-screen bg-theme p-12 text-center text-zinc-500">
         در حال بارگذاری...
       </main>
     );
@@ -84,7 +85,7 @@ export default function ThemeAdminPage() {
 
   if (!data) {
     return (
-      <main className="min-h-screen bg-[#050505] p-12 text-center">
+      <main className="min-h-screen bg-theme p-12 text-center">
         <p className="text-red-500">تنظیمات پیدا نشد. اول SQL رو اجرا کن.</p>
         <a
           href="/admin"
@@ -97,7 +98,7 @@ export default function ThemeAdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050505]">
+    <main className="min-h-screen bg-theme">
       <div className="mx-auto max-w-5xl px-6 py-8">
         {/* Header */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">

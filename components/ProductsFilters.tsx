@@ -35,8 +35,8 @@ export default function ProductsFilters({
   const filterContent = (
     <>
       {/* فیلتر قیمت */}
-      <div className="mb-6 border-b border-[#EDE4CE] pb-6">
-        <h3 className="mb-4 text-sm font-bold text-gray-900">
+      <div className="mb-6 border-b border-theme pb-6">
+        <h3 className="mb-4 text-sm font-bold text-theme">
           فیلتر بر اساس قیمت
         </h3>
 
@@ -49,7 +49,7 @@ export default function ProductsFilters({
             step={100_000}
             value={minPrice}
             onChange={(e) => setMinPrice(Number(e.target.value))}
-            className="w-full accent-amber-500"
+            className="kaw-range w-full"
           />
           <input
             type="range"
@@ -58,13 +58,13 @@ export default function ProductsFilters({
             step={100_000}
             value={maxPrice}
             onChange={(e) => setMaxPrice(Number(e.target.value))}
-            className="w-full accent-amber-500"
+            className="kaw-range w-full"
           />
         </div>
 
         <div className="mb-3 flex items-center justify-between text-xs">
-          <span className="text-gray-500">قیمت:</span>
-          <span className="font-bold text-gray-800">
+          <span className="text-theme-muted">قیمت:</span>
+          <span className="font-bold text-theme">
             {formatPrice(minPrice)} — {formatPrice(maxPrice)}
           </span>
         </div>
@@ -72,23 +72,23 @@ export default function ProductsFilters({
         <button
           type="button"
           onClick={applyFilters}
-          className="w-full rounded-lg bg-gray-100 py-2 text-xs font-bold text-gray-700 transition hover:bg-amber-500 hover:text-white"
+          className="w-full rounded-lg bg-theme-surface py-2 text-xs font-bold text-theme transition hover:bg-accent hover:text-white"
         >
           صافی
         </button>
       </div>
 
       {/* فیلتر موجودی */}
-      <div className="mb-6 border-b border-[#EDE4CE] pb-6">
-        <h3 className="mb-4 text-sm font-bold text-gray-900">وضعیت کالا</h3>
+      <div className="mb-6 border-b border-theme pb-6">
+        <h3 className="mb-4 text-sm font-bold text-theme">وضعیت کالا</h3>
         <label className="mb-3 flex cursor-pointer items-center gap-2 text-sm">
           <input
             type="checkbox"
             checked={inStockOnly}
             onChange={(e) => setInStockOnly(e.target.checked)}
-            className="h-4 w-4 accent-amber-500"
+            className="h-4 w-4 accent-[color:var(--accent)]"
           />
-          <span className="text-gray-700">فقط کالاهای موجود</span>
+          <span className="text-theme">فقط کالاهای موجود</span>
         </label>
 
         <label className="flex cursor-pointer items-center gap-2 text-sm">
@@ -96,9 +96,9 @@ export default function ProductsFilters({
             type="checkbox"
             checked={onSaleOnly}
             onChange={(e) => setOnSaleOnly(e.target.checked)}
-            className="h-4 w-4 accent-amber-500"
+            className="h-4 w-4 accent-[color:var(--accent)]"
           />
-          <span className="text-gray-700">فقط کالاهای تخفیف‌دار</span>
+          <span className="text-theme">فقط کالاهای تخفیف‌دار</span>
         </label>
       </div>
 
@@ -106,7 +106,7 @@ export default function ProductsFilters({
       <button
         type="button"
         onClick={applyFilters}
-        className="mb-2 w-full rounded-lg bg-amber-500 py-2.5 text-sm font-bold text-white transition hover:bg-amber-600"
+        className="mb-2 w-full rounded-lg bg-accent py-2.5 text-sm font-bold text-white transition hover:bg-accent-hover"
       >
         اعمال فیلتر
       </button>
@@ -114,7 +114,7 @@ export default function ProductsFilters({
       <button
         type="button"
         onClick={resetFilters}
-        className="w-full rounded-lg border border-[#E8DFC8] py-2.5 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
+        className="w-full rounded-lg border border-theme py-2.5 text-sm font-bold text-theme transition hover:bg-theme-surface"
       >
         حذف فیلترها
       </button>
@@ -127,7 +127,7 @@ export default function ProductsFilters({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 rounded-lg bg-blue-800 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-900 lg:hidden"
+        className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white transition hover:bg-accent-hover lg:hidden"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -157,17 +157,17 @@ export default function ProductsFilters({
       {/* دراور فیلتر موبایل */}
       <aside
         className={
-          "fixed right-0 top-0 z-[210] h-screen w-[85vw] max-w-[350px] overflow-y-auto bg-white p-5 shadow-2xl transition-transform duration-300 lg:hidden " +
+          "fixed right-0 top-0 z-[210] h-screen w-[85vw] max-w-[350px] overflow-y-auto bg-theme-card p-5 shadow-2xl transition-transform duration-300 lg:hidden " +
           (isOpen ? "translate-x-0" : "translate-x-full")
         }
         dir="rtl"
       >
-        <div className="mb-5 flex items-center justify-between border-b border-[#EDE4CE] pb-3">
-          <span className="text-base font-black text-amber-600">فیلترها</span>
+        <div className="mb-5 flex items-center justify-between border-b border-theme pb-3">
+          <span className="text-base font-black text-accent">فیلترها</span>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-xl text-gray-500 transition hover:bg-gray-100"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-xl text-theme-muted transition hover:bg-theme-surface"
           >
             ✕
           </button>
@@ -177,8 +177,8 @@ export default function ProductsFilters({
       </aside>
 
       {/* سایدبار فیلتر دسکتاپ */}
-      <div className="hidden rounded-2xl border border-[#E8DFC8] bg-white p-5 shadow-sm lg:block">
-        <h3 className="mb-4 border-b border-[#EDE4CE] pb-3 text-base font-black text-amber-600">
+      <div className="hidden rounded-2xl border border-theme bg-theme-card p-5 shadow-sm lg:block">
+        <h3 className="mb-4 border-b border-theme pb-3 text-base font-black text-accent">
           فیلترها
         </h3>
         {filterContent}
