@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ImageUploader from "@/components/admin/ImageUploader";
 import GalleryManager from "@/components/admin/GalleryManager";
 import ColorManager, { type ColorItem } from "@/components/admin/ColorManager";
 import SizeManager, { type SizeItem } from "@/components/admin/SizeManager";
 import SpecsManager, { type ProductSpec } from "@/components/admin/SpecsManager";
+import AttributesPicker from "@/components/admin/AttributesPicker";
 import type { Category } from "@/data/products";
+import type { Brand } from "@/lib/supabase/brands";
+import type { Attribute } from "@/lib/supabase/attributes";
 
 export type ProductFormData = {
   id: string;
@@ -15,7 +18,7 @@ export type ProductFormData = {
   englishName: string;
   price: string;
   oldPrice: string;
-  costPrice: string; // 💰 قیمت خرید (برای محاسبه سود)
+  costPrice: string;
   category: Category;
   image: string;
   images: string[];
@@ -28,7 +31,7 @@ export type ProductFormData = {
   brand: string;
   colors: ColorItem[];
   sizes: SizeItem[];
-  specs?: ProductSpec[]; // 🆕 مشخصات فنی
+  specs?: ProductSpec[];
 };
 
 const inputCls =
@@ -39,11 +42,182 @@ const inputLtrCls =
 
 type TabType = "general" | "media" | "specs" | "variants" | "details";
 
+/* ═══════════════════════════════════════════
+   BrandCombobox — dropdown سفارشی
+   ═══════════════════════════════════════════ */
+function BrandCombobox({
+  value,
+  onChange,
+  brands,
+  inputCls: cls,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  brands: Brand[];
+  inputCls: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", onClickOutside);
+      return () => document.removeEventListener("mousedown", onClickOutside);
+    }
+  }, [open]);
+
+  const activeBrands = brands.filter((b) => b.is_active);
+
+  const filtered = query.trim()
+    ? activeBrands.filter((b) =>
+        b.name.toLowerCase().includes(query.toLowerCase())
+      )
+    : activeBrands;
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <div className="relative">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => {
+            setQuery("");
+            setOpen(true);
+          }}
+          dir="ltr"
+          placeholder="Naturehike"
+          className={`${cls} pl-9`}
+        />
+        <button
+          type="button"
+          onClick={() => {
+            setQuery("");
+            setOpen((s) => !s);
+          }}
+          className="absolute left-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg text-theme-muted transition hover:bg-theme-card hover:text-theme"
+          aria-label="نمایش لیست برندها"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            className={`h-3.5 w-3.5 transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {open && (
+        <div className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-theme bg-theme-card p-1 shadow-2xl">
+          {filtered.length === 0 && !query.trim() && (
+            <div className="px-3 py-3 text-center text-[11px] text-theme-muted">
+              برندی ثبت نشده —{" "}
+              <a
+                href="/admin/brands"
+                target="_blank"
+                className="text-accent underline"
+              >
+                افزودن برند
+              </a>
+            </div>
+          )}
+
+          {filtered.length === 0 && query.trim() && (
+            <button
+              type="button"
+              onClick={() => {
+                onChange(query.trim());
+                setOpen(false);
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-right text-xs text-theme transition hover:bg-theme-surface"
+            >
+              <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                ➕
+              </span>
+              <span>
+                استفاده از «<span className="font-bold">{query}</span>» به‌عنوان
+                برند جدید
+              </span>
+            </button>
+          )}
+
+          {filtered.map((b) => (
+            <button
+              key={b.id}
+              type="button"
+              onClick={() => {
+                onChange(b.name);
+                setOpen(false);
+              }}
+              className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-right transition hover:bg-theme-surface ${
+                value === b.name ? "bg-accent/10" : ""
+              }`}
+            >
+              <span className="flex h-8 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border border-theme bg-theme-surface p-0.5">
+                {b.logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={b.logo}
+                    alt={b.name}
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-[9px] text-theme-muted">—</span>
+                )}
+              </span>
+              <span className="flex-1 text-xs font-bold text-theme">
+                {b.name}
+              </span>
+              {value === b.name && (
+                <span className="text-xs text-accent">✓</span>
+              )}
+            </button>
+          ))}
+
+          <div className="mt-1 border-t border-theme pt-1">
+            <a
+              href="/admin/brands"
+              target="_blank"
+              rel="noreferrer"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-right text-[11px] text-theme-muted transition hover:bg-theme-surface hover:text-theme"
+            >
+              <span>⚙️</span>
+              <span>مدیریت برندها</span>
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProductModal({
   open,
   editingId,
   initialData,
   categories,
+  brands = [],
+  attributes = [],
   saving,
   error,
   onClose,
@@ -53,6 +227,8 @@ export default function ProductModal({
   editingId: string | null;
   initialData: ProductFormData;
   categories: { key: string; label: string; emoji: string }[];
+  brands?: Brand[];
+  attributes?: Attribute[];
   saving: boolean;
   error: string;
   onClose: () => void;
@@ -91,7 +267,7 @@ export default function ProductModal({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
     >
       <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-theme bg-theme-card text-theme shadow-2xl">
-        {/* هدر مودال */}
+        {/* هدر */}
         <div className="flex items-center justify-between border-b border-theme px-6 py-4">
           <h2 className="text-base font-black text-theme">
             {editingId ? "✏️ ویرایش محصول" : "➕ افزودن محصول جدید"}
@@ -105,26 +281,28 @@ export default function ProductModal({
           </button>
         </div>
 
-        {/* نوار تب‌ها */}
-        <div className="flex items-center gap-1 overflow-x-auto border-b border-theme bg-theme-surface/50 px-4 py-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-bold transition ${
-                activeTab === tab.id
-                  ? "bg-accent text-white shadow-sm"
-                  : "text-theme-muted hover:bg-theme-surface hover:text-theme"
-              }`}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-            </button>
-          ))}
+        {/* تب‌ها */}
+        <div className="border-b border-theme bg-theme-surface/50">
+          <div className="flex items-center gap-2 overflow-x-auto px-4 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-bold transition ${
+                  activeTab === tab.id
+                    ? "bg-accent text-white shadow-sm"
+                    : "text-theme-muted hover:bg-theme-surface hover:text-theme"
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* بدنه فرم */}
+        {/* بدنه */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -132,8 +310,8 @@ export default function ProductModal({
           }}
           className="flex flex-1 flex-col overflow-hidden"
         >
-          <div className="flex-1 space-y-4 overflow-y-auto p-6">
-            {/* تب ۱: اطلاعات اصلی و قیمت */}
+          <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
+            {/* تب ۱ */}
             {activeTab === "general" && (
               <div className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -192,7 +370,6 @@ export default function ProductModal({
                   </div>
                 </div>
 
-                {/* قیمت‌ها */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className="mb-1.5 block text-xs font-bold text-theme-muted">
@@ -220,7 +397,6 @@ export default function ProductModal({
                   </div>
                 </div>
 
-                {/* 💰 قیمت خرید */}
                 <div>
                   <label className="mb-1.5 block text-xs font-bold text-theme-muted">
                     💰 قیمت خرید (تومان) — اختیاری
@@ -258,18 +434,29 @@ export default function ProductModal({
                       ))}
                     </select>
                   </div>
+
                   <div>
                     <label className="mb-1.5 block text-xs font-bold text-theme-muted">
                       برند
+                      {brands.filter((b) => b.is_active).length > 0 && (
+                        <span className="ml-1 text-[10px] font-normal">
+                          (
+                          {brands
+                            .filter((b) => b.is_active)
+                            .length.toLocaleString("fa-IR")}{" "}
+                          برند موجود)
+                        </span>
+                      )}
                     </label>
-                    <input
-                      type="text"
+                    <BrandCombobox
                       value={form.brand}
-                      onChange={(e) => update("brand", e.target.value)}
-                      dir="ltr"
-                      placeholder="Naturehike"
-                      className={inputLtrCls}
+                      onChange={(v) => update("brand", v)}
+                      brands={brands}
+                      inputCls={inputLtrCls}
                     />
+                    <p className="mt-1 text-[10px] text-theme-muted">
+                      💡 روی فلش ▾ بزن تا لیست برندها رو ببینی
+                    </p>
                   </div>
                 </div>
 
@@ -287,7 +474,7 @@ export default function ProductModal({
               </div>
             )}
 
-            {/* تب ۲: تصاویر و رسانه */}
+            {/* تب ۲ */}
             {activeTab === "media" && (
               <div className="space-y-5">
                 <ImageUploader
@@ -302,15 +489,24 @@ export default function ProductModal({
               </div>
             )}
 
-            {/* 🆕 تب ۳: مشخصات فنی */}
+            {/* 🆕 تب ۳ — مشخصات فنی */}
             {activeTab === "specs" && (
-              <SpecsManager
-                specs={form.specs ?? []}
-                onChange={(specs) => update("specs", specs)}
-              />
+              <div className="space-y-5">
+                <AttributesPicker
+                  attributes={attributes}
+                  specs={form.specs ?? []}
+                  onChange={(specs) => update("specs", specs)}
+                  category={form.category}
+                />
+
+                <SpecsManager
+                  specs={form.specs ?? []}
+                  onChange={(specs) => update("specs", specs)}
+                />
+              </div>
             )}
 
-            {/* تب ۴: ویژگی‌ها، رنگ‌ها و سایزها */}
+            {/* تب ۴ */}
             {activeTab === "variants" && (
               <div className="space-y-5">
                 <ColorManager
@@ -336,7 +532,7 @@ export default function ProductModal({
               </div>
             )}
 
-            {/* تب ۵: توضیحات و نظرات */}
+            {/* تب ۵ */}
             {activeTab === "details" && (
               <div className="space-y-4">
                 <div>
@@ -401,7 +597,7 @@ export default function ProductModal({
             )}
           </div>
 
-          {/* فوتر ثابت دکمه‌ها */}
+          {/* فوتر */}
           <div className="flex items-center gap-2 border-t border-theme bg-theme-surface/50 p-4">
             <button
               type="submit"

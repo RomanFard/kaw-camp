@@ -1,16 +1,18 @@
 export type Category =
   | "tent"
+  | "lighting"
+  | "cooking"
   | "sleep"
+  | "table" // 🆕 میز و صندلی
+  | "tools"
   | "mattress"
   | "backpack"
   | "clothing"
   | "shoes"
+  // ─── legacy (برای محصولات فعلی نگه داشته شده) ───
   | "socks"
   | "gaiters"
-  | "tools"
-  | "lighting"
   | "bottle"
-  | "cooking"
   | "sunglasses"
   | "watch"
   | "bicycle"
@@ -57,23 +59,30 @@ export type Product = {
   sizes?: ProductSize[];
 };
 
+// ═══════════════════════════════════════════
+// دسته‌بندی‌ها — هماهنگ با منوی سایت (megaMenu)
+// ═══════════════════════════════════════════
 export const categories: { key: Category; label: string; emoji: string }[] = [
-  { key: "tent",        label: "چادر",              emoji: "⛺" },
-  { key: "sleep",       label: "کیسه خواب",         emoji: "🛏️" },
-  { key: "mattress",    label: "زیرانداز",          emoji: "🟦" },
-  { key: "backpack",    label: "کوله پشتی",         emoji: "🎒" },
-  { key: "clothing",    label: "لباس کوهنوردی",     emoji: "🧥" },
-  { key: "shoes",       label: "کفش کوهنوردی",      emoji: "🥾" },
-  { key: "socks",       label: "جوراب",              emoji: "🧦" },
-  { key: "gaiters",     label: "گتر",                emoji: "🦵" },
-  { key: "tools",       label: "ابزار فنی",          emoji: "🧰" },
-  { key: "lighting",    label: "لامپ و چراغ",        emoji: "🔦" },
-  { key: "bottle",      label: "لیوان و قمقمه",      emoji: "🥤" },
-  { key: "cooking",     label: "لوازم پخت و پز",     emoji: "🍳" },
-  { key: "sunglasses",  label: "عینک",               emoji: "🕶️" },
-  { key: "watch",       label: "ساعت ورزشی",         emoji: "⌚" },
-  { key: "bicycle",     label: "دوچرخه",             emoji: "🚲" },
-  { key: "accessories", label: "اکسسوری",            emoji: "🎒" },
+  // ─── ۱۰ دسته اصلی (مطابق منوی سایت) ───
+  { key: "tent",        label: "چادر و سایبان",           emoji: "⛺" },
+  { key: "lighting",    label: "چراغ و روشنایی",          emoji: "🔦" },
+  { key: "cooking",     label: "پخت و پز",                emoji: "🍳" },
+  { key: "sleep",       label: "لوازم خواب و شب‌مانی",     emoji: "🛏️" },
+  { key: "table",       label: "میز و صندلی",             emoji: "🪑" },
+  { key: "tools",       label: "تجهیزات و ابزار",         emoji: "🧰" },
+  { key: "mattress",    label: "زیرانداز کمپینگ",         emoji: "🟦" },
+  { key: "backpack",    label: "کیف و کوله‌پشتی",        emoji: "🎒" },
+  { key: "clothing",    label: "پوشاک کوهنوردی",          emoji: "🧥" },
+  { key: "shoes",       label: "کفش کوهنوردی",            emoji: "🥾" },
+
+  // ─── legacy — برای محصولات فعلی ───
+  { key: "socks",       label: "جوراب",                    emoji: "🧦" },
+  { key: "gaiters",     label: "گتر",                      emoji: "🦵" },
+  { key: "bottle",      label: "لیوان و قمقمه",            emoji: "🥤" },
+  { key: "sunglasses",  label: "عینک",                     emoji: "🕶️" },
+  { key: "watch",       label: "ساعت ورزشی",               emoji: "⌚" },
+  { key: "bicycle",     label: "دوچرخه",                   emoji: "🚲" },
+  { key: "accessories", label: "اکسسوری",                  emoji: "🎒" },
 ];
 
 export const products: Product[] = [

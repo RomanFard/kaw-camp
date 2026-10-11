@@ -10,9 +10,62 @@ import SortDropdown from "@/components/products/SortDropdown";
 import { categories } from "@/data/products";
 import { useProducts } from "@/components/context/ProductsContext";
 import ScrollToHash from "@/components/ScrollToHash";
+import type { Product } from "@/data/products";
 
 const ITEMS_PER_PAGE = 12;
-const FALLBACK_MAX_PRICE = 2_000_000_000; // سقف اضطراری
+const FALLBACK_MAX_PRICE = 2_000_000_000;
+
+// 🆕 مپینگ URL param → برچسب‌های ممکن در specs
+const SPEC_FILTER_MAP: Record<string, string[]> = {
+  capacity: ["ظرفیت", "تعداد نفرات", "ظرفیت خواب", "ظرفیت نشستن"],
+  weight: ["وزن"],
+  material: ["جنس", "جنس بدنه", "پارچه"],
+  warranty: ["گارانتی"],
+  // هر کلید دیگه‌ای خواستی اضافه کن
+};
+
+// 🆕 تبدیل ارقام فارسی/عربی به انگلیسی
+function normalizeDigits(s: string): string {
+  const persian = "۰۱۲۳۴۵۶۷۸۹";
+  const arabic = "٠١٢٣٤٥٦٧٨٩";
+  return s.replace(/[۰-۹٠-٩]/g, (d) => {
+    const pi = persian.indexOf(d);
+    if (pi !== -1) return String(pi);
+    const ai = arabic.indexOf(d);
+    if (ai !== -1) return String(ai);
+    return d;
+  });
+}
+
+// 🆕 استخراج اعداد از یک رشته
+function extractNumbers(s: string): number[] {
+  const normalized = normalizeDigits(s);
+  const matches = normalized.match(/\d+/g) || [];
+  return matches.map(Number);
+}
+
+// 🆕 مقایسهٔ مقدار spec با مقدار URL
+function matchesSpecValue(productValue: string, targetValue: string): boolean {
+  const productNums = extractNumbers(productValue);
+  const targetNums = extractNumbers(targetValue);
+
+  // اگه هیچ عددی نبود → string match
+  if (productNums.length === 0 || targetNums.length === 0) {
+    return normalizeDigits(productValue)
+      .toLowerCase()
+      .includes(normalizeDigits(targetValue).toLowerCase());
+  }
+
+  // تک عدد → باید دقیقاً باشه
+  if (targetNums.length === 1) {
+    return productNums.includes(targetNums[0]);
+  }
+
+  // رنج → هر عددی در بازه
+  const min = Math.min(...targetNums);
+  const max = Math.max(...targetNums);
+  return productNums.some((n) => n >= min && n <= max);
+}
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -28,17 +81,25 @@ function ProductsContent() {
 
   const cat = searchParams.get("cat");
   const sort = searchParams.get("sort") || "popular";
+  const brandParam = searchParams.get("brand");
 
-  // سقف قیمت داینامیک بر اساس محصولات واقعی
+  // 🆕 همهٔ پارامترهای spec filter از URL
+  const activeSpecFilters = useMemo(() => {
+    const filters: Record<string, string> = {};
+    Object.keys(SPEC_FILTER_MAP).forEach((key) => {
+      const value = searchParams.get(key);
+      if (value) filters[key] = value;
+    });
+    return filters;
+  }, [searchParams]);
+
   const priceCeiling = useMemo(() => {
     if (products.length === 0) return FALLBACK_MAX_PRICE;
     const highest = Math.max(...products.map((p) => p.price));
-    // رُند کردن به بالا به عدد «گرد» بعدی (مثلاً 199M → 200M)
     const magnitude = Math.pow(10, Math.floor(Math.log10(highest)));
     return Math.ceil(highest / magnitude) * magnitude;
   }, [products]);
 
-  // وقتی محصولات لود شدن، سقف اسلایدر رو به بالاترین قیمت واقعی ست کن
   useEffect(() => {
     if (products.length > 0) {
       setMaxPrice(priceCeiling);
@@ -51,11 +112,20 @@ function ProductsContent() {
 
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, selectedCategories, maxPrice, onlyInStock, onlyOnSale]);
+  }, [
+    searchQuery,
+    selectedCategories,
+    maxPrice,
+    onlyInStock,
+    onlyOnSale,
+    brandParam,
+    activeSpecFilters,
+  ]);
 
   const filtered = useMemo(() => {
     let result = [...products];
 
+    // فیلتر جستجو
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
@@ -66,15 +136,38 @@ function ProductsContent() {
       );
     }
 
+    // فیلتر دسته‌بندی
     if (selectedCategories.length > 0) {
       result = result.filter((p) => selectedCategories.includes(p.category));
     }
 
+    // 🆕 فیلتر برند (case-insensitive)
+    if (brandParam) {
+      const target = brandParam.toLowerCase();
+      result = result.filter(
+        (p) => (p.brand ?? "").toLowerCase() === target
+      );
+    }
+
+    // 🆕 فیلتر spec-based (capacity, weight, ...)
+    Object.entries(activeSpecFilters).forEach(([key, value]) => {
+      const labels = SPEC_FILTER_MAP[key];
+      if (!labels) return;
+      result = result.filter((p) => {
+        return (p.specs ?? []).some((spec) => {
+          if (!labels.includes(spec.label.trim())) return false;
+          return matchesSpecValue(spec.value, value);
+        });
+      });
+    });
+
+    // فیلتر قیمت
     result = result.filter((p) => p.price <= maxPrice);
 
     if (onlyInStock) result = result.filter((p) => p.inStock);
     if (onlyOnSale) result = result.filter((p) => p.oldPrice);
 
+    // مرتب‌سازی
     if (sort === "cheap") result.sort((a, b) => a.price - b.price);
     else if (sort === "expensive") result.sort((a, b) => b.price - a.price);
     else if (sort === "popular") result.sort((a, b) => b.rating - a.rating);
@@ -96,40 +189,31 @@ function ProductsContent() {
     onlyInStock,
     onlyOnSale,
     sort,
+    brandParam,
+    activeSpecFilters,
   ]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
   const paginated = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  // اسکرول نرم به لیست محصولات
   function scrollToList() {
     let cancelled = false;
     let attempts = 0;
-
     function tryScroll() {
       if (cancelled) return;
-
       const el = document.getElementById("products-list");
       if (el) {
         const isMobile = window.innerWidth < 768;
         const offset = isMobile ? 90 : 20;
         const targetY =
           el.getBoundingClientRect().top + window.scrollY - offset;
-
-        window.scrollTo({
-          top: targetY,
-          behavior: "smooth",
-        });
+        window.scrollTo({ top: targetY, behavior: "smooth" });
         return;
       }
-
       attempts++;
-      if (attempts < 20) {
-        window.setTimeout(tryScroll, 100);
-      }
+      if (attempts < 20) window.setTimeout(tryScroll, 100);
     }
-
     window.setTimeout(tryScroll, 250);
   }
 
@@ -148,7 +232,25 @@ function ProductsContent() {
     router.push("/products");
   }
 
-  // toggle category + اسکرول
+  // 🆕 حذف یک فیلتر URL
+  function removeUrlParam(key: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(key);
+    const qs = params.toString();
+    router.push(qs ? `/products?${qs}` : "/products");
+  }
+
+  // 🆕 لیست چیپ‌های فیلترهای فعال از URL
+  const activeChips: { key: string; label: string; value: string }[] = [];
+  if (brandParam) {
+    activeChips.push({ key: "brand", label: "برند", value: brandParam });
+  }
+  Object.entries(activeSpecFilters).forEach(([key, value]) => {
+    const labels = SPEC_FILTER_MAP[key];
+    const labelText = labels?.[0] ?? key;
+    activeChips.push({ key, label: labelText, value });
+  });
+
   function toggleCategory(key: string) {
     setSelectedCategories((prev) =>
       prev.includes(key) ? prev.filter((c) => c !== key) : [...prev, key]
@@ -156,7 +258,6 @@ function ProductsContent() {
     scrollToList();
   }
 
-  // 🆕 فقط قیمت → بدون اسکرول خودکار
   function handleMaxPriceChange(v: number) {
     setMaxPrice(v);
   }
@@ -210,9 +311,39 @@ function ProductsContent() {
           <SortDropdown value={sort} onChange={handleSortChange} />
         </div>
 
+        {/* 🆕 نوار چیپ‌های فیلتر فعال */}
+        {activeChips.length > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] text-theme-muted">
+              فیلترهای فعال:
+            </span>
+            {activeChips.map((chip) => (
+              <button
+                key={chip.key}
+                type="button"
+                onClick={() => removeUrlParam(chip.key)}
+                className="group flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[11px] font-bold text-accent transition hover:bg-accent/20"
+              >
+                <span>
+                  {chip.label}: {chip.value}
+                </span>
+                <span className="text-accent/70 group-hover:text-accent">
+                  ✕
+                </span>
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-[11px] text-theme-muted underline underline-offset-4 transition hover:text-theme"
+            >
+              حذف همه
+            </button>
+          </div>
+        )}
+
         {/* Layout */}
         <div className="grid gap-6 lg:grid-cols-[280px_1fr] lg:gap-8">
-          {/* Sidebar */}
           <aside className="lg:sticky lg:top-4 lg:h-fit">
             <ProductFilterSidebar
               searchQuery={searchQuery}
@@ -233,7 +364,6 @@ function ProductsContent() {
             />
           </aside>
 
-          {/* Grid */}
           <div
             id="products-list"
             className="flex min-h-[calc(100vh-300px)] scroll-mt-24 flex-col"
@@ -241,7 +371,9 @@ function ProductsContent() {
             {paginated.length === 0 ? (
               <div className="rounded-2xl border border-theme bg-theme-card p-12 text-center">
                 <p className="text-4xl">🔍</p>
-                <p className="mt-3 font-bold text-theme">محصولی یافت نشد</p>
+                <p className="mt-3 font-bold text-theme">
+                  محصولی با این فیلترها یافت نشد
+                </p>
                 <button
                   onClick={handleReset}
                   className="mt-4 rounded-lg bg-accent px-5 py-2 text-sm font-bold text-white transition hover:bg-accent-hover"
@@ -257,7 +389,6 @@ function ProductsContent() {
                   ))}
                 </div>
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="mt-auto flex items-center justify-center gap-2 pt-10">
                     <button

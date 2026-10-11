@@ -12,7 +12,7 @@ type NavItem = {
   badge?: number;
 };
 
-// 🆕 «داشبورد» از این لیست حذف شد چون دکمه بالای منو هست
+// 🆕 «داشبورد» از این لیست حذف شده چون دکمه بالای منو هست
 const NAV_ITEMS: NavItem[] = [
   { id: "products", label: "محصولات", icon: "📦", href: "/admin/products" },
   { id: "orders", label: "سفارشات", icon: "🛒", href: "/admin/orders" },
@@ -20,6 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: "accounting", label: "حسابداری", icon: "💰", href: "/admin/accounting" },
   { id: "categories", label: "دسته‌بندی‌ها", icon: "🖼️", href: "/admin/categories" },
   { id: "brands", label: "برندها", icon: "🏷️", href: "/admin/brands" },
+  { id: "attributes", label: "ویژگی‌ها", icon: "🎛️", href: "/admin/attributes" }, // 🆕
   { id: "hero-slides", label: "بنر اصلی", icon: "🎬", href: "/admin/hero-slides" },
   { id: "category-showcase", label: "ویترین بلک داگ", icon: "🐕", href: "/admin/category-showcase" },
   { id: "black-dog-steps", label: "مراحل برپا کردن", icon: "🏕️", href: "/admin/black-dog-steps" },
@@ -104,7 +105,7 @@ export default function AdminSidebar({
 
       {/* ─── منوی اصلی ─── */}
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {/* 🆕 آیتم داشبورد — فقط اینجا، با highlight */}
+        {/* 🆕 آیتم داشبورد — فقط این‌جا، با highlight */}
         <a
           href="/admin"
           onClick={onCloseMobileMenu}

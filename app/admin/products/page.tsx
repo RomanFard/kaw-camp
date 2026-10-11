@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import ProductModal, { type ProductFormData } from "@/components/admin/ProductModal";
+import ProductModal, {
+  type ProductFormData,
+} from "@/components/admin/ProductModal";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { formatPrice } from "@/lib/utils";
 import { useToast } from "@/components/context/ToastContext";
@@ -13,6 +15,10 @@ import {
   deleteProduct,
   generateNextProductId,
 } from "@/lib/supabase/products";
+// 🆕 برندها
+import { getAllBrands, type Brand } from "@/lib/supabase/brands";
+// 🆕 ویژگی‌ها
+import { getAllAttributes, type Attribute } from "@/lib/supabase/attributes";
 import {
   products as seedProducts,
   categories,
@@ -40,7 +46,7 @@ const EMPTY_FORM: ProductFormData = {
   brand: "",
   colors: [],
   sizes: [],
-  specs: [], // 🆕
+  specs: [],
 };
 
 export default function ProductsAdminPage() {
@@ -52,6 +58,12 @@ export default function ProductsAdminPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<Category | "all">("all");
 
+  // 🆕 برندها
+  const [brands, setBrands] = useState<Brand[]>([]);
+
+  // 🆕 ویژگی‌ها
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(EMPTY_FORM);
@@ -61,10 +73,17 @@ export default function ProductsAdminPage() {
   // state مربوط به منوی موبایل
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // 🆕 load همزمان محصولات، برندها و ویژگی‌ها
   async function load() {
     setLoading(true);
-    const data = await getAllProducts();
-    setProducts(data);
+    const [productsData, brandsData, attributesData] = await Promise.all([
+      getAllProducts(),
+      getAllBrands(),
+      getAllAttributes(),
+    ]);
+    setProducts(productsData);
+    setBrands(brandsData);
+    setAttributes(attributesData);
     setLoading(false);
   }
 
@@ -123,7 +142,7 @@ export default function ProductsAdminPage() {
         value: s.value,
         image: s.image,
       })),
-      specs: p.specs ?? [], // 🆕
+      specs: p.specs ?? [],
     });
     setFormError("");
     setModalOpen(true);
@@ -141,7 +160,6 @@ export default function ProductsAdminPage() {
     setSaving(true);
     const cleanImages = form.images.map((s) => s.trim()).filter(Boolean);
 
-    // 🆕 پاک‌سازی مشخصات فنی (حذف ردیف‌های خالی)
     const cleanSpecs = (form.specs ?? []).filter(
       (s) => s.label.trim() !== "" && s.value.trim() !== ""
     );
@@ -169,7 +187,7 @@ export default function ProductsAdminPage() {
       brand: form.brand.trim() || undefined,
       colors: form.colors.length > 0 ? form.colors : undefined,
       sizes: form.sizes.length > 0 ? form.sizes : undefined,
-      specs: cleanSpecs.length > 0 ? cleanSpecs : undefined, // 🆕
+      specs: cleanSpecs.length > 0 ? cleanSpecs : undefined,
     };
 
     let result;
@@ -242,7 +260,7 @@ export default function ProductsAdminPage() {
         english_name: p.englishName ?? null,
         colors: p.colors ?? null,
         sizes: p.sizes ?? null,
-        specs: p.specs ?? null, // 🆕
+        specs: p.specs ?? null,
       }))
     );
     toast.success("بازنشانی موفق!");
@@ -495,6 +513,8 @@ export default function ProductsAdminPage() {
           editingId={editingId}
           initialData={formData}
           categories={categories}
+          brands={brands}
+          attributes={attributes}
           saving={saving}
           error={formError}
           onClose={() => setModalOpen(false)}
