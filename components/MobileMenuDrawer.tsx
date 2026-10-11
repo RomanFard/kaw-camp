@@ -31,7 +31,6 @@ export default function MobileMenuDrawer({
     defaultMenu as MobileMenuCategory[]
   );
   const [searchOpen, setSearchOpen] = useState(false);
-  // 🆕 برای انیمیشن زیرمنو دسکتاپ
   const [submenuVisible, setSubmenuVisible] = useState(false);
   const { totalItems } = useCart();
 
@@ -68,7 +67,6 @@ export default function MobileMenuDrawer({
     };
   }, []);
 
-  // 🆕 انیمیشن ورود زیرمنو دسکتاپ (چپ به راست)
   useLayoutEffect(() => {
     if (view.type === "category") {
       requestAnimationFrame(() => setSubmenuVisible(true));
@@ -255,7 +253,6 @@ export default function MobileMenuDrawer({
         </header>
 
         <div className="flex-1 overflow-y-auto">
-          {/* 🆕 در دسکتاپ همیشه MainView نمایش داده می‌شه */}
           <div className={view.type === "category" ? "hidden md:block" : ""}>
             <MainView
               menuItems={menuItems}
@@ -265,7 +262,6 @@ export default function MobileMenuDrawer({
             />
           </div>
 
-          {/* 🆕 در موبایل، CategoryView جایگزین می‌شه */}
           {view.type === "category" && currentCategory && (
             <div className="md:hidden">
               <CategoryView
@@ -280,7 +276,7 @@ export default function MobileMenuDrawer({
         </div>
       </aside>
 
-      {/* ─── 🆕 پنل زیرمنو دسکتاپ (سمت چپ drawer) ─── */}
+      {/* ─── پنل زیرمنو دسکتاپ ─── */}
       {view.type === "category" && currentCategory && (
         <div
           dir="rtl"
@@ -654,9 +650,18 @@ function CategoryView({
         <CapacityFilter categoryKey={category.key} onApply={onClose} />
       )}
 
-      {category.photo && (
-        <div className="mt-6 flex flex-col items-center px-6">
-          <div className="w-full max-w-[240px] overflow-hidden rounded-xl border border-theme">
+      {/* 🆕 دکمهٔ «مشاهده همه» حالا بالا + تصویر پایین */}
+      <div className="mt-6 flex flex-col items-center px-6">
+        <Link
+          href={`/products?cat=${category.key}`}
+          onClick={onClose}
+          className="text-lg font-black tracking-tight text-theme transition hover:text-accent"
+        >
+          مشاهده همه {category.label}
+        </Link>
+
+        {category.photo && (
+          <div className="mt-5 w-full max-w-[240px] overflow-hidden rounded-xl border border-theme">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={category.photo}
@@ -664,16 +669,8 @@ function CategoryView({
               className="h-auto w-full object-cover"
             />
           </div>
-
-          <Link
-            href={`/products?cat=${category.key}`}
-            onClick={onClose}
-            className="mt-5 text-lg font-black tracking-tight text-theme transition hover:text-accent"
-          >
-            مشاهده همه {category.label}
-          </Link>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
