@@ -28,13 +28,19 @@ export type ProductSize = {
   image?: string;
 };
 
+// 🆕 مشخصات فنی — قابل اضافه کردن فیلد جدید
+export type ProductSpec = {
+  label: string;
+  value: string;
+};
+
 export type Product = {
   id: string;
   name: string;
   slug: string;
   price: number;
   oldPrice?: number;
-  costPrice?: number;   // 🆕 قیمت خرید (برای محاسبه سود)
+  costPrice?: number; // 🆕 قیمت خرید (برای محاسبه سود)
   category: Category;
   image: string;
   images?: string[];
@@ -46,6 +52,7 @@ export type Product = {
   features: string[];
   brand?: string;
   englishName?: string;
+  specs?: ProductSpec[]; // 🆕 مشخصات فنی سفارشی
   colors?: ProductColor[];
   sizes?: ProductSize[];
 };

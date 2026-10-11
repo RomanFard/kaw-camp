@@ -12,7 +12,7 @@ import { useProducts } from "@/components/context/ProductsContext";
 import ScrollToHash from "@/components/ScrollToHash";
 
 const ITEMS_PER_PAGE = 12;
-const MAX_PRICE = 50_000_000;
+const FALLBACK_MAX_PRICE = 2_000_000_000; // سقف اضطراری
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -21,13 +21,29 @@ function ProductsContent() {
 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
+  const [maxPrice, setMaxPrice] = useState(FALLBACK_MAX_PRICE);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [onlyInStock, setOnlyInStock] = useState(false);
   const [onlyOnSale, setOnlyOnSale] = useState(false);
 
   const cat = searchParams.get("cat");
   const sort = searchParams.get("sort") || "popular";
+
+  // سقف قیمت داینامیک بر اساس محصولات واقعی
+  const priceCeiling = useMemo(() => {
+    if (products.length === 0) return FALLBACK_MAX_PRICE;
+    const highest = Math.max(...products.map((p) => p.price));
+    // رُند کردن به بالا به عدد «گرد» بعدی (مثلاً 199M → 200M)
+    const magnitude = Math.pow(10, Math.floor(Math.log10(highest)));
+    return Math.ceil(highest / magnitude) * magnitude;
+  }, [products]);
+
+  // وقتی محصولات لود شدن، سقف اسلایدر رو به بالاترین قیمت واقعی ست کن
+  useEffect(() => {
+    if (products.length > 0) {
+      setMaxPrice(priceCeiling);
+    }
+  }, [priceCeiling, products.length]);
 
   useEffect(() => {
     if (cat) setSelectedCategories([cat]);
@@ -86,7 +102,7 @@ function ProductsContent() {
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
   const paginated = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  // 🆕 اسکرول نرم به لیست محصولات
+  // اسکرول نرم به لیست محصولات
   function scrollToList() {
     let cancelled = false;
     let attempts = 0;
@@ -101,7 +117,6 @@ function ProductsContent() {
         const targetY =
           el.getBoundingClientRect().top + window.scrollY - offset;
 
-        // 🆕 اسکرول نرم
         window.scrollTo({
           top: targetY,
           behavior: "smooth",
@@ -115,7 +130,6 @@ function ProductsContent() {
       }
     }
 
-    // صبر کن تا state آپدیت بشه و محصولات دوباره رندر بشن
     window.setTimeout(tryScroll, 250);
   }
 
@@ -127,14 +141,14 @@ function ProductsContent() {
 
   function handleReset() {
     setSearchQuery("");
-    setMaxPrice(MAX_PRICE);
+    setMaxPrice(priceCeiling);
     setSelectedCategories([]);
     setOnlyInStock(false);
     setOnlyOnSale(false);
     router.push("/products");
   }
 
-  // 🆕 toggle category + اسکرول
+  // toggle category + اسکرول
   function toggleCategory(key: string) {
     setSelectedCategories((prev) =>
       prev.includes(key) ? prev.filter((c) => c !== key) : [...prev, key]
@@ -142,10 +156,9 @@ function ProductsContent() {
     scrollToList();
   }
 
-  // 🆕 handlers فیلترها + اسکرول
+  // 🆕 فقط قیمت → بدون اسکرول خودکار
   function handleMaxPriceChange(v: number) {
     setMaxPrice(v);
-    scrollToList();
   }
 
   function handleOnlyInStockChange(v: boolean) {
@@ -209,6 +222,7 @@ function ProductsContent() {
               onToggleCategory={toggleCategory}
               minPrice={0}
               maxPrice={maxPrice}
+              maxPriceLimit={priceCeiling}
               onMinPriceChange={() => {}}
               onMaxPriceChange={handleMaxPriceChange}
               onlyInStock={onlyInStock}

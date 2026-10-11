@@ -23,6 +23,7 @@ export type ProductRow = {
   english_name: string | null;
   colors: { label: string; value: string; image?: string }[] | null;
   sizes: { label: string; value: string; image?: string }[] | null;
+  specs: { label: string; value: string }[] | null; // 🆕
   created_at?: string;
   updated_at?: string;
 };
@@ -50,6 +51,7 @@ export function rowToProduct(row: ProductRow): Product {
     englishName: row.english_name ?? undefined,
     colors: row.colors ?? undefined,
     sizes: row.sizes ?? undefined,
+    specs: row.specs ?? undefined, // 🆕
   };
 }
 
@@ -78,6 +80,7 @@ export function productToRow(
     english_name: p.englishName ?? null,
     colors: p.colors ?? null,
     sizes: p.sizes ?? null,
+    specs: p.specs ?? null, // 🆕
   };
 }
 

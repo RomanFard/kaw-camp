@@ -8,6 +8,7 @@ type Props = {
   onToggleCategory: (key: string) => void;
   minPrice: number;
   maxPrice: number;
+  maxPriceLimit: number; // 🆕 سقف اسلایدر (داینامیک)
   onMinPriceChange: (v: number) => void;
   onMaxPriceChange: (v: number) => void;
   onlyInStock: boolean;
@@ -17,9 +18,11 @@ type Props = {
   onReset: () => void;
 };
 
-const MAX_PRICE = 50_000_000;
+const SLIDER_MIN = 100_000;
 
 function formatShort(n: number): string {
+  if (n >= 1_000_000_000)
+    return `${(n / 1_000_000_000).toLocaleString("fa-IR")}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toLocaleString("fa-IR")}M`;
   if (n >= 1_000) return `${(n / 1_000).toLocaleString("fa-IR")}K`;
   return n.toLocaleString("fa-IR");
@@ -31,7 +34,10 @@ export default function ProductFilterSidebar({
   categories,
   selectedCategories,
   onToggleCategory,
+  minPrice,
   maxPrice,
+  maxPriceLimit,
+  onMinPriceChange,
   onMaxPriceChange,
   onlyInStock,
   onOnlyInStockChange,
@@ -39,7 +45,11 @@ export default function ProductFilterSidebar({
   onOnlyOnSaleChange,
   onReset,
 }: Props) {
-  const percent = ((maxPrice - 100_000) / (MAX_PRICE - 100_000)) * 100;
+  // محاسبهٔ درصد بر اساس سقف داینامیک
+  const percent =
+    maxPriceLimit > SLIDER_MIN
+      ? ((maxPrice - SLIDER_MIN) / (maxPriceLimit - SLIDER_MIN)) * 100
+      : 100;
 
   return (
     <div className="space-y-4">
@@ -92,33 +102,48 @@ export default function ProductFilterSidebar({
         <h3 className="mb-3 text-xs font-black text-theme">محدوده قیمت</h3>
 
         <div className="relative pb-1 pt-1">
-          {/* Track خاکستری */}
-          <div className="absolute left-0 right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-theme-surface" />
+          {/* خط پس‌زمینه */}
+          <div className="pointer-events-none absolute left-0 right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-theme-surface" />
 
-{/* Track پر شده */}
-<div
-  className="absolute right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-accent transition-[width] duration-75"
-  style={{ width: `${percent}%` }}
-/>
+          {/* خط پر شده */}
+          <div
+            className="pointer-events-none absolute right-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-accent"
+            style={{ width: `${percent}%` }}
+          />
 
-{/* Thumb */}
-<div
-  className="pointer-events-none absolute top-1/2 h-4 w-4 rounded-full bg-accent shadow-lg shadow-accent/40 ring-2 ring-theme-card"
-  style={{
-    right: `${percent}%`,
-    transform: "translate(50%, -50%)",
-  }}
-/>
-
-          {/* Input نامرئی */}
+          {/* اسلایدر با thumb بومی قابل کشیدن */}
           <input
             type="range"
-            min={100_000}
-            max={MAX_PRICE}
+            min={SLIDER_MIN}
+            max={maxPriceLimit}
             step={100_000}
             value={maxPrice}
             onChange={(e) => onMaxPriceChange(Number(e.target.value))}
-            className="relative z-10 w-full cursor-pointer opacity-0"
+            dir="rtl"
+            className="relative z-10 w-full cursor-pointer appearance-none bg-transparent
+              [&::-webkit-slider-runnable-track]:h-4
+              [&::-webkit-slider-runnable-track]:bg-transparent
+              [&::-webkit-slider-thumb]:h-4
+              [&::-webkit-slider-thumb]:w-4
+              [&::-webkit-slider-thumb]:-mt-0
+              [&::-webkit-slider-thumb]:appearance-none
+              [&::-webkit-slider-thumb]:rounded-full
+              [&::-webkit-slider-thumb]:bg-accent
+              [&::-webkit-slider-thumb]:shadow-lg
+              [&::-webkit-slider-thumb]:shadow-accent/40
+              [&::-webkit-slider-thumb]:cursor-grab
+              [&::-webkit-slider-thumb]:active:cursor-grabbing
+              [&::-moz-range-track]:h-4
+              [&::-moz-range-track]:bg-transparent
+              [&::-moz-range-thumb]:h-4
+              [&::-moz-range-thumb]:w-4
+              [&::-moz-range-thumb]:rounded-full
+              [&::-moz-range-thumb]:border-0
+              [&::-moz-range-thumb]:bg-accent
+              [&::-moz-range-thumb]:shadow-lg
+              [&::-moz-range-thumb]:shadow-accent/40
+              [&::-moz-range-thumb]:cursor-grab
+              [&::-moz-range-thumb]:active:cursor-grabbing"
           />
         </div>
 

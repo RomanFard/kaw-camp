@@ -5,6 +5,7 @@ import ImageUploader from "@/components/admin/ImageUploader";
 import GalleryManager from "@/components/admin/GalleryManager";
 import ColorManager, { type ColorItem } from "@/components/admin/ColorManager";
 import SizeManager, { type SizeItem } from "@/components/admin/SizeManager";
+import SpecsManager, { type ProductSpec } from "@/components/admin/SpecsManager";
 import type { Category } from "@/data/products";
 
 export type ProductFormData = {
@@ -14,7 +15,7 @@ export type ProductFormData = {
   englishName: string;
   price: string;
   oldPrice: string;
-  costPrice: string; // 🆕 قیمت خرید (برای محاسبه سود)
+  costPrice: string; // 💰 قیمت خرید (برای محاسبه سود)
   category: Category;
   image: string;
   images: string[];
@@ -27,6 +28,7 @@ export type ProductFormData = {
   brand: string;
   colors: ColorItem[];
   sizes: SizeItem[];
+  specs?: ProductSpec[]; // 🆕 مشخصات فنی
 };
 
 const inputCls =
@@ -35,7 +37,7 @@ const inputCls =
 const inputLtrCls =
   "w-full rounded-xl border border-theme bg-theme-surface px-3.5 py-2.5 font-mono text-left text-xs text-theme placeholder:text-theme-muted outline-none focus:border-accent transition";
 
-type TabType = "general" | "media" | "variants" | "details";
+type TabType = "general" | "media" | "specs" | "variants" | "details";
 
 export default function ProductModal({
   open,
@@ -78,6 +80,7 @@ export default function ProductModal({
   const tabs: { id: TabType; label: string; icon: string }[] = [
     { id: "general", label: "اصلی و قیمت", icon: "⚙️" },
     { id: "media", label: "تصاویر", icon: "🖼️" },
+    { id: "specs", label: "مشخصات فنی", icon: "📐" },
     { id: "variants", label: "ویژگی و تنوع", icon: "🎨" },
     { id: "details", label: "توضیحات و امتیاز", icon: "📝" },
   ];
@@ -217,7 +220,7 @@ export default function ProductModal({
                   </div>
                 </div>
 
-                {/* 🆕 قیمت خرید */}
+                {/* 💰 قیمت خرید */}
                 <div>
                   <label className="mb-1.5 block text-xs font-bold text-theme-muted">
                     💰 قیمت خرید (تومان) — اختیاری
@@ -299,7 +302,15 @@ export default function ProductModal({
               </div>
             )}
 
-            {/* تب ۳: ویژگی‌ها، رنگ‌ها و سایزها */}
+            {/* 🆕 تب ۳: مشخصات فنی */}
+            {activeTab === "specs" && (
+              <SpecsManager
+                specs={form.specs ?? []}
+                onChange={(specs) => update("specs", specs)}
+              />
+            )}
+
+            {/* تب ۴: ویژگی‌ها، رنگ‌ها و سایزها */}
             {activeTab === "variants" && (
               <div className="space-y-5">
                 <ColorManager
@@ -325,7 +336,7 @@ export default function ProductModal({
               </div>
             )}
 
-            {/* تب ۴: توضیحات و نظرات */}
+            {/* تب ۵: توضیحات و نظرات */}
             {activeTab === "details" && (
               <div className="space-y-4">
                 <div>

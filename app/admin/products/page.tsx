@@ -27,7 +27,7 @@ const EMPTY_FORM: ProductFormData = {
   englishName: "",
   price: "",
   oldPrice: "",
-  costPrice: "",   // 🆕
+  costPrice: "",
   category: "tent",
   image: "",
   images: [""],
@@ -40,6 +40,7 @@ const EMPTY_FORM: ProductFormData = {
   brand: "",
   colors: [],
   sizes: [],
+  specs: [], // 🆕
 };
 
 export default function ProductsAdminPage() {
@@ -57,7 +58,7 @@ export default function ProductsAdminPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
-  // 🆕 state برای منوی موبایل
+  // state مربوط به منوی موبایل
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   async function load() {
@@ -101,7 +102,7 @@ export default function ProductsAdminPage() {
       englishName: p.englishName ?? "",
       price: String(p.price),
       oldPrice: p.oldPrice ? String(p.oldPrice) : "",
-      costPrice: (p as any).costPrice ? String((p as any).costPrice) : "",   // 🆕
+      costPrice: (p as any).costPrice ? String((p as any).costPrice) : "",
       category: p.category,
       image: p.image,
       images: p.images && p.images.length > 0 ? p.images : [""],
@@ -122,6 +123,7 @@ export default function ProductsAdminPage() {
         value: s.value,
         image: s.image,
       })),
+      specs: p.specs ?? [], // 🆕
     });
     setFormError("");
     setModalOpen(true);
@@ -133,11 +135,16 @@ export default function ProductsAdminPage() {
     if (!form.name.trim()) return setFormError("نام محصول الزامی است");
     if (!form.slug.trim()) return setFormError("slug الزامی است");
     if (!form.price.trim() || Number(form.price) <= 0)
-      return setFormError("قیمت باید بزرگتر از صفر باشد");
+      return setFormError("قیمت باید بزرگ‌تر از صفر باشد");
     if (!form.image.trim()) return setFormError("عکس اصلی الزامی است");
 
     setSaving(true);
     const cleanImages = form.images.map((s) => s.trim()).filter(Boolean);
+
+    // 🆕 پاک‌سازی مشخصات فنی (حذف ردیف‌های خالی)
+    const cleanSpecs = (form.specs ?? []).filter(
+      (s) => s.label.trim() !== "" && s.value.trim() !== ""
+    );
 
     const productData: Product = {
       id: form.id,
@@ -146,7 +153,7 @@ export default function ProductsAdminPage() {
       englishName: form.englishName.trim() || undefined,
       price: Number(form.price),
       oldPrice: form.oldPrice ? Number(form.oldPrice) : undefined,
-      costPrice: form.costPrice ? Number(form.costPrice) : 0,   // 🆕
+      costPrice: form.costPrice ? Number(form.costPrice) : 0,
       category: form.category,
       image: form.image.trim(),
       images: cleanImages.length > 0 ? cleanImages : undefined,
@@ -162,6 +169,7 @@ export default function ProductsAdminPage() {
       brand: form.brand.trim() || undefined,
       colors: form.colors.length > 0 ? form.colors : undefined,
       sizes: form.sizes.length > 0 ? form.sizes : undefined,
+      specs: cleanSpecs.length > 0 ? cleanSpecs : undefined, // 🆕
     };
 
     let result;
@@ -184,7 +192,7 @@ export default function ProductsAdminPage() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`آیا از حذف محصول "${name}" مطمئنی؟`)) return;
+    if (!confirm(`آیا از حذف محصول "${name}" مطمئنید؟`)) return;
 
     const { error } = await deleteProduct(id);
     if (error) {
@@ -209,7 +217,7 @@ export default function ProductsAdminPage() {
   }
 
   async function handleReset() {
-    if (!confirm("آیا مطمئنی؟ محصولات اولیه جایگزین می‌شوند.")) return;
+    if (!confirm("آیا مطمئنید؟ محصولات اولیه جایگزین می‌شوند.")) return;
 
     setLoading(true);
     await supabase.from("products").delete().neq("id", "___never___");
@@ -234,6 +242,7 @@ export default function ProductsAdminPage() {
         english_name: p.englishName ?? null,
         colors: p.colors ?? null,
         sizes: p.sizes ?? null,
+        specs: p.specs ?? null, // 🆕
       }))
     );
     toast.success("بازنشانی موفق!");
@@ -269,7 +278,6 @@ export default function ProductsAdminPage() {
           {/* هدر بالای صفحه */}
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              {/* دکمه منو موبایل */}
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(true)}
@@ -309,7 +317,7 @@ export default function ProductsAdminPage() {
                 onClick={handleReset}
                 className="rounded-xl border border-theme bg-theme-card px-4 py-2.5 text-xs font-bold text-theme-muted transition hover:text-theme"
               >
-                🔄 بازنشانی داده‌ها
+                🔄 بازنشانی داده‌های اولیه
               </button>
               <button
                 type="button"
@@ -335,7 +343,7 @@ export default function ProductsAdminPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="🔍 جستجو در نام، برند، شناسه..."
+              placeholder="جستجو در نام یا برند یا شناسه..."
               className="flex-1 rounded-xl border border-theme bg-theme-card px-4 py-2.5 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
             />
             <select

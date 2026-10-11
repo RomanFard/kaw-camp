@@ -101,6 +101,10 @@ export default function ProductPageClient({ product }: { product: Product }) {
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
       : 0;
 
+  // 🆕 مشخصات فنی داینامیک
+  const dynamicSpecs = product.specs ?? [];
+  const hasDynamicSpecs = dynamicSpecs.length > 0;
+
   function goToImage(i: number) {
     setActiveImageIndex(i);
     const slide = mobileGalleryRef.current?.children[i] as
@@ -553,48 +557,80 @@ export default function ProductPageClient({ product }: { product: Product }) {
         </div>
 
         <div className="kaw-scrollbar max-h-[360px] overflow-y-auto pl-1 pr-2 md:max-h-[420px]">
-          {/* تب مشخصات */}
+          {/* 🆕 تب مشخصات */}
           {activeTab === "specs" && (
-            <div className="grid gap-1.5 md:grid-cols-2 md:gap-x-10 md:gap-y-3">
-              {[
-                { label: "برند", value: brand },
-                { label: "نام انگلیسی", value: englishName },
-                { label: "شناسه", value: productCode },
-                { label: "امتیاز", value: `${avgRating.toFixed(1)} از ۵` },
-                ...(colors.length > 0
-                  ? [
-                      {
-                        label: "رنگ‌ها",
-                        value: colors.map((c) => c.label).join(" / "),
-                      },
-                    ]
-                  : []),
-                ...(sizes.length > 0
-                  ? [
-                      {
-                        label: "سایزها",
-                        value: sizes.map((s) => s.label).join(" / "),
-                      },
-                    ]
-                  : []),
-              ].map((row, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between border-b border-theme py-2.5 text-xs md:py-4 md:text-lg"
-                >
-                  <span className="text-theme-muted">{row.label}</span>
-                  <span
-                    className="font-bold text-theme"
-                    dir={
-                      row.label === "نام انگلیسی" || row.label === "شناسه"
-                        ? "ltr"
-                        : undefined
-                    }
-                  >
-                    {row.value}
-                  </span>
+            <div className="space-y-6 md:space-y-8">
+              {/* مشخصات فنی داینامیک */}
+              {hasDynamicSpecs && (
+                <div>
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme md:mb-5 md:text-xl">
+                    <span>📐</span>
+                    <span>مشخصات فنی</span>
+                  </h3>
+                  <div className="grid gap-1.5 md:grid-cols-2 md:gap-x-10 md:gap-y-3">
+                    {dynamicSpecs.map((spec, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between border-b border-theme py-2.5 text-xs md:py-4 md:text-lg"
+                      >
+                        <span className="text-theme-muted">{spec.label}</span>
+                        <span className="font-bold text-theme">
+                          {spec.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
+              )}
+
+              {/* مشخصات کلی */}
+              <div>
+                <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme md:mb-5 md:text-xl">
+                  <span>📋</span>
+                  <span>مشخصات کلی</span>
+                </h3>
+                <div className="grid gap-1.5 md:grid-cols-2 md:gap-x-10 md:gap-y-3">
+                  {[
+                    { label: "برند", value: brand },
+                    { label: "نام انگلیسی", value: englishName },
+                    { label: "شناسه", value: productCode },
+                    { label: "امتیاز", value: `${avgRating.toFixed(1)} از ۵` },
+                    ...(colors.length > 0
+                      ? [
+                          {
+                            label: "رنگ‌ها",
+                            value: colors.map((c) => c.label).join(" / "),
+                          },
+                        ]
+                      : []),
+                    ...(sizes.length > 0
+                      ? [
+                          {
+                            label: "سایزها",
+                            value: sizes.map((s) => s.label).join(" / "),
+                          },
+                        ]
+                      : []),
+                  ].map((row, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between border-b border-theme py-2.5 text-xs md:py-4 md:text-lg"
+                    >
+                      <span className="text-theme-muted">{row.label}</span>
+                      <span
+                        className="font-bold text-theme"
+                        dir={
+                          row.label === "نام انگلیسی" || row.label === "شناسه"
+                            ? "ltr"
+                            : undefined
+                        }
+                      >
+                        {row.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
