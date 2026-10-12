@@ -11,7 +11,10 @@ const GAP = 1.04;
 const PERSPECTIVE = 2400;
 const MOBILE_MAX = 640;
 const RESUME_DELAY = 2000;
-const MAX_PRODUCTS_PER_ROW = 12;
+
+// 🆕 تعداد محصولات هر ردیف و کل
+const PRODUCTS_PER_ROW = 12;
+const TOTAL_PRODUCTS = PRODUCTS_PER_ROW * 2;
 
 const mod = (a: number, m: number) => ((a % m) + m) % m;
 const wrapP = (x: number, n: number) => mod(x + n / 2, n) - n / 2;
@@ -441,12 +444,22 @@ function Carousel3D({ products, reverse = false }: RowProps) {
 export default function CategoryGrid() {
   const { products, loading } = useProducts();
 
-  // 🆕 ۱۲ محصول جدید (بر اساس id نزولی)
+  // 🆕 ۲۴ محصول جدید (بر اساس id نزولی)
   const latestProducts = useMemo(() => {
     return [...products]
       .sort((a, b) => Number(b.id) - Number(a.id))
-      .slice(0, MAX_PRODUCTS_PER_ROW);
+      .slice(0, TOTAL_PRODUCTS);
   }, [products]);
+
+  // 🆕 تقسیم به دو گروه مجزا
+  const row1Products = useMemo(
+    () => latestProducts.slice(0, PRODUCTS_PER_ROW),
+    [latestProducts]
+  );
+  const row2Products = useMemo(
+    () => latestProducts.slice(PRODUCTS_PER_ROW, TOTAL_PRODUCTS),
+    [latestProducts]
+  );
 
   // حالت loading
   if (loading) {
@@ -494,7 +507,7 @@ export default function CategoryGrid() {
 
             <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-accent" />
 
-            {/* 🆕 لینک مشاهده همه */}
+            {/* لینک مشاهده همه */}
             <a
               href="/products?sort=newest"
               className="mt-4 inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/5 px-4 py-2 text-[11px] font-bold text-accent transition hover:bg-accent hover:text-white md:text-xs"
@@ -518,13 +531,10 @@ export default function CategoryGrid() {
           </div>
         </div>
 
-        {/* دو ردیف کاروسل */}
-        <Carousel3D products={latestProducts} />
+        {/* 🆕 دو ردیف کاروسل — محصولات مجزا */}
+        <Carousel3D products={row1Products} />
         <div className="mt-2 md:mt-4">
-          <Carousel3D
-            products={[...latestProducts].reverse()}
-            reverse
-          />
+          <Carousel3D products={row2Products} reverse />
         </div>
       </div>
     </section>

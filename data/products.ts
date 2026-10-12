@@ -3,7 +3,7 @@ export type Category =
   | "lighting"
   | "cooking"
   | "sleep"
-  | "table" // 🆕 میز و صندلی
+  | "table"
   | "tools"
   | "mattress"
   | "backpack"
@@ -16,20 +16,21 @@ export type Category =
   | "sunglasses"
   | "watch"
   | "bicycle"
-  | "accessories";
+  | "accessories"
+  | "other"; // 🆕 سایر
 
 export type ProductColor = {
   label: string;
   value: string;
   image?: string;
-  priceDelta?: number; // 🆕 مبلغ اضافه (تومان) — اگه خالی → 0
+  priceDelta?: number;
 };
 
 export type ProductSize = {
   label: string;
   value: string;
   image?: string;
-  priceDelta?: number; // 🆕
+  priceDelta?: number;
 };
 
 // 🆕 ظرفیت‌ها
@@ -40,7 +41,7 @@ export type ProductCapacity = {
   priceDelta?: number;
 };
 
-// 🆕 مشخصات فنی — قابل اضافه کردن فیلد جدید
+// 🆕 مشخصات فنی
 export type ProductSpec = {
   label: string;
   value: string;
@@ -67,14 +68,14 @@ export type Product = {
   specs?: ProductSpec[];
   colors?: ProductColor[];
   sizes?: ProductSize[];
-  capacities?: ProductCapacity[]; // 🆕
+  capacities?: ProductCapacity[];
 };
 
 // ═══════════════════════════════════════════
 // دسته‌بندی‌ها — هماهنگ با منوی سایت (megaMenu)
 // ═══════════════════════════════════════════
 export const categories: { key: Category; label: string; emoji: string }[] = [
-  // ─── ۱۰ دسته اصلی (مطابق منوی سایت) ───
+  // ─── ۱۰ دسته اصلی ───
   { key: "tent",        label: "چادر و سایبان",           emoji: "⛺" },
   { key: "lighting",    label: "چراغ و روشنایی",          emoji: "🔦" },
   { key: "cooking",     label: "پخت و پز",                emoji: "🍳" },
@@ -86,7 +87,7 @@ export const categories: { key: Category; label: string; emoji: string }[] = [
   { key: "clothing",    label: "پوشاک کوهنوردی",          emoji: "🧥" },
   { key: "shoes",       label: "کفش کوهنوردی",            emoji: "🥾" },
 
-  // ─── legacy — برای محصولات فعلی ───
+  // ─── legacy ───
   { key: "socks",       label: "جوراب",                    emoji: "🧦" },
   { key: "gaiters",     label: "گتر",                      emoji: "🦵" },
   { key: "bottle",      label: "لیوان و قمقمه",            emoji: "🥤" },
@@ -94,6 +95,9 @@ export const categories: { key: Category; label: string; emoji: string }[] = [
   { key: "watch",       label: "ساعت ورزشی",               emoji: "⌚" },
   { key: "bicycle",     label: "دوچرخه",                   emoji: "🚲" },
   { key: "accessories", label: "اکسسوری",                  emoji: "🎒" },
+
+  // 🆕 سایر
+  { key: "other",       label: "سایر",                     emoji: "📦" },
 ];
 
 export const products: Product[] = [

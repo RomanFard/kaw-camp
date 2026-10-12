@@ -364,7 +364,7 @@ function MainView({
             onClick={onClose}
             className="flex items-center justify-between border-b border-theme/40 px-5 py-3.5 text-sm font-bold text-theme transition hover:bg-theme-surface"
           >
-            <span>همه محصولات</span>
+            <span>سایر</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
