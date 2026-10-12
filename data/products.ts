@@ -22,12 +22,22 @@ export type ProductColor = {
   label: string;
   value: string;
   image?: string;
+  priceDelta?: number; // 🆕 مبلغ اضافه (تومان) — اگه خالی → 0
 };
 
 export type ProductSize = {
   label: string;
   value: string;
   image?: string;
+  priceDelta?: number; // 🆕
+};
+
+// 🆕 ظرفیت‌ها
+export type ProductCapacity = {
+  label: string;
+  value: string;
+  image?: string;
+  priceDelta?: number;
 };
 
 // 🆕 مشخصات فنی — قابل اضافه کردن فیلد جدید
@@ -42,7 +52,7 @@ export type Product = {
   slug: string;
   price: number;
   oldPrice?: number;
-  costPrice?: number; // 🆕 قیمت خرید (برای محاسبه سود)
+  costPrice?: number;
   category: Category;
   image: string;
   images?: string[];
@@ -54,9 +64,10 @@ export type Product = {
   features: string[];
   brand?: string;
   englishName?: string;
-  specs?: ProductSpec[]; // 🆕 مشخصات فنی سفارشی
+  specs?: ProductSpec[];
   colors?: ProductColor[];
   sizes?: ProductSize[];
+  capacities?: ProductCapacity[]; // 🆕
 };
 
 // ═══════════════════════════════════════════

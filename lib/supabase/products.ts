@@ -21,9 +21,17 @@ export type ProductRow = {
   features: string[] | null;
   brand: string | null;
   english_name: string | null;
-  colors: { label: string; value: string; image?: string }[] | null;
-  sizes: { label: string; value: string; image?: string }[] | null;
-  specs: { label: string; value: string }[] | null; // 🆕
+  colors:
+    | { label: string; value: string; image?: string; priceDelta?: number }[]
+    | null;
+  sizes:
+    | { label: string; value: string; image?: string; priceDelta?: number }[]
+    | null;
+  capacities: // 🆕
+    | { label: string; value: string; image?: string; priceDelta?: number }[]
+    | null;
+  specs: { label: string; value: string }[] | null;
+  cost_price?: number | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -38,6 +46,7 @@ export function rowToProduct(row: ProductRow): Product {
     slug: row.slug,
     price: row.price,
     oldPrice: row.old_price ?? undefined,
+    costPrice: row.cost_price ?? undefined, // 🆕
     category: row.category as Category,
     image: row.image,
     images: row.images ?? undefined,
@@ -51,7 +60,8 @@ export function rowToProduct(row: ProductRow): Product {
     englishName: row.english_name ?? undefined,
     colors: row.colors ?? undefined,
     sizes: row.sizes ?? undefined,
-    specs: row.specs ?? undefined, // 🆕
+    capacities: row.capacities ?? undefined, // 🆕
+    specs: row.specs ?? undefined,
   };
 }
 
@@ -80,7 +90,9 @@ export function productToRow(
     english_name: p.englishName ?? null,
     colors: p.colors ?? null,
     sizes: p.sizes ?? null,
-    specs: p.specs ?? null, // 🆕
+    capacities: p.capacities ?? null, // 🆕
+    specs: p.specs ?? null,
+    cost_price: p.costPrice ?? 0, // 🆕
   };
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { Product } from "@/data/products";
 import { useCart } from "@/components/context/CartContext";
 import { useWishlist } from "@/components/context/WishlistContext";
@@ -54,11 +54,17 @@ type TabKey = "specs" | "desc" | "reviews";
 export default function ProductPageClient({ product }: { product: Product }) {
   const colors = product.colors || [];
   const sizes = product.sizes || [];
+  const capacities = product.capacities || [];
+
   const hasColors = colors.length > 0;
   const hasSizes = sizes.length > 0;
+  const hasCapacities = capacities.length > 0;
 
   const [selectedColor, setSelectedColor] = useState(
     hasColors ? colors[0].label : ""
+  );
+  const [selectedCapacity, setSelectedCapacity] = useState(
+    hasCapacities ? capacities[0].label : ""
   );
   const [selectedSize, setSelectedSize] = useState(
     hasSizes ? sizes[0].label : ""
@@ -82,11 +88,50 @@ export default function ProductPageClient({ product }: { product: Product }) {
   const { toggleItem, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
 
-  const galleryImages = product.images?.length
+  // 🆕 عکس اصلی از محصول
+  const baseGalleryImages = product.images?.length
     ? product.images
     : [product.image];
 
+  // 🆕 اگه رنگ انتخاب‌شده عکس اختصاصی داره، اون رو اول گالری بذار
+  const selectedColorObj = colors.find((c) => c.label === selectedColor);
+  const colorImage = selectedColorObj?.image;
+
+  const galleryImages = useMemo(() => {
+    if (colorImage) {
+      // عکس رنگ رو اول بذار (اگه تکراری نباشه)
+      const withoutDup = baseGalleryImages.filter((img) => img !== colorImage);
+      return [colorImage, ...withoutDup];
+    }
+    return baseGalleryImages;
+  }, [colorImage, baseGalleryImages]);
+
   const activeImage = galleryImages[activeImageIndex] || product.image;
+
+  // 🆕 وقتی رنگ عوض می‌شه، ایندکس عکس ریست بشه
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [selectedColor, selectedCapacity, selectedSize]);
+
+  // 🆕 محاسبهٔ مبلغ اضافه از رنگ + ظرفیت + سایز
+  const selectedCapacityObj = capacities.find(
+    (c) => c.label === selectedCapacity
+  );
+  const selectedSizeObj = sizes.find((s) => s.label === selectedSize);
+
+  const deltaSum = useMemo(() => {
+    let sum = 0;
+    sum += selectedColorObj?.priceDelta ?? 0;
+    sum += selectedCapacityObj?.priceDelta ?? 0;
+    sum += selectedSizeObj?.priceDelta ?? 0;
+    return sum;
+  }, [selectedColorObj, selectedCapacityObj, selectedSizeObj]);
+
+  const finalPrice = product.price + deltaSum;
+  const finalOldPrice =
+    product.oldPrice && product.oldPrice > 0
+      ? product.oldPrice + deltaSum
+      : undefined;
 
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
@@ -101,7 +146,6 @@ export default function ProductPageClient({ product }: { product: Product }) {
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
       : 0;
 
-  // 🆕 مشخصات فنی داینامیک
   const dynamicSpecs = product.specs ?? [];
   const hasDynamicSpecs = dynamicSpecs.length > 0;
 
@@ -152,7 +196,13 @@ export default function ProductPageClient({ product }: { product: Product }) {
       }, 800);
     }
 
-    addItem(product, quantity);
+    // 🆕 محصول با قیمت نهایی و ویژگی‌های انتخاب‌شده
+    const productWithPrice: Product = {
+      ...product,
+      price: finalPrice,
+      oldPrice: finalOldPrice,
+    };
+    addItem(productWithPrice, quantity);
   }
 
   function submitReview(e: React.FormEvent) {
@@ -176,9 +226,9 @@ export default function ProductPageClient({ product }: { product: Product }) {
 
   return (
     <div className="space-y-6">
-      {/* ═══════ گرید اصلی: گالری + اطلاعات ═══════ */}
+      {/* ═══════ گرید اصلی ═══════ */}
       <div className="grid gap-6 lg:grid-cols-[1fr_540px] lg:gap-8">
-        {/* ═══ ستون گالری ═══ */}
+        {/* ═══ گالری ═══ */}
         <div className="overflow-hidden rounded-lg border border-theme bg-theme-card">
           <div className="relative">
             {/* دسکتاپ */}
@@ -291,7 +341,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
           )}
         </div>
 
-        {/* ═══ ستون اطلاعات ═══ */}
+        {/* ═══ اطلاعات ═══ */}
         <div className="rounded-lg border border-theme bg-theme-card p-4 md:p-8">
           <h1 className="text-lg font-bold leading-tight text-theme md:text-3xl">
             {product.name}
@@ -323,6 +373,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
             </span>
           </div>
 
+          {/* رنگ‌ها */}
           {hasColors && (
             <div className="mt-5 md:mt-7">
               <p className="mb-2 text-sm font-bold text-theme md:mb-3 md:text-lg">
@@ -330,6 +381,11 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 <span className="font-normal text-theme-muted">
                   {selectedColor}
                 </span>
+                {selectedColorObj?.priceDelta && selectedColorObj.priceDelta > 0 && (
+                  <span className="ml-2 text-xs text-accent">
+                    (+ {selectedColorObj.priceDelta.toLocaleString("fa-IR")})
+                  </span>
+                )}
               </p>
               <div className="flex flex-wrap gap-1.5 md:gap-2">
                 {colors.map((c) => (
@@ -360,6 +416,51 @@ export default function ProductPageClient({ product }: { product: Product }) {
             </div>
           )}
 
+          {/* 🆕 ظرفیت‌ها */}
+          {hasCapacities && (
+            <div className="mt-5 md:mt-6">
+              <p className="mb-2 text-sm font-bold text-theme md:mb-3 md:text-lg">
+                ظرفیت:{" "}
+                <span className="font-normal text-theme-muted">
+                  {selectedCapacity}
+                </span>
+                {selectedCapacityObj?.priceDelta &&
+                  selectedCapacityObj.priceDelta > 0 && (
+                    <span className="ml-2 text-xs text-accent">
+                      (+ {selectedCapacityObj.priceDelta.toLocaleString("fa-IR")})
+                    </span>
+                  )}
+              </p>
+              <div className="flex flex-wrap gap-1.5 md:gap-2">
+                {capacities.map((c) => (
+                  <button
+                    key={c.label}
+                    type="button"
+                    onClick={() => setSelectedCapacity(c.label)}
+                    className={`flex min-w-[70px] items-center justify-center gap-1.5 rounded border px-3 py-2 text-xs font-semibold transition md:min-w-[90px] md:gap-2 md:px-4 md:py-3 md:text-lg ${
+                      selectedCapacity === c.label
+                        ? "border-theme bg-theme-surface text-theme"
+                        : "border-theme text-theme-muted hover:border-theme-muted"
+                    }`}
+                  >
+                    {c.image && (
+                      <span className="h-4 w-4 overflow-hidden rounded-sm border border-theme md:h-5 md:w-5">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={c.image}
+                          alt={c.label}
+                          className="h-full w-full object-cover"
+                        />
+                      </span>
+                    )}
+                    <span>{c.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* سایزها */}
           {hasSizes && (
             <div className="mt-5 md:mt-6">
               <p className="mb-2 text-sm font-bold text-theme md:mb-3 md:text-lg">
@@ -367,6 +468,11 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 <span className="font-normal text-theme-muted">
                   {selectedSize}
                 </span>
+                {selectedSizeObj?.priceDelta && selectedSizeObj.priceDelta > 0 && (
+                  <span className="ml-2 text-xs text-accent">
+                    (+ {selectedSizeObj.priceDelta.toLocaleString("fa-IR")})
+                  </span>
+                )}
               </p>
               <div className="flex flex-wrap gap-1.5 md:gap-2">
                 {sizes.map((s) => (
@@ -387,17 +493,24 @@ export default function ProductPageClient({ product }: { product: Product }) {
             </div>
           )}
 
-          <div className="mt-5 flex items-baseline gap-2 md:mt-7 md:gap-4">
+          {/* 🆕 قیمت نهایی */}
+          <div className="mt-5 flex flex-wrap items-baseline gap-2 md:mt-7 md:gap-4">
             <span className="text-xl font-bold text-theme md:text-4xl">
-              {formatPrice(product.price)}
+              {formatPrice(finalPrice)}
             </span>
-            {product.oldPrice && (
+            {finalOldPrice && finalOldPrice > finalPrice && (
               <span className="text-sm text-theme-muted line-through md:text-xl">
-                {formatPrice(product.oldPrice)}
+                {formatPrice(finalOldPrice)}
+              </span>
+            )}
+            {deltaSum > 0 && (
+              <span className="rounded-full bg-accent/10 px-2.5 py-1 text-[10px] font-bold text-accent md:text-xs">
+                + {deltaSum.toLocaleString("fa-IR")} تومان
               </span>
             )}
           </div>
 
+          {/* تعداد */}
           <div className="mt-5 md:mt-7">
             <p className="mb-2 text-sm font-bold text-theme md:mb-3 md:text-lg">
               تعداد:
@@ -423,6 +536,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
             </div>
           </div>
 
+          {/* دکمه‌ها */}
           <div className="mt-5 grid grid-cols-2 gap-2 md:mt-7 md:gap-3">
             <button
               ref={cartButtonRef}
@@ -438,7 +552,12 @@ export default function ProductPageClient({ product }: { product: Product }) {
               type="button"
               onClick={() => {
                 if (product.inStock) {
-                  addItem(product, quantity);
+                  const productWithPrice: Product = {
+                    ...product,
+                    price: finalPrice,
+                    oldPrice: finalOldPrice,
+                  };
+                  addItem(productWithPrice, quantity);
                   window.location.href = "/checkout";
                 }
               }}
@@ -513,7 +632,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* ═══════ تب مشخصات فنی / توضیحات / نظرات ═══════ */}
+      {/* ═══════ تب‌ها ═══════ */}
       <div className="rounded-lg border border-theme bg-theme-card p-3 md:p-8">
         <div className="mb-4 flex gap-1.5 overflow-x-auto border-b border-theme pb-2.5 md:mb-6 md:gap-2 md:pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button
@@ -557,10 +676,9 @@ export default function ProductPageClient({ product }: { product: Product }) {
         </div>
 
         <div className="kaw-scrollbar max-h-[360px] overflow-y-auto pl-1 pr-2 md:max-h-[420px]">
-          {/* 🆕 تب مشخصات */}
+          {/* مشخصات فنی */}
           {activeTab === "specs" && (
             <div className="space-y-6 md:space-y-8">
-              {/* مشخصات فنی داینامیک */}
               {hasDynamicSpecs && (
                 <div>
                   <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme md:mb-5 md:text-xl">
@@ -571,10 +689,12 @@ export default function ProductPageClient({ product }: { product: Product }) {
                     {dynamicSpecs.map((spec, i) => (
                       <div
                         key={i}
-                        className="flex items-center justify-between border-b border-theme py-2.5 text-xs md:py-4 md:text-lg"
+                        className="flex flex-col gap-1 border-b border-theme py-2.5 text-xs md:flex-row md:items-start md:justify-between md:gap-4 md:py-3.5 md:text-base"
                       >
-                        <span className="text-theme-muted">{spec.label}</span>
-                        <span className="font-bold text-theme">
+                        <span className="shrink-0 font-medium text-theme-muted md:min-w-[110px]">
+                          {spec.label}
+                        </span>
+                        <span className="break-words font-bold leading-6 text-theme md:flex-1 md:text-left">
                           {spec.value}
                         </span>
                       </div>
@@ -583,7 +703,6 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 </div>
               )}
 
-              {/* مشخصات کلی */}
               <div>
                 <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme md:mb-5 md:text-xl">
                   <span>📋</span>
@@ -603,6 +722,14 @@ export default function ProductPageClient({ product }: { product: Product }) {
                           },
                         ]
                       : []),
+                    ...(capacities.length > 0
+                      ? [
+                          {
+                            label: "ظرفیت‌ها",
+                            value: capacities.map((c) => c.label).join(" / "),
+                          },
+                        ]
+                      : []),
                     ...(sizes.length > 0
                       ? [
                           {
@@ -614,11 +741,13 @@ export default function ProductPageClient({ product }: { product: Product }) {
                   ].map((row, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between border-b border-theme py-2.5 text-xs md:py-4 md:text-lg"
+                      className="flex flex-col gap-1 border-b border-theme py-2.5 text-xs md:flex-row md:items-start md:justify-between md:gap-4 md:py-3.5 md:text-base"
                     >
-                      <span className="text-theme-muted">{row.label}</span>
+                      <span className="shrink-0 font-medium text-theme-muted md:min-w-[110px]">
+                        {row.label}
+                      </span>
                       <span
-                        className="font-bold text-theme"
+                        className="break-words font-bold leading-6 text-theme md:flex-1 md:text-left"
                         dir={
                           row.label === "نام انگلیسی" || row.label === "شناسه"
                             ? "ltr"
@@ -634,7 +763,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
             </div>
           )}
 
-          {/* تب توضیحات */}
+          {/* توضیحات */}
           {activeTab === "desc" && (
             <div>
               {product.shortDesc && (
@@ -668,7 +797,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
             </div>
           )}
 
-          {/* تب نظرات */}
+          {/* نظرات */}
           {activeTab === "reviews" && (
             <div className="space-y-4 md:space-y-6">
               <div className="flex flex-col items-center gap-3 rounded-xl border border-theme bg-theme-surface/40 p-4 md:flex-row md:items-center md:gap-8 md:p-6">
@@ -839,7 +968,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* ═══════ انیمیشن پرتاب به کوله ═══════ */}
+      {/* انیمیشن */}
       {flyingItems.map((item, index) => (
         <div
           key={index}
@@ -871,7 +1000,6 @@ export default function ProductPageClient({ product }: { product: Product }) {
         </div>
       ))}
 
-      {/* Lightbox */}
       {lightboxOpen && (
         <ImageLightbox
           images={galleryImages}

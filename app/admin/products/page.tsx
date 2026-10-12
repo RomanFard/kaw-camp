@@ -15,9 +15,7 @@ import {
   deleteProduct,
   generateNextProductId,
 } from "@/lib/supabase/products";
-// 🆕 برندها
 import { getAllBrands, type Brand } from "@/lib/supabase/brands";
-// 🆕 ویژگی‌ها
 import { getAllAttributes, type Attribute } from "@/lib/supabase/attributes";
 import {
   products as seedProducts,
@@ -46,6 +44,7 @@ const EMPTY_FORM: ProductFormData = {
   brand: "",
   colors: [],
   sizes: [],
+  capacities: [], // 🆕
   specs: [],
 };
 
@@ -58,10 +57,7 @@ export default function ProductsAdminPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<Category | "all">("all");
 
-  // 🆕 برندها
   const [brands, setBrands] = useState<Brand[]>([]);
-
-  // 🆕 ویژگی‌ها
   const [attributes, setAttributes] = useState<Attribute[]>([]);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -70,10 +66,8 @@ export default function ProductsAdminPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
-  // state مربوط به منوی موبایل
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // 🆕 load همزمان محصولات، برندها و ویژگی‌ها
   async function load() {
     setLoading(true);
     const [productsData, brandsData, attributesData] = await Promise.all([
@@ -121,7 +115,7 @@ export default function ProductsAdminPage() {
       englishName: p.englishName ?? "",
       price: String(p.price),
       oldPrice: p.oldPrice ? String(p.oldPrice) : "",
-      costPrice: (p as any).costPrice ? String((p as any).costPrice) : "",
+      costPrice: p.costPrice ? String(p.costPrice) : "",
       category: p.category,
       image: p.image,
       images: p.images && p.images.length > 0 ? p.images : [""],
@@ -136,11 +130,19 @@ export default function ProductsAdminPage() {
         label: c.label,
         value: c.value,
         image: c.image,
+        priceDelta: c.priceDelta ?? 0,
       })),
       sizes: (p.sizes ?? []).map((s) => ({
         label: s.label,
         value: s.value,
         image: s.image,
+        priceDelta: s.priceDelta ?? 0,
+      })),
+      capacities: (p.capacities ?? []).map((c) => ({
+        label: c.label,
+        value: c.value,
+        image: c.image,
+        priceDelta: c.priceDelta ?? 0,
       })),
       specs: p.specs ?? [],
     });
@@ -187,6 +189,7 @@ export default function ProductsAdminPage() {
       brand: form.brand.trim() || undefined,
       colors: form.colors.length > 0 ? form.colors : undefined,
       sizes: form.sizes.length > 0 ? form.sizes : undefined,
+      capacities: form.capacities.length > 0 ? form.capacities : undefined, // 🆕
       specs: cleanSpecs.length > 0 ? cleanSpecs : undefined,
     };
 
@@ -260,6 +263,7 @@ export default function ProductsAdminPage() {
         english_name: p.englishName ?? null,
         colors: p.colors ?? null,
         sizes: p.sizes ?? null,
+        capacities: p.capacities ?? null, // 🆕
         specs: p.specs ?? null,
       }))
     );
@@ -276,7 +280,6 @@ export default function ProductsAdminPage() {
 
   return (
     <div dir="rtl" className="flex min-h-screen bg-theme text-theme">
-      {/* Backdrop موبایل */}
       {isMobileMenuOpen && (
         <div
           onClick={() => setIsMobileMenuOpen(false)}
@@ -284,16 +287,13 @@ export default function ProductsAdminPage() {
         />
       )}
 
-      {/* سایدبار مشترک */}
       <AdminSidebar
         isMobileMenuOpen={isMobileMenuOpen}
         onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
       />
 
-      {/* محتوای اصلی */}
       <main className="flex-1 overflow-x-hidden p-4 pb-12 sm:p-8">
         <div className="mx-auto max-w-7xl">
-          {/* هدر بالای صفحه */}
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -347,7 +347,6 @@ export default function ProductsAdminPage() {
             </div>
           </div>
 
-          {/* کارت‌های آماری */}
           <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatCard label="کل محصولات" value={stats.total} icon="📦" />
             <StatCard label="موجود در انبار" value={stats.inStock} icon="✅" />
@@ -355,7 +354,6 @@ export default function ProductsAdminPage() {
             <StatCard label="ناموجود" value={stats.outOfStock} icon="⛔" />
           </div>
 
-          {/* نوار ابزار جستجو و فیلتر */}
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
             <input
               type="text"
@@ -380,7 +378,6 @@ export default function ProductsAdminPage() {
             </select>
           </div>
 
-          {/* جدول محصولات */}
           <div className="overflow-hidden rounded-2xl border border-theme bg-theme-card shadow-sm">
             {loading ? (
               <div className="p-12 text-center text-xs text-theme-muted">

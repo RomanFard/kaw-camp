@@ -7,6 +7,7 @@ export type ColorItem = {
   label: string;
   value: string;
   image?: string;
+  priceDelta?: number; // 🆕 مبلغ اضافه (تومان)
 };
 
 type Props = {
@@ -37,7 +38,7 @@ export default function ColorManager({ colors, onChange }: Props) {
   );
 
   function addColor() {
-    const next = [...colors, { label: "", value: "" }];
+    const next = [...colors, { label: "", value: "", priceDelta: 0 }];
     onChange(next);
     setExpandedIndex(next.length - 1);
   }
@@ -80,6 +81,7 @@ export default function ColorManager({ colors, onChange }: Props) {
         <div className="space-y-3">
           {colors.map((color, index) => {
             const isExpanded = expandedIndex === index;
+            const delta = color.priceDelta ?? 0;
             return (
               <div
                 key={index}
@@ -118,6 +120,11 @@ export default function ColorManager({ colors, onChange }: Props) {
                           dir="ltr"
                         >
                           {color.value}
+                        </span>
+                      )}
+                      {delta > 0 && (
+                        <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent">
+                          + {delta.toLocaleString("fa-IR")}
                         </span>
                       )}
                     </div>
@@ -196,6 +203,30 @@ export default function ColorManager({ colors, onChange }: Props) {
                         }
                         label="عکس مخصوص این رنگ (اختیاری)"
                       />
+                    </div>
+
+                    {/* 🆕 مبلغ اضافه */}
+                    <div>
+                      <label className="mb-1 block text-[11px] font-bold text-theme-muted">
+                        مبلغ اضافه (تومان)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="10000"
+                        value={color.priceDelta ?? 0}
+                        onChange={(e) =>
+                          updateColor(index, {
+                            priceDelta: Number(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0"
+                        className="w-full rounded-lg border border-theme bg-theme-surface px-3 py-2 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+                      />
+                      <p className="mt-1 text-[10px] text-theme-muted">
+                        💡 اگه این رنگ گرون‌تر از قیمت پایه‌ست، مبلغ اضافه رو
+                        وارد کن. اگه همون قیمت پایه‌ست → ۰ بذار.
+                      </p>
                     </div>
                   </div>
                 )}

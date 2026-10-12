@@ -7,6 +7,7 @@ export type SizeItem = {
   label: string;
   value: string;
   image?: string;
+  priceDelta?: number; // 🆕 مبلغ اضافه (تومان)
 };
 
 type Props = {
@@ -42,7 +43,7 @@ export default function SizeManager({ sizes, onChange }: Props) {
   );
 
   function addSize() {
-    const next = [...sizes, { label: "", value: "" }];
+    const next = [...sizes, { label: "", value: "", priceDelta: 0 }];
     onChange(next);
     setExpandedIndex(next.length - 1);
   }
@@ -85,6 +86,7 @@ export default function SizeManager({ sizes, onChange }: Props) {
         <div className="space-y-3">
           {sizes.map((size, index) => {
             const isExpanded = expandedIndex === index;
+            const delta = size.priceDelta ?? 0;
             return (
               <div
                 key={index}
@@ -120,6 +122,11 @@ export default function SizeManager({ sizes, onChange }: Props) {
                       {size.value && (
                         <span className="text-[11px] text-theme-muted" dir="ltr">
                           {size.value}
+                        </span>
+                      )}
+                      {delta > 0 && (
+                        <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent">
+                          + {delta.toLocaleString("fa-IR")}
                         </span>
                       )}
                     </div>
@@ -198,6 +205,30 @@ export default function SizeManager({ sizes, onChange }: Props) {
                         }
                         label="عکس مخصوص این سایز (اختیاری)"
                       />
+                    </div>
+
+                    {/* 🆕 مبلغ اضافه */}
+                    <div>
+                      <label className="mb-1 block text-[11px] font-bold text-theme-muted">
+                        مبلغ اضافه (تومان)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="10000"
+                        value={size.priceDelta ?? 0}
+                        onChange={(e) =>
+                          updateSize(index, {
+                            priceDelta: Number(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0"
+                        className="w-full rounded-lg border border-theme bg-theme-surface px-3 py-2 text-xs text-theme outline-none transition placeholder:text-theme-muted focus:border-accent"
+                      />
+                      <p className="mt-1 text-[10px] text-theme-muted">
+                        💡 اگه این سایز گرون‌تر از قیمت پایه‌ست، مبلغ اضافه رو
+                        وارد کن. اگه همون قیمت پایه‌ست → ۰ بذار.
+                      </p>
                     </div>
                   </div>
                 )}

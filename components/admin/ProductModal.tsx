@@ -5,6 +5,9 @@ import ImageUploader from "@/components/admin/ImageUploader";
 import GalleryManager from "@/components/admin/GalleryManager";
 import ColorManager, { type ColorItem } from "@/components/admin/ColorManager";
 import SizeManager, { type SizeItem } from "@/components/admin/SizeManager";
+import CapacitiesManager, {
+  type CapacityItem,
+} from "@/components/admin/CapacitiesManager";
 import SpecsManager, { type ProductSpec } from "@/components/admin/SpecsManager";
 import AttributesPicker from "@/components/admin/AttributesPicker";
 import type { Category } from "@/data/products";
@@ -31,6 +34,7 @@ export type ProductFormData = {
   brand: string;
   colors: ColorItem[];
   sizes: SizeItem[];
+  capacities: CapacityItem[]; // 🆕
   specs?: ProductSpec[];
 };
 
@@ -489,7 +493,7 @@ export default function ProductModal({
               </div>
             )}
 
-            {/* 🆕 تب ۳ — مشخصات فنی */}
+            {/* تب ۳ */}
             {activeTab === "specs" && (
               <div className="space-y-5">
                 <AttributesPicker
@@ -506,18 +510,29 @@ export default function ProductModal({
               </div>
             )}
 
-            {/* تب ۴ */}
+            {/* تب ۴ — ویژگی و تنوع */}
             {activeTab === "variants" && (
-              <div className="space-y-5">
+              <div className="space-y-6">
                 <ColorManager
                   colors={form.colors}
                   onChange={(colors) => update("colors", colors)}
                 />
-                <SizeManager
-                  sizes={form.sizes}
-                  onChange={(sizes) => update("sizes", sizes)}
-                />
-                <div>
+
+                <div className="border-t border-theme pt-5">
+                  <CapacitiesManager
+                    capacities={form.capacities ?? []}
+                    onChange={(capacities) => update("capacities", capacities)}
+                  />
+                </div>
+
+                <div className="border-t border-theme pt-5">
+                  <SizeManager
+                    sizes={form.sizes}
+                    onChange={(sizes) => update("sizes", sizes)}
+                  />
+                </div>
+
+                <div className="border-t border-theme pt-5">
                   <label className="mb-1.5 block text-xs font-bold text-theme-muted">
                     ویژگی‌های فنی (هر خط یک مورد)
                   </label>

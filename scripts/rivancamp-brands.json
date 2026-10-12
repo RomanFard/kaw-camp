@@ -1,0 +1,442 @@
+[
+  {
+    "id": 1014,
+    "name": "BRS",
+    "slug": "brs",
+    "description": "",
+    "parent": 0,
+    "count": 34,
+    "image": {
+      "id": 12616,
+      "src": "https://rivancamp.com/wp-content/uploads/2025/08/images.jpg",
+      "thumbnail": "https://rivancamp.com/wp-content/uploads/2025/08/images.jpg",
+      "srcset": "https://rivancamp.com/wp-content/uploads/2025/08/images-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/08/images.jpg 180w",
+      "sizes": "(max-width: 180px) 100vw, 180px",
+      "thumbnail_srcset": "https://rivancamp.com/wp-content/uploads/2025/08/images-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/08/images.jpg 180w",
+      "thumbnail_sizes": "(max-width: 180px) 100vw, 180px",
+      "name": "images",
+      "alt": "لوازم کمپینگ برند BRS"
+    },
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 5733,
+    "name": "CRKT",
+    "slug": "crkt",
+    "description": "",
+    "parent": 0,
+    "count": 5,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 3959,
+    "name": "آیوان",
+    "slug": "aione",
+    "description": "",
+    "parent": 0,
+    "count": 6,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 1363,
+    "name": "استنلی",
+    "slug": "stanley",
+    "description": "",
+    "parent": 0,
+    "count": 1,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 1087,
+    "name": "اسمال سان",
+    "slug": "small-sun",
+    "description": "",
+    "parent": 0,
+    "count": 46,
+    "image": null,
+    "review_count": 2,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 685,
+    "name": "اووِر ارث",
+    "slug": "over-earth",
+    "description": "",
+    "parent": 0,
+    "count": 2,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 1172,
+    "name": "بلک داگ",
+    "slug": "black-dog",
+    "description": "",
+    "parent": 0,
+    "count": 46,
+    "image": {
+      "id": 16686,
+      "src": "https://rivancamp.com/wp-content/uploads/2025/09/images-1.jpg",
+      "thumbnail": "https://rivancamp.com/wp-content/uploads/2025/09/images-1.jpg",
+      "srcset": "https://rivancamp.com/wp-content/uploads/2025/09/images-1-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/09/images-1.jpg 225w",
+      "sizes": "(max-width: 225px) 100vw, 225px",
+      "thumbnail_srcset": "https://rivancamp.com/wp-content/uploads/2025/09/images-1-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/09/images-1.jpg 225w",
+      "thumbnail_sizes": "(max-width: 225px) 100vw, 225px",
+      "name": "BLACK-DOG-BRAND",
+      "alt": "برند بلک داگ (BLACK DOG)"
+    },
+    "review_count": 4,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 814,
+    "name": "بلک دیر",
+    "slug": "black-deer",
+    "description": "",
+    "parent": 0,
+    "count": 2,
+    "image": {
+      "id": 12618,
+      "src": "https://rivancamp.com/wp-content/uploads/2025/08/images.png",
+      "thumbnail": "https://rivancamp.com/wp-content/uploads/2025/08/images.png",
+      "srcset": "https://rivancamp.com/wp-content/uploads/2025/08/images-150x150.png 150w, https://rivancamp.com/wp-content/uploads/2025/08/images.png 225w",
+      "sizes": "(max-width: 225px) 100vw, 225px",
+      "thumbnail_srcset": "https://rivancamp.com/wp-content/uploads/2025/08/images-150x150.png 150w, https://rivancamp.com/wp-content/uploads/2025/08/images.png 225w",
+      "thumbnail_sizes": "(max-width: 225px) 100vw, 225px",
+      "name": "images",
+      "alt": "لوازم کوهنوردی بلک دیر"
+    },
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 1399,
+    "name": "پکینیو | Pekynew",
+    "slug": "pekynew",
+    "description": "",
+    "parent": 0,
+    "count": 11,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 1318,
+    "name": "پلار",
+    "slug": "polar",
+    "description": "",
+    "parent": 0,
+    "count": 4,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 4194,
+    "name": "چانوداگ",
+    "slug": "chanodug",
+    "description": "",
+    "parent": 0,
+    "count": 35,
+    "image": {
+      "id": 18138,
+      "src": "https://rivancamp.com/wp-content/uploads/2025/10/62384_chanodug.jpg",
+      "thumbnail": "https://rivancamp.com/wp-content/uploads/2025/10/62384_chanodug.jpg",
+      "srcset": "https://rivancamp.com/wp-content/uploads/2025/10/62384_chanodug-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/10/62384_chanodug.jpg 400w",
+      "sizes": "(max-width: 400px) 100vw, 400px",
+      "thumbnail_srcset": "https://rivancamp.com/wp-content/uploads/2025/10/62384_chanodug-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/10/62384_chanodug.jpg 400w",
+      "thumbnail_sizes": "(max-width: 400px) 100vw, 400px",
+      "name": "62384_chanodug",
+      "alt": "برند چانوداگ"
+    },
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 2144,
+    "name": "دیوتر | Deuter",
+    "slug": "deuter",
+    "description": "",
+    "parent": 0,
+    "count": 2,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 1138,
+    "name": "زینگارو",
+    "slug": "zingaro",
+    "description": "",
+    "parent": 0,
+    "count": 10,
+    "image": {
+      "id": 12615,
+      "src": "https://rivancamp.com/wp-content/uploads/2025/08/Zingaro.jpg",
+      "thumbnail": "https://rivancamp.com/wp-content/uploads/2025/08/Zingaro-500x500.jpg",
+      "srcset": "https://rivancamp.com/wp-content/uploads/2025/08/Zingaro-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/08/Zingaro-500x500.jpg 500w, https://rivancamp.com/wp-content/uploads/2025/08/Zingaro-700x700.jpg 700w, https://rivancamp.com/wp-content/uploads/2025/08/Zingaro.jpg 1510w",
+      "sizes": "(max-width: 1510px) 100vw, 1510px",
+      "thumbnail_srcset": "https://rivancamp.com/wp-content/uploads/2025/08/Zingaro-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/08/Zingaro-500x500.jpg 500w, https://rivancamp.com/wp-content/uploads/2025/08/Zingaro-700x700.jpg 700w, https://rivancamp.com/wp-content/uploads/2025/08/Zingaro.jpg 1510w",
+      "thumbnail_sizes": "(max-width: 500px) 100vw, 500px",
+      "name": "Zingaro",
+      "alt": "محصولات برند زینگارو"
+    },
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 6265,
+    "name": "سیلور کرست",
+    "slug": "silver-crest",
+    "description": "",
+    "parent": 0,
+    "count": 1,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 6326,
+    "name": "کانپکس",
+    "slug": "conpex",
+    "description": "",
+    "parent": 0,
+    "count": 1,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 661,
+    "name": "کوکر",
+    "slug": "cooker",
+    "description": "",
+    "parent": 0,
+    "count": 4,
+    "image": {
+      "id": 10909,
+      "src": "https://rivancamp.com/wp-content/uploads/2025/04/e15be954ee1a470ecc01f7b65549c8bb28844229_1668962574.jpg",
+      "thumbnail": "https://rivancamp.com/wp-content/uploads/2025/04/e15be954ee1a470ecc01f7b65549c8bb28844229_1668962574.jpg",
+      "srcset": "https://rivancamp.com/wp-content/uploads/2025/04/e15be954ee1a470ecc01f7b65549c8bb28844229_1668962574-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/04/e15be954ee1a470ecc01f7b65549c8bb28844229_1668962574.jpg 160w",
+      "sizes": "(max-width: 160px) 100vw, 160px",
+      "thumbnail_srcset": "https://rivancamp.com/wp-content/uploads/2025/04/e15be954ee1a470ecc01f7b65549c8bb28844229_1668962574-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/04/e15be954ee1a470ecc01f7b65549c8bb28844229_1668962574.jpg 160w",
+      "thumbnail_sizes": "(max-width: 160px) 100vw, 160px",
+      "name": "e15be954ee1a470ecc01f7b65549c8bb28844229_1668962574",
+      "alt": "برند کوکر"
+    },
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 2396,
+    "name": "کینساچ",
+    "slug": "kinsach",
+    "description": "",
+    "parent": 0,
+    "count": 43,
+    "image": null,
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 708,
+    "name": "کینگ کمپ",
+    "slug": "king-camp",
+    "description": "",
+    "parent": 0,
+    "count": 13,
+    "image": {
+      "id": 11369,
+      "src": "https://rivancamp.com/wp-content/uploads/2025/06/72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO106410000000015_FMpng_-e1749631597655.png",
+      "thumbnail": "https://rivancamp.com/wp-content/uploads/2025/06/72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO106410000000015_FMpng_-e1749631597655-500x500.png",
+      "srcset": "https://rivancamp.com/wp-content/uploads/2025/06/72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO106410000000015_FMpng_-e1749631597655-150x150.png 150w, https://rivancamp.com/wp-content/uploads/2025/06/72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO106410000000015_FMpng_-e1749631597655-500x500.png 500w, https://rivancamp.com/wp-content/uploads/2025/06/72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO106410000000015_FMpng_-e1749631597655.png 600w",
+      "sizes": "(max-width: 600px) 100vw, 600px",
+      "thumbnail_srcset": "https://rivancamp.com/wp-content/uploads/2025/06/72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO106410000000015_FMpng_-e1749631597655-150x150.png 150w, https://rivancamp.com/wp-content/uploads/2025/06/72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO106410000000015_FMpng_-e1749631597655-500x500.png 500w, https://rivancamp.com/wp-content/uploads/2025/06/72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO106410000000015_FMpng_-e1749631597655.png 600w",
+      "thumbnail_sizes": "(max-width: 500px) 100vw, 500px",
+      "name": "72ace0bd3173364a777f8d521bab3de5.w2130.h2130._RO1064,1,0,0,0,0,0,0,0,0,15_FMpng_",
+      "alt": "لوگوی کینگ کمپ"
+    },
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 3907,
+    "name": "ماونتین هایکر",
+    "slug": "mountainhiker",
+    "description": "",
+    "parent": 0,
+    "count": 23,
+    "image": {
+      "id": 17101,
+      "src": "https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b.jpg",
+      "thumbnail": "https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b-500x500.jpg",
+      "srcset": "https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b-500x500.jpg 500w, https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b-700x700.jpg 700w, https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b.jpg 800w",
+      "sizes": "(max-width: 800px) 100vw, 800px",
+      "thumbnail_srcset": "https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b-150x150.jpg 150w, https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b-500x500.jpg 500w, https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b-700x700.jpg 700w, https://rivancamp.com/wp-content/uploads/2025/09/id-11134216-7r98r-lyc056qy3ap41b.jpg 800w",
+      "thumbnail_sizes": "(max-width: 500px) 100vw, 500px",
+      "name": "id-11134216-7r98r-lyc056qy3ap41b",
+      "alt": "محصولات ماونتین هایکر mountainhiker"
+    },
+    "review_count": 0,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  },
+  {
+    "id": 522,
+    "name": "نیچرهایک",
+    "slug": "naturehike",
+    "description": "محصولات کمپینگ و کوهنوردی برند نیچرهایک Naturehike با تمرکز بر سبک بودن، کیفیت ساخت بالا و دوام در شرایط سخت آب‌وهوایی طراحی شده‌اند. این برند که از سال ۲۰۱۰ فعالیت خود را آغاز کرده، با بهره‌گیری از فناوری‌های نوین و تست‌های میدانی، طیفی گسترده از تجهیزات مانند چادر، کیسه خواب، ننو، لوازم پخت‌وپز، کوله‌پشتی و مبلمان کمپینگ را ارائه می‌دهد. محصولات نیچرهایک با توجه به نیاز کاربران حرفه‌ای و طبیعت‌گردان، همواره توازن دقیقی میان وزن کم، عملکرد بالا و قیمت مناسب برقرار می‌کنند.\r\n<h2>نیچرهایک ساخت کجاست؟</h2>\r\nبرند نیچرهایک Naturehike در سال ۲۰۱۰ با تمرکز بر تولید تجهیزات سبک‌ وزن و تخصصی برای کوهنوردی و کمپینگ تأسیس شد. در حالی که بسیاری تصور می‌کنند محصولات ساخت چین معمولاً بی‌کیفیت‌اند، نیچرهایک خلاف این تصور را اثبات کرده‌است. این شرکت با سرمایه‌گذاری بر تحقیق و توسعه، آزمایش‌های میدانی در طبیعت، و بهره‌گیری از فرایندهای پیشرفته تولید، جایگاهی متفاوت برای خود در میان برندهای چینی تعریف کرده است. بنیان‌گذار نیچرهایک، فردی با تجربه در طبیعت‌گردی، مأموریت برند را «تسهیل ماجراجویی با تکیه بر کیفیت و سبکی» تعریف کرده‌است.\r\n<h2>مزیت‌ محصولات نیچرهایک</h2>\r\nیکی از نقاط تمایز برند نیچرهایک، آزمایش محصولات نه‌فقط در محیط‌های آزمایشگاهی بلکه در شرایط واقعی و فضای باز است. این رویکرد باعث شده کالاهایی نظیر چادرهای کوهنوردی، کیسه خواب، تجهیزات نورپردازی و ابزارهای پخت‌وپز کمپینگ، نه‌تنها از نظر تئوریک بلکه در عمل نیز کارآمد و مقاوم باشند. نیچرهایک با ثبت بیش از ۸۰ اختراع در حوزه طراحی تجهیزات فضای باز، نشان داده نوآوری را جدی می‌گیرد. بسیاری از محصولات این برند، مانند چادرهای فوق‌سبک، امروز جزو پرفروش‌ترین‌ها در بازار جهانی‌اند.\r\n<h2>محصولات کمپینگ و کوهنوردی</h2>\r\nنمایندگی برند نیچرهایک در کشورهای مختلف طیف گسترده‌ای از تجهیزات را در دسترس علاقه‌مندان قرار داده‌است. این محصولات، از چادر و ننو گرفته تا مبلمان کمپینگ، ظروف آشپزی، کیف و پوشاک، برای طیف متنوعی از کاربران – چه حرفه‌ای و چه آماتور – طراحی شده‌اند. یکی از اهداف نیچرهایک، عرضه کالاهایی است که علاوه بر کیفیت، حجم و وزن کمتری داشته باشند تا حمل و استفاده از آن‌ها در طبیعت ساده‌تر شود. این فلسفه تولید باعث محبوبیت جهانی برند شده‌است، خصوصاً میان طبیعت‌گردانی که سفرهای طولانی و سبک را ترجیح می‌دهند.\r\n<h2>دارای استاندارد جهانی کیفیت با قیمت اقتصادی</h2>\r\nاگرچه برند نیچرهایک ساخت چین است، اما کیفیت محصولات آن به گونه‌ای‌ست که مشتریان اروپایی و آمریکایی نیز به آن اقبال نشان داده‌اند. واردات برند نیچرهایک به بیش از ۹۰ کشور گواهی است بر اعتماد بازار جهانی به این نام. این برند با حفظ کیفیتی در حد برندهای مطرح اروپایی و ارائه قیمت‌هایی رقابتی، موفق شده‌ در بازاری اشباع‌شده، جایگاهی پایدار برای خود بسازد. از چادرهای حرفه‌ای گرفته تا لوازم جانبی سبک‌وزن، نیچرهایک تلاش می‌کند تا تعادلی بین عملکرد و قیمت ایجاد کند.\r\n<h2>نگاهی به آینده مارک نیچرهایک</h2>\r\nبرند نیچرهایک نه تنها به‌ عنوان تولیدکننده‌ تجهیزات کمپینگ و کوهنوردی شناخته می‌شود، بلکه به‌دلیل توجه به بازخورد کاربران و نوآوری مستمر نیز مورد تحسین است. این برند با تکیه بر فلسفه‌ای ساده اما مؤثر توسعه محصولات سبک، مقاوم و مقرون به صرفه برای زندگی در فضای باز موفق شده به یکی از معتبرترین نام‌ها در صنعت تجهیزات فضای باز تبدیل شود. به‌نظر می‌رسد این مسیر رو به رشد ادامه خواهد داشت و نیچرهایک، همچنان سهم مهمی از بازار جهانی را به خود اختصاص خواهد داد.",
+    "parent": 0,
+    "count": 364,
+    "image": null,
+    "review_count": 17,
+    "permalink": {
+      "errors": {
+        "invalid_taxonomy": [
+          "رده نامعتبر."
+        ]
+      },
+      "error_data": []
+    }
+  }
+]
