@@ -3,10 +3,13 @@
 // اسکریپت وارد کردن محصولات از ریوان کمپ به KAW CAMP
 // ═══════════════════════════════════════════
 // استفاده:
-//   node scripts/import-rivancamp.mjs                       → dry-run ۱۰۰ محصول
-//   node scripts/import-rivancamp.mjs --run                 → اجرای واقعی
-//   node scripts/import-rivancamp.mjs --limit=10 --run      → فقط ۱۰ تا
-//   node scripts/import-rivancamp.mjs --product-id=31716 --run → فقط یه محصول
+//   node scripts/import-rivancamp.mjs --limit=200                          → ۲۰۰ محصول اول (dry-run)
+//   node scripts/import-rivancamp.mjs --limit=200 --run                    → ۲۰۰ محصول اول (واقعی)
+//   node scripts/import-rivancamp.mjs --limit=200 --start=200 --run        → ۲۰۰ محصول بعدی (۲۰۱-۴۰۰)
+//   node scripts/import-rivancamp.mjs --limit=200 --start=400 --run        → ۲۰۰ محصول بعدی (۴۰۱-۶۰۰)
+//   node scripts/import-rivancamp.mjs --product-id=31716 --run             → فقط یه محصول خاص
+//
+// نکته: --start=N یعنی N محصول اول ریوان رو رد کن و از N+1 شروع کن
 
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
@@ -27,119 +30,74 @@ const getArg = (name, def) => {
 
 const RUN = hasFlag("--run");
 const LIMIT = parseInt(getArg("limit", "100"));
+const START_OFFSET = parseInt(getArg("start", "0")); // 🆕
 const MAX_IMAGES = parseInt(getArg("max-images", "5"));
 const SKIP_IMAGES = hasFlag("--skip-images");
 const SKIP_BRANDS = hasFlag("--skip-brands");
-const ONLY_PRODUCT_ID = getArg("product-id", ""); // 🆕
+const ONLY_PRODUCT_ID = getArg("product-id", "");
 
 console.log("═══════════════════════════════════════════");
 console.log("🚀 KAW CAMP — Import از ریوان");
 console.log("═══════════════════════════════════════════");
 console.log("حالت:", RUN ? "🔴 اجرای واقعی" : "🟢 Dry-run (بدون درج)");
 console.log("تعداد:", LIMIT);
+if (START_OFFSET > 0) console.log("شروع از محصول شماره:", START_OFFSET + 1);
 if (ONLY_PRODUCT_ID) console.log("فقط محصول ID:", ONLY_PRODUCT_ID);
 console.log("حداکثر عکس هر محصول:", SKIP_IMAGES ? "بدون عکس" : MAX_IMAGES);
 console.log("");
 
-// ═══ مپ دسته‌بندی: Rivan slug → KAW Category ═══
+// ═══ مپ دسته‌بندی ═══
 const CATEGORY_MAP = {
-  // ─── چادر و سایبان ───
-  "tent": "tent",
-  "camping-tent": "tent",
-  "naturehike-tent": "tent",
-  "mountaineering-tent": "tent",
-  "automatic-tent": "tent",
-  "inflatable-tent": "tent",
-  "travel-awning": "tent",
-  "pekynew-tent": "tent",
-  "kingcamp": "tent",
-  "chanodug": "tent",
-
-  // ─── چراغ و روشنایی ───
-  "camp-light": "lighting",
-  "flashlight": "lighting",
-  "small-sun-flashlight": "lighting",
-  "naturehike-flashlight": "lighting",
-  "zingaro-flashlight": "lighting",
-  "uv-flashlight": "lighting",
-  "tent-lights": "lighting",
-  "lantern": "lighting",
-  "naturehike-light": "lighting",
-  "headlamp": "lighting",
-
-  // ─── پخت و پز ───
-  "cooking": "cooking",
-  "travel-stove": "cooking",
-  "naturehike-camping-stove": "cooking",
-  "brs1": "cooking",
-  "flame-head": "cooking",
-  "brs": "cooking",
-  "wood-burning-stove": "cooking",
-  "naturehike": "cooking",
-  "barbecue": "cooking",
-  "dishes": "cooking",
-
-  // ─── لوازم خواب و شب‌مانی ───
-  "sleep-essentials": "sleep",
-  "sleeping-bag": "sleep",
-  "naturehike-sleeping-bag": "sleep",
-  "air-pillow": "sleep",
-  "camping-bed": "sleep",
-  "blanket": "sleep",
-  "neck-pillow": "sleep",
-
-  // ─── زیرانداز کمپینگ ───
-  "underlay": "mattress",
-  "air-mattress": "mattress",
-  "naturehike-mattress": "mattress",
-  "chanodug2": "mattress",
-  "travel-mat": "mattress",
-  "naturehike-mat": "mattress",
-  "tent-floor": "mattress",
-  "sleeping-bag-liner": "mattress",
-
-  // ─── میز و صندلی ───
-  "camping-table-and-chairs": "table",
-  "camping-table": "table",
-  "naturhike": "table",
-  "chanodug1": "table",
-  "camping-chair": "table",
-  "naturehike-camping-chair": "table",
+  // چادر و سایبان
+  "tent": "tent", "camping-tent": "tent", "naturehike-tent": "tent",
+  "mountaineering-tent": "tent", "automatic-tent": "tent",
+  "inflatable-tent": "tent", "travel-awning": "tent",
+  "pekynew-tent": "tent", "kingcamp": "tent", "chanodug": "tent",
+  // چراغ و روشنایی
+  "camp-light": "lighting", "flashlight": "lighting",
+  "small-sun-flashlight": "lighting", "naturehike-flashlight": "lighting",
+  "zingaro-flashlight": "lighting", "uv-flashlight": "lighting",
+  "tent-lights": "lighting", "lantern": "lighting",
+  "naturehike-light": "lighting", "headlamp": "lighting",
+  // پخت و پز
+  "cooking": "cooking", "travel-stove": "cooking",
+  "naturehike-camping-stove": "cooking", "brs1": "cooking",
+  "flame-head": "cooking", "brs": "cooking",
+  "wood-burning-stove": "cooking", "naturehike": "cooking",
+  "barbecue": "cooking", "dishes": "cooking",
+  // لوازم خواب و شب‌مانی
+  "sleep-essentials": "sleep", "sleeping-bag": "sleep",
+  "naturehike-sleeping-bag": "sleep", "air-pillow": "sleep",
+  "camping-bed": "sleep", "blanket": "sleep", "neck-pillow": "sleep",
+  // زیرانداز
+  "underlay": "mattress", "air-mattress": "mattress",
+  "naturehike-mattress": "mattress", "chanodug2": "mattress",
+  "travel-mat": "mattress", "naturehike-mat": "mattress",
+  "tent-floor": "mattress", "sleeping-bag-liner": "mattress",
+  // میز و صندلی
+  "camping-table-and-chairs": "table", "camping-table": "table",
+  "naturhike": "table", "chanodug1": "table",
+  "camping-chair": "table", "naturehike-camping-chair": "table",
   "inflatable-sofa": "table",
-
-  // ─── تجهیزات و ابزار ───
-  "travel-equipment": "tools",
-  "power-station": "tools",
-  "toolbox": "tools",
-  "coolbox": "tools",
-  "jetfan": "tools",
-  "camping-trolley": "tools",
-  "climbing-baton": "tools",
-
-  // ─── کیف و کوله‌پشتی ───
-  "backpack": "backpack",
-  "hiking-backpack": "backpack",
-  "camping-bag": "backpack",
-  "travel-backpack": "backpack",
+  // تجهیزات و ابزار
+  "travel-equipment": "tools", "power-station": "tools",
+  "toolbox": "tools", "coolbox": "tools", "jetfan": "tools",
+  "camping-trolley": "tools", "climbing-baton": "tools",
+  // کیف و کوله‌پشتی
+  "backpack": "backpack", "hiking-backpack": "backpack",
+  "camping-bag": "backpack", "travel-backpack": "backpack",
   "tactical-backpack": "backpack",
-
-  // ─── پوشاک کوهنوردی ───
-  "clothing": "clothing",
-  "jackets": "clothing",
-
-  // ─── کفش کوهنوردی ───
+  // پوشاک
+  "clothing": "clothing", "jackets": "clothing",
+  // کفش
   "shoes": "shoes",
-
-  // ─── لیوان و قمقمه ───
+  // لیوان
   "mug": "bottle",
 };
 
-// ═══ خواندن .env.local ═══
 async function loadEnv() {
   const envPath = path.join(ROOT, ".env.local");
-  if (!existsSync(envPath)) {
-    throw new Error(".env.local پیدا نشد.");
-  }
+  if (!existsSync(envPath)) throw new Error(".env.local پیدا نشد.");
   const text = await readFile(envPath, "utf8");
   const env = {};
   for (const line of text.split("\n")) {
@@ -197,7 +155,6 @@ function attributesToSpecs(attributes) {
     .filter((s) => s.label && s.value);
 }
 
-// ═══ fetch helper ═══
 async function fetchJson(url, label = "") {
   try {
     const res = await fetch(url, {
@@ -217,7 +174,7 @@ async function fetchJson(url, label = "") {
   }
 }
 
-// ۱. همهٔ دسته‌بندی‌ها
+// ═══ ۱. دسته‌بندی‌ها ═══
 async function fetchAllCategories() {
   console.log("📥 دریافت دسته‌بندی‌ها از WP REST...");
   const map = {};
@@ -237,31 +194,42 @@ async function fetchAllCategories() {
   return map;
 }
 
-// ۲. IDs محصولات → catIds
-async function fetchProductCatIds(limit) {
+// 🆕 ۲. catIds محصولات (با offset)
+async function fetchProductCatIds(limit, offset = 0) {
   console.log("📥 دریافت product_cat از WP REST...");
+  if (offset > 0) console.log(`   شروع از محصول #${offset + 1}`);
+
   const map = {};
-  let page = 1;
-  let total = 0;
-  while (total < limit) {
+  let page = Math.floor(offset / 100) + 1;
+  let skipInFirstPage = offset - (page - 1) * 100;
+  let isFirstPage = true;
+  let fetchedGlobal = 0;
+  let collected = 0;
+
+  while (collected < limit) {
     const data = await fetchJson(
       `https://rivancamp.com/wp-json/wp/v2/product?per_page=100&page=${page}&_fields=id,product_cat`
     );
     if (!data || data.length === 0) break;
+
     for (const p of data) {
-      if (total >= limit) break;
+      fetchedGlobal++;
+      if (isFirstPage && fetchedGlobal <= skipInFirstPage) continue;
+      if (collected >= limit) break;
       map[p.id] = p.product_cat || [];
-      total++;
+      collected++;
     }
-    console.log(`   صفحه ${page}: +${data.length} → ${total}/${limit}`);
+
+    console.log(`   صفحه ${page}: → ${collected}/${limit}`);
+    isFirstPage = false;
     if (data.length < 100) break;
     page++;
   }
-  console.log(`   ✅ ${total} محصول با catIds`);
+  console.log(`   ✅ ${collected} محصول با catIds`);
   return map;
 }
 
-// 🆕 ۲b. فقط یه محصول خاص
+// 🆕 ۲b. محصول تک
 async function fetchSingleProductCatId(id) {
   console.log(`📥 دریافت product_cat برای محصول ${id}...`);
   const data = await fetchJson(
@@ -272,21 +240,32 @@ async function fetchSingleProductCatId(id) {
   return { [data.id]: data.product_cat || [] };
 }
 
-// ۳. محصولات کامل از Store API
-async function fetchStoreProducts(limit) {
+// 🆕 ۳. محصولات کامل (با offset)
+async function fetchStoreProducts(limit, offset = 0) {
   console.log("📥 دریافت جزئیات کامل از Store API...");
+  if (offset > 0) console.log(`   شروع از محصول #${offset + 1}`);
+
   const list = [];
-  let page = 1;
+  let page = Math.floor(offset / 100) + 1;
+  let skipInFirstPage = offset - (page - 1) * 100;
+  let isFirstPage = true;
+  let fetchedGlobal = 0;
+
   while (list.length < limit) {
     const data = await fetchJson(
       `https://rivancamp.com/wp-json/wc/store/v1/products?per_page=100&page=${page}`
     );
     if (!data || data.length === 0) break;
+
     for (const p of data) {
+      fetchedGlobal++;
+      if (isFirstPage && fetchedGlobal <= skipInFirstPage) continue;
       if (list.length >= limit) break;
       list.push(p);
     }
-    console.log(`   صفحه ${page}: +${data.length} → ${list.length}/${limit}`);
+
+    console.log(`   صفحه ${page}: → ${list.length}/${limit}`);
+    isFirstPage = false;
     if (data.length < 100) break;
     page++;
   }
@@ -294,7 +273,7 @@ async function fetchStoreProducts(limit) {
   return list;
 }
 
-// 🆕 ۳b. فقط یه محصول خاص
+// 🆕 ۳b. محصول تک
 async function fetchSingleStoreProduct(id) {
   console.log(`📥 دریافت جزئیات محصول ${id} از Store API...`);
   const data = await fetchJson(
@@ -360,20 +339,18 @@ async function main() {
   // ۳. دسته‌بندی‌ها
   const catMap = await fetchAllCategories();
 
-  // ۴. catIds محصولات
+  // ۴. catIds
   let productCatMap;
   let allRivan;
 
   if (ONLY_PRODUCT_ID) {
-    // 🆕 حالت تک محصول
     productCatMap = await fetchSingleProductCatId(ONLY_PRODUCT_ID);
     console.log("");
     allRivan = await fetchSingleStoreProduct(ONLY_PRODUCT_ID);
   } else {
-    // حالت عادی
-    productCatMap = await fetchProductCatIds(LIMIT);
+    productCatMap = await fetchProductCatIds(LIMIT, START_OFFSET);
     console.log("");
-    allRivan = await fetchStoreProducts(LIMIT);
+    allRivan = await fetchStoreProducts(LIMIT, START_OFFSET);
   }
 
   // ۶. پردازش
@@ -392,7 +369,6 @@ async function main() {
       rp.name.length > 45 ? rp.name.slice(0, 45) + "…" : rp.name;
 
     try {
-      // slug/id تکراری
       if (slugSet.has(rp.slug)) {
         console.log(`  [${num}] ⏭  ${shortName} (slug تکراری)`);
         skipped++;
@@ -406,7 +382,6 @@ async function main() {
         continue;
       }
 
-      // دسته‌بندی
       const catIds = productCatMap[rp.id] || [];
       const catSlugs = catIds.map((id) => catMap[id]?.slug).filter(Boolean);
 
@@ -427,21 +402,15 @@ async function main() {
         continue;
       }
 
-      // برند
       const rawBrand = extractBrand(rp.attributes);
       const brandName = rawBrand ? cleanBrandName(rawBrand) : "";
       const brandToSave = brandName || undefined;
 
-      if (
-        brandName &&
-        !SKIP_BRANDS &&
-        !brandSet.has(brandName.toLowerCase())
-      ) {
+      if (brandName && !SKIP_BRANDS && !brandSet.has(brandName.toLowerCase())) {
         newBrands.push({ name: brandName, slug: rp.slug });
         brandSet.add(brandName.toLowerCase());
       }
 
-      // عکس‌ها
       const rawImages = (rp.images || []).slice(0, MAX_IMAGES);
       const uploadedUrls = [];
       const localId = String(rp.id);
@@ -467,21 +436,16 @@ async function main() {
               uploadedUrls.push(`[DRY]/${filePath}`);
             }
           } catch (imgErr) {
-            console.log(
-              `     ⚠️  عکس ${imgIdx + 1} رد شد: ${imgErr.message}`
-            );
+            console.log(`     ⚠️  عکس ${imgIdx + 1} رد شد: ${imgErr.message}`);
           }
         }
       }
 
-      // قیمت
       const priceRaw = Number(rp.prices?.price || 0);
       const regularRaw = Number(rp.prices?.regular_price || 0);
       const price = Math.round(priceRaw);
       const oldPrice =
-        regularRaw > 0 && regularRaw !== priceRaw
-          ? Math.round(regularRaw)
-          : null;
+        regularRaw > 0 && regularRaw !== priceRaw ? Math.round(regularRaw) : null;
 
       const specs = attributesToSpecs(rp.attributes);
 
@@ -504,6 +468,7 @@ async function main() {
         english_name: null,
         colors: null,
         sizes: null,
+        capacities: null,
         specs: specs.length > 0 ? specs : null,
         cost_price: 0,
       };
@@ -568,8 +533,9 @@ async function main() {
   if (!SKIP_BRANDS) console.log(`🏷  برند جدید: ${newBrands.length}`);
   console.log("");
   if (!RUN) {
-    console.log("⚠️  dry-run بود. برای اجرای واقعی:");
-    console.log("   node scripts/import-rivancamp.mjs --run");
+    console.log("⚠️  dry-run بود. برای اجرای واقعی: --run اضافه کن");
+  } else {
+    console.log(`💡 مجموع محصولات در DB: ${(existingProducts?.length || 0) + inserted}`);
   }
 }
 

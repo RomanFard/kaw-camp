@@ -117,7 +117,6 @@ export default function MobileMenuDrawer({
         }
       />
 
-      {/* ─── Drawer اصلی ─── */}
       <aside
         dir="rtl"
         className={
@@ -276,7 +275,6 @@ export default function MobileMenuDrawer({
         </div>
       </aside>
 
-      {/* ─── پنل زیرمنو دسکتاپ ─── */}
       {view.type === "category" && currentCategory && (
         <div
           dir="rtl"
@@ -366,14 +364,37 @@ function MainView({
             onClick={onClose}
             className="flex items-center justify-between border-b border-theme/40 px-5 py-3.5 text-sm font-bold text-theme transition hover:bg-theme-surface"
           >
+            <span>همه محصولات</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.2}
+              stroke="currentColor"
+              className="h-3.5 w-3.5 text-theme-muted"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 19.5L8.25 12l7.5-7.5"
+              />
+            </svg>
+          </Link>
+        </li>
+        <li className="px-4 py-2">
+          <Link
+            href="/products"
+            onClick={onClose}
+            className="flex items-center justify-center rounded-xl border-2 border-accent bg-accent/10 px-4 py-3 text-sm font-black text-accent transition hover:bg-accent hover:text-white"
+          >
             همه محصولات
           </Link>
         </li>
-        <li>
+        <li className="px-4 py-2">
           <Link
             href="/brands"
             onClick={onClose}
-            className="flex items-center justify-between border-b border-theme/40 px-5 py-3.5 text-sm font-bold text-theme transition hover:bg-theme-surface"
+            className="flex items-center justify-center rounded-xl border-2 border-theme bg-theme-surface px-4 py-3 text-sm font-black text-theme transition hover:border-accent hover:text-accent"
           >
             برندها
           </Link>
@@ -471,7 +492,6 @@ function MainView({
     </div>
   );
 }
-
 function CapacityFilter({
   categoryKey,
   onApply,
@@ -479,22 +499,25 @@ function CapacityFilter({
   categoryKey: string;
   onApply: () => void;
 }) {
+  // 🆕 آرایه از کوچیک به بزرگ (RTL: راست=کوچیک، چپ=بزرگ)
   const CAPACITIES = [
-    "۱۲ نفره و بالاتر",
-    "۱۰ نفره",
-    "۸ نفره",
-    "۷ نفره",
-    "۶ نفره",
-    "۵ نفره",
-    "۴ نفره",
-    "۳ نفره",
-    "۲ نفره",
     "۱ نفره",
+    "۲ نفره",
+    "۳ نفره",
+    "۴ نفره",
+    "۵ نفره",
+    "۶ نفره",
+    "۷ نفره",
+    "۸ نفره",
+    "۱۰ نفره",
+    "۱۲ نفره و بالاتر",
   ];
-  const [index, setIndex] = useState(0);
   const MAX = CAPACITIES.length - 1;
+
+  // 🆕 پیش‌فرض: همه (index = MAX)
+  const [index, setIndex] = useState(MAX);
   const percent = (index / MAX) * 100;
-  const isAll = index === 0;
+  const isAll = index === MAX;
 
   return (
     <div className="border-b border-theme/40 px-5 py-5">
@@ -505,7 +528,8 @@ function CapacityFilter({
         </span>
       </div>
 
-      <div dir="ltr" className="px-1">
+      {/* اسلایدر RTL */}
+      <div dir="rtl" className="px-1">
         <input
           type="range"
           min={0}
@@ -515,14 +539,15 @@ function CapacityFilter({
           onChange={(e) => setIndex(Number(e.target.value))}
           className="kaw-range h-1.5 w-full cursor-pointer appearance-none rounded-full"
           style={{
-            background: `linear-gradient(to right, var(--accent, #E84C4C) 0%, var(--accent, #E84C4C) ${percent}%, var(--theme-surface, #27272A) ${percent}%, var(--theme-surface, #27272A) 100%)`,
+            background: `linear-gradient(to left, var(--accent, #E84C4C) 0%, var(--accent, #E84C4C) ${percent}%, var(--theme-surface, #27272A) ${percent}%, var(--theme-surface, #27272A) 100%)`,
           }}
         />
       </div>
 
+      {/* 🆕 برچسب‌ها: راست=کوچیک، چپ=بزرگ (RTL) */}
       <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-theme-muted">
-        <span>۱۲+ نفره</span>
         <span>۱ نفره</span>
+        <span>۱۲+ نفره</span>
       </div>
 
       <Link
@@ -541,7 +566,6 @@ function CapacityFilter({
     </div>
   );
 }
-
 function CategoryView({
   category,
   openGroups,
@@ -650,12 +674,12 @@ function CategoryView({
         <CapacityFilter categoryKey={category.key} onApply={onClose} />
       )}
 
-      {/* 🆕 دکمهٔ «مشاهده همه» حالا بالا + تصویر پایین */}
+      {/* 🆕 «مشاهده همه» با کادر و استایل دکمه‌ای + عکس */}
       <div className="mt-6 flex flex-col items-center px-6">
         <Link
           href={`/products?cat=${category.key}`}
           onClick={onClose}
-          className="text-lg font-black tracking-tight text-theme transition hover:text-accent"
+          className="flex w-full max-w-[260px] items-center justify-center rounded-xl border-2 border-accent bg-accent/10 px-4 py-3 text-sm font-black text-accent transition hover:bg-accent hover:text-white md:text-base"
         >
           مشاهده همه {category.label}
         </Link>

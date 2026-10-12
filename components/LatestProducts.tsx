@@ -1,54 +1,30 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getAppContent } from "@/lib/supabase/appContent";
-import type { CategoryGridFilter } from "@/lib/contentTypes";
-
-const DEFAULT_FILTERS: CategoryGridFilter[] = [
-  { key: "best", label: "منتخب ها", photos: ["tent", "sleep", "mattress", "backpack", "clothing", "boots"] },
-  { key: "tent", label: "چادر", photos: ["tent", "bottle", "cooking", "lighting", "tools", "accessories"] },
-  { key: "sleep", label: "کیسه خواب", photos: ["sleep", "mattress", "tent", "bottle", "lighting", "backpack"] },
-  { key: "mattress", label: "زیرانداز", photos: ["mattress", "sleep", "tent", "backpack", "clothing", "boots"] },
-  { key: "backpack", label: "کوله پشتی", photos: ["backpack", "accessories", "bottle", "clothing", "boots", "tent"] },
-  { key: "clothing", label: "لباس کوهنوردی", photos: ["clothing", "boots", "socks", "gaiters", "backpack", "tent"] },
-  { key: "shoes", label: "کفش کوهنوردی", photos: ["boots", "gaiters", "socks", "clothing", "backpack", "tent"] },
-];
-
-const LABELS: Record<string, string> = {
-  tent: "چادر و سایبان",
-  sleep: "کیسه خواب",
-  mattress: "زیرانداز",
-  backpack: "کوله پشتی",
-  clothing: "لباس کوهنوردی",
-  boots: "کفش کوهنوردی",
-  socks: "جوراب",
-  gaiters: "گتر",
-  tools: "ابزار و تجهیزات",
-  lighting: "روشنایی و چراغ",
-  bottle: "قمقمه و فلاسک",
-  cooking: "پخت و پز",
-  accessories: "لوازم جانبی",
-};
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useProducts } from "@/components/context/ProductsContext";
+import { formatPrice } from "@/lib/utils";
+import type { Product } from "@/data/products";
 
 const SPEED = 0.5;
 const STEP_DEG = 26;
 const GAP = 1.04;
 const PERSPECTIVE = 2400;
-
 const MOBILE_MAX = 640;
-
-// 🆕 تأخیر شروع حرکت بعد از برداشتن دست/موس (میلی‌ثانیه)
 const RESUME_DELAY = 2000;
+const MAX_PRODUCTS_PER_ROW = 12;
 
 const mod = (a: number, m: number) => ((a % m) + m) % m;
 const wrapP = (x: number, n: number) => mod(x + n / 2, n) - n / 2;
 
+// ═══════════════════════════════════════════
+// Carousel3D — کاروسل ۳بعدی
+// ═══════════════════════════════════════════
 type RowProps = {
-  photos: string[];
+  products: Product[];
   reverse?: boolean;
 };
 
-function Carousel3D({ photos, reverse = false }: RowProps) {
+function Carousel3D({ products, reverse = false }: RowProps) {
   const [wrapW, setWrapW] = useState(1200);
   const [dot, setDot] = useState(0);
 
@@ -62,7 +38,6 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
   const dragStartX = useRef<number | null>(null);
   const dragged = useRef(false);
 
-  // 🆕 پاز هوشمند
   const hoverRef = useRef(false);
   const pauseUntilRef = useRef(0);
   const activeCardIdxRef = useRef<number | null>(null);
@@ -80,12 +55,12 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
     return () => ro.disconnect();
   }, []);
 
-  const n = photos.length;
+  const n = products.length;
   const isMobile = wrapW < MOBILE_MAX;
 
   const size = isMobile
-    ? Math.round(Math.min(130, Math.max(80, wrapW * 0.28)))
-    : Math.round(Math.min(240, Math.max(100, wrapW * 0.2)));
+    ? Math.round(Math.min(150, Math.max(90, wrapW * 0.32)))
+    : Math.round(Math.min(280, Math.max(120, wrapW * 0.22)));
 
   const radius = (size * GAP) / 2 / Math.tan((STEP_DEG / 2) * (Math.PI / 180));
 
@@ -126,7 +101,6 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
       el.style.pointerEvents = opacity > 0.3 ? "auto" : "none";
       el.style.setProperty("--t", textOpacity.toFixed(3));
 
-      // 🆕 زوم کارت فعال (فقط وقتی drag نمی‌کنیم)
       const inner = el.firstElementChild as HTMLElement | null;
       if (inner) {
         const isActive =
@@ -173,7 +147,6 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
         }
         velRef.current = 0;
       } else {
-        // 🆕 حرکت فقط وقتی hover نیست، drag نیست، و ۲ ثانیه گذشته
         const canMove =
           !hoverRef.current &&
           dragStartX.current === null &&
@@ -221,7 +194,7 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
     dragStartX.current = e.clientX;
     dragged.current = false;
     hoverRef.current = true;
-    activeCardIdxRef.current = null; // 🆕 لغو زوم هنگام drag
+    activeCardIdxRef.current = null;
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
@@ -234,9 +207,10 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
       }
     }
     dragStartX.current = null;
-    // 🆕 بعد از drag، ۲ ثانیه صبر
     pauseUntilRef.current = Date.now() + RESUME_DELAY;
   };
+
+  if (n === 0) return null;
 
   return (
     <div>
@@ -245,12 +219,11 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
         dir="ltr"
         className="relative w-full select-none touch-pan-y"
         style={{
-          height: size + 90,
+          height: size + 100,
           perspective: `${PERSPECTIVE}px`,
           WebkitMaskImage: fadeMask,
           maskImage: fadeMask,
         }}
-        // 🆕 carousel-level hover
         onPointerEnter={(e) => {
           if (e.pointerType !== "mouse") return;
           hoverRef.current = true;
@@ -261,7 +234,6 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
           pauseUntilRef.current = Date.now() + RESUME_DELAY;
           activeCardIdxRef.current = null;
         }}
-        // 🆕 touch: شروع/پایان لمس روی کل carousel
         onTouchStart={() => {
           hoverRef.current = true;
         }}
@@ -286,18 +258,21 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
             transform: `translateZ(${-radius}px)`,
           }}
         >
-          {photos.map((photoName, i) => {
-            const imageSrc = `/images/categories/photos/${photoName}.jpg`;
-            const label = LABELS[photoName] || photoName;
+          {products.map((product, i) => {
+            const hasDiscount = !!product.oldPrice;
+            const discount = product.oldPrice
+              ? Math.round(
+                  ((product.oldPrice - product.price) / product.oldPrice) * 100
+                )
+              : 0;
 
             return (
               <a
-                key={`${photoName}-${i}`}
+                key={`${product.id}-${i}`}
                 ref={(el) => {
                   cardRefs.current[i] = el;
                 }}
-                href="/products"
-                // 🆕 hover/touch روی هر کارت → بزرگ شه
+                href={`/product/${product.id}`}
                 onPointerEnter={(e) => {
                   if (e.pointerType !== "mouse") return;
                   activeCardIdxRef.current = i;
@@ -335,43 +310,53 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
                   willChange: "transform, filter, opacity",
                 }}
               >
-                {/* 🆕 inner wrapper برای زوم نرم */}
                 <div className="kaw-card-inner">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={imageSrc}
-                    alt={label}
+                    src={product.image}
+                    alt={product.name}
                     loading="lazy"
                     draggable={false}
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      target.style.display = "none";
-                      const parent = target.parentElement;
-                      if (parent && !parent.querySelector(".fallback-emoji")) {
-                        const wrapper = document.createElement("div");
-                        wrapper.className =
-                          "fallback-emoji absolute inset-0 flex flex-col items-center justify-center gap-2 bg-theme-surface";
-                        wrapper.innerHTML = `<span style="font-size: 2rem">📦</span>`;
-                        parent.appendChild(wrapper);
-                      }
-                    }}
                     className="h-full w-full object-cover object-center"
                   />
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  {/* گرادیان تیره */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
+                  {/* بج تخفیف */}
+                  {hasDiscount && discount > 0 && (
+                    <span className="absolute right-2 top-2 rounded-md bg-accent px-1.5 py-0.5 text-[9px] font-black text-white shadow-lg md:text-[11px]">
+                      {discount}٪
+                    </span>
+                  )}
+
+                  {/* ناموجود */}
+                  {!product.inStock && (
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/70 text-xs font-bold text-white md:text-sm">
+                      ناموجود
+                    </span>
+                  )}
+
+                  {/* اطلاعات پایین */}
                   <div
                     dir="rtl"
                     className="absolute bottom-0 left-0 right-0 p-2 md:p-3"
                     style={{ opacity: "var(--t, 1)" }}
                   >
                     <div className="mb-1 h-[2px] w-6 bg-accent md:mb-1.5" />
-                    <h3 className="text-[10px] font-black text-white md:text-xs">
-                      {label}
+                    <h3 className="line-clamp-1 text-[10px] font-black text-white md:text-sm">
+                      {product.name}
                     </h3>
-                    <p className="mt-0.5 text-[8px] font-bold text-accent md:text-[10px]">
-                      مشاهده محصولات
-                    </p>
+                    <div className="mt-1 flex items-center gap-2">
+                      {product.oldPrice && (
+                        <span className="text-[8px] text-white/60 line-through md:text-[10px]">
+                          {formatPrice(product.oldPrice)}
+                        </span>
+                      )}
+                      <span className="text-[10px] font-black text-accent md:text-xs">
+                        {formatPrice(product.price)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </a>
@@ -402,11 +387,11 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-2">
-        {photos.map((_, i) => (
+        {products.map((_, i) => (
           <button
             key={i}
             type="button"
-            aria-label={`عکس ${i + 1}`}
+            aria-label={`محصول ${i + 1}`}
             onClick={() => goTo(i)}
             className={
               "h-1.5 rounded-full transition-all duration-500 " +
@@ -416,7 +401,6 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
         ))}
       </div>
 
-      {/* 🆕 استایل inner card */}
       <style jsx>{`
         .kaw-card-inner {
           position: absolute;
@@ -451,17 +435,47 @@ function Carousel3D({ photos, reverse = false }: RowProps) {
   );
 }
 
+// ═══════════════════════════════════════════
+// کامپوننت اصلی
+// ═══════════════════════════════════════════
 export default function CategoryGrid() {
-  const [filters, setFilters] = useState<CategoryGridFilter[]>(DEFAULT_FILTERS);
+  const { products, loading } = useProducts();
 
-  useEffect(() => {
-    (async () => {
-      const data = await getAppContent<CategoryGridFilter[]>("category_grid");
-      if (data && data.length > 0) setFilters(data);
-    })();
-  }, []);
+  // 🆕 ۱۲ محصول جدید (بر اساس id نزولی)
+  const latestProducts = useMemo(() => {
+    return [...products]
+      .sort((a, b) => Number(b.id) - Number(a.id))
+      .slice(0, MAX_PRODUCTS_PER_ROW);
+  }, [products]);
 
-  const photos = filters[0]?.photos || [];
+  // حالت loading
+  if (loading) {
+    return (
+      <section className="relative py-12 md:py-16">
+        <div className="relative w-full overflow-hidden bg-theme py-12 md:py-16">
+          <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
+            <div className="mb-10 text-center">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3.5 py-1.5 backdrop-blur-sm">
+                <span className="text-[11px] font-bold tracking-[0.15em] text-accent md:text-xs">
+                  OUR WORK
+                </span>
+              </div>
+              <h2 className="text-2xl font-black tracking-tight text-theme md:text-3xl lg:text-4xl">
+                <span className="text-accent">جدیدترین</span> ها
+              </h2>
+              <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-accent" />
+              <p className="mt-6 text-xs text-theme-muted">در حال بارگذاری...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // اگه محصولی نیست
+  if (latestProducts.length === 0) {
+    return null;
+  }
 
   return (
     <section className="relative py-12 md:py-16">
@@ -479,12 +493,38 @@ export default function CategoryGrid() {
             </h2>
 
             <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-accent" />
+
+            {/* 🆕 لینک مشاهده همه */}
+            <a
+              href="/products?sort=newest"
+              className="mt-4 inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/5 px-4 py-2 text-[11px] font-bold text-accent transition hover:bg-accent hover:text-white md:text-xs"
+            >
+              مشاهده همه محصولات
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+                className="h-3 w-3"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </a>
           </div>
         </div>
 
-        <Carousel3D photos={photos} />
+        {/* دو ردیف کاروسل */}
+        <Carousel3D products={latestProducts} />
         <div className="mt-2 md:mt-4">
-          <Carousel3D photos={photos} reverse />
+          <Carousel3D
+            products={[...latestProducts].reverse()}
+            reverse
+          />
         </div>
       </div>
     </section>

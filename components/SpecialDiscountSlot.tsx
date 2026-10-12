@@ -15,20 +15,16 @@ const money = (n: number) => new Intl.NumberFormat("fa-IR").format(n);
 const SPEED = 40;
 const RESUME_DELAY = 2000;
 
-// 🆕 درصد تخفیف نمایشی برای محصولات بدون oldPrice
-const FAKE_DISCOUNT = 15;
-
-// 🆕 محاسبه‌ی قیمت اصلی و درصد تخفیف (واقعی یا نمایشی)
+// 🆕 فقط تخفیف واقعی (oldPrice)
 function getPricing(p: Product) {
   if (p.oldPrice && p.oldPrice > p.price) {
     const discount = Math.round(
       ((p.oldPrice - p.price) / p.oldPrice) * 100
     );
-    return { original: p.oldPrice, discount, isFake: false };
+    return { original: p.oldPrice, discount, hasDiscount: true };
   }
-  // محصول بدون تخفیف → تخفیف نمایشی
-  const original = Math.round(p.price / (1 - FAKE_DISCOUNT / 100));
-  return { original, discount: FAKE_DISCOUNT, isFake: true };
+  // محصول بدون oldPrice → بدون تخفیف
+  return { original: null, discount: 0, hasDiscount: false };
 }
 
 export default function DiscountProducts({}: Props = {}) {
@@ -167,7 +163,7 @@ export default function DiscountProducts({}: Props = {}) {
   if (loading || items.length === 0) return null;
 
   const card = (p: Product, idx: number) => {
-    const { original, discount } = getPricing(p);
+    const { original, discount, hasDiscount } = getPricing(p);
     const img = p.image || getProductImage(p.category, p.id);
     const isActive = activeCardId === p.id;
 
@@ -186,16 +182,20 @@ export default function DiscountProducts({}: Props = {}) {
         >
           <div className="camp-product__photo">
             <img src={img} alt={p.name} draggable={false} />
-            {/* 🆕 همیشه بج تخفیف نشون داده می‌شه */}
-            <span className="camp-badge">
-              {discount.toLocaleString("fa-IR")}٪
-            </span>
+            {/* 🆕 فقط اگه تخفیف واقعی بود */}
+            {hasDiscount && discount > 0 && (
+              <span className="camp-badge">
+                {discount.toLocaleString("fa-IR")}٪
+              </span>
+            )}
           </div>
           <div className="camp-product__info">
             <h3>{p.name}</h3>
             <span className="camp-brand">KAW CAMP</span>
-            {/* 🆕 همیشه قیمت خط‌خورده + قیمت اصلی نشون داده می‌شه */}
-            <del>{money(original)}</del>
+            {/* 🆕 فقط اگه تخفیف واقعی بود، قیمت خط‌خورده نشون داده می‌شه */}
+            {hasDiscount && original && (
+              <del>{money(original)}</del>
+            )}
             <strong>
               {money(p.price)} <small>تومان</small>
             </strong>
@@ -250,14 +250,14 @@ export default function DiscountProducts({}: Props = {}) {
         .camp-product__photo img{width:100%;height:100%;object-fit:cover;transition:transform .5s;pointer-events:none}
         .camp-product--active .camp-product__photo img{transform:scale(1.08)}
 
-        /* 🆕 بج تخفیف همیشه با استایل قرمز */
+        /* 🆕 بج تخفیف فقط برای تخفیف واقعی */
         .camp-badge{position:absolute;z-index:2;top:5px;right:5px;padding:3px 8px;border-radius:14px;background:#e64f35;color:#fff;font-size:10px;font-weight:900;box-shadow:0 2px 6px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.15);letter-spacing:.3px}
 
         .camp-product__info{text-align:center;padding:7px 1px 0}
         .camp-product__info h3{min-height:32px;margin:0 0 3px;font-size:11px;line-height:1.5;font-weight:700;color:#f5f1e6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
         .camp-brand{display:block;margin-bottom:5px;color:#a9aaa0;font-size:8px;letter-spacing:1px;direction:ltr}
 
-        /* 🆕 قیمت خط‌خورده واضح‌تر */
+        /* 🆕 قیمت خط‌خورده فقط برای تخفیف واقعی */
         .camp-product__info del{display:block;color:#8b8275;font-size:9px;text-decoration:line-through;margin-bottom:2px}
 
         .camp-product__info strong{display:block;margin-top:2px;color:#ff9d32;font-size:13px;white-space:nowrap}
