@@ -46,7 +46,7 @@ function Icon({
 }
 
 function ProductCard({ product }: { product: Product }) {
-  const { isInWishlist, toggle } = useWishlist();
+ const { isInWishlist, toggleItem } = useWishlist();
   const inWishlist = isInWishlist(product.id);
   const hasDiscount = !!product.oldPrice;
   const discount = product.oldPrice
@@ -125,10 +125,10 @@ function ProductCard({ product }: { product: Product }) {
             "pointer-events-auto flex h-7 w-7 items-center justify-center transition hover:opacity-60 md:h-8 md:w-8 " +
             (inWishlist ? "text-red-500" : "text-black")
           }
-          onClick={(e) => {
-            e.preventDefault();
-            toggle(product.id);
-          }}
+onClick={(e) => {
+  e.preventDefault();
+  toggleItem(product, "product");
+}}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
