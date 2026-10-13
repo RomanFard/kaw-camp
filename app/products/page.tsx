@@ -357,7 +357,7 @@ function ProductsContent() {
 
   return (
     <main className="relative min-h-screen bg-theme">
-      <ScrollToHash />
+      
       <Header />
 
       {/* ───── هدر صفحه ───── */}
