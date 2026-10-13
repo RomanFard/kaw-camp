@@ -14,8 +14,17 @@ import { HeroSlideProvider } from "@/components/context/HeroSlideContext";
 import ToastContainer from "@/components/ToastContainer";
 
 export const metadata: Metadata = {
-  title: "KAW CAMP | فروشگاه تخصصی کمپینگ و کوهنوردی",
+  // 🆕 موقت — برای تأیید عنوان اینماد
+  // ⚠️ بعد از تأیید اینماد، این خط رو به مقدار اصلی برگردون:
+  // title: "KAW CAMP | فروشگاه تخصصی کمپینگ و کوهنوردی",
+  title: "4817186",
+
   description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
+
+  // 🆕 متاتگ اینماد — دائمی
+  other: {
+    enamad: "4817186",
+  },
 };
 
 export default function RootLayout({
@@ -76,8 +85,7 @@ export default function RootLayout({
                   <CartProvider>
                     <WishlistProvider>
                       {children}
-                    
-  
+
                       <ToastContainer />
                     </WishlistProvider>
                   </CartProvider>
