@@ -17,62 +17,65 @@ export default function NewsletterSection() {
   }
 
   return (
-    <section dir="rtl" className="overflow-hidden py-12 md:py-16">
-      {/* ═══ کادر تمام‌عرض — از لبه تا لبه ═══ */}
-      <div className="relative w-full overflow-hidden bg-theme-card px-6 py-14 text-center md:py-20">
-        {/* گرادیان پس‌زمینه */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div
-            className="absolute -right-32 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full blur-[120px]"
-            style={{ backgroundColor: "var(--accent)", opacity: 0.15 }}
-          />
-          <div
-            className="absolute -left-32 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full blur-[120px]"
-            style={{ backgroundColor: "var(--accent)", opacity: 0.1 }}
-          />
-        </div>
+    <section dir="rtl" className="w-full px-3 py-10 sm:px-6 md:px-7 md:py-14">
+      <div className="bg-white px-6 py-10 md:px-10 md:py-12">
+        <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-10">
+          {/* ─── متن ─── */}
+          <div className="text-right">
+            <h2 className="text-lg font-black tracking-tight text-black md:text-xl lg:text-2xl">
+              عضویت و دریافت ۱۵٪ تخفیف
+            </h2>
+            <p className="mt-3 max-w-md text-[13px] leading-6 text-black/70 md:text-[14px] md:leading-7">
+              برای دریافت تخفیف‌های ویژه، نکات کمپینگ و جدیدترین اخبار فروشگاه،
+              ایمیل خود را وارد کنید.
+            </p>
+          </div>
 
-        {/* محتوا */}
-        <div className="relative z-10 mx-auto max-w-[1400px] px-4 md:px-12 lg:px-16">
-          <h2 className="text-3xl font-black tracking-tight md:text-4xl lg:text-5xl">
-            <span className="text-theme">در جریان </span>
-            <span className="text-accent">باش</span>
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-xl text-sm text-theme-muted md:text-base">
-            برای دریافت تخفیف‌های ویژه، نکات کمپینگ و جدیدترین اخبار فروشگاه
-            مشترک شوید.
-          </p>
-
-          {submitted ? (
-            <div className="mx-auto mt-8 flex max-w-md items-center justify-center gap-3 rounded-2xl border border-accent/30 bg-accent/5 px-6 py-4">
-              <span className="text-2xl">✅</span>
-              <p className="text-sm font-bold text-accent md:text-base">
-                با موفقیت عضو شدید!
-              </p>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row"
-            >
-              <input
-                type="email"
-                required
-                dir="ltr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="آدرس ایمیل خود را وارد کنید..."
-                className="w-full flex-1 rounded-full border border-theme bg-theme-surface px-5 py-3.5 text-sm text-theme outline-none transition focus:border-accent"
-              />
-              <button
-                type="submit"
-                className="w-full rounded-full bg-accent px-8 py-3.5 text-sm font-bold text-white transition hover:bg-accent-hover sm:w-auto"
+          {/* ─── فرم / پیام موفقیت ─── */}
+          <div className="w-full">
+            {submitted ? (
+              <div className="flex items-center justify-center gap-3 border border-black/20 bg-white px-5 py-4 md:justify-start">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  stroke="currentColor"
+                  className="h-5 w-5 text-black"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.5 12.75l6 6 9-13.5"
+                  />
+                </svg>
+                <p className="text-[13px] font-bold text-black md:text-[14px]">
+                  با موفقیت عضو شدید!
+                </p>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className="flex w-full flex-col gap-2 sm:flex-row"
               >
-                عضویت
-              </button>
-            </form>
-          )}
+                <input
+                  type="email"
+                  required
+                  dir="ltr"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="آدرس ایمیل..."
+                  className="flex-1 rounded-none border border-black/20 bg-white px-4 py-3 text-[13px] text-black placeholder:text-black/40 outline-none transition focus:border-black md:text-[14px]"
+                />
+                <button
+                  type="submit"
+                  className="rounded-none bg-black px-6 py-3 text-[13px] font-bold text-white transition hover:bg-zinc-800 md:text-[14px]"
+                >
+                  عضویت
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </section>

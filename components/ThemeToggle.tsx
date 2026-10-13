@@ -13,7 +13,7 @@ export default function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="h-10 w-10 rounded-lg border border-zinc-800 bg-zinc-900/50" />
+      <div className="h-10 w-10 rounded-lg border border-zinc-800 bg-zinc-900" />
     );
   }
 
@@ -28,14 +28,14 @@ export default function ThemeToggle() {
       className={
         "flex h-10 w-10 items-center justify-center rounded-lg border transition " +
         (isDark
-          ? // 🆕 دارک مود → دکمه روشن
-            "border-white/20 bg-white text-zinc-900 hover:border-accent hover:bg-accent hover:text-white"
-          : // 🆕 لایت مود → دکمه تیره
-            "border-zinc-700 bg-zinc-900 text-zinc-100 hover:border-accent hover:bg-accent hover:text-white")
+          ? // دارک مود (زمینه تیره) → دکمه روشن
+            "border-white bg-white text-black hover:border-accent hover:bg-accent hover:text-white"
+          : // لایت مود (زمینه روشن) → دکمه تیره
+            "border-black bg-black text-white hover:border-accent hover:bg-accent hover:text-white")
       }
     >
       {isDark ? (
-        // آیکون خورشید (برای رفتن به light)
+        // آیکون خورشید
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -51,7 +51,7 @@ export default function ThemeToggle() {
           />
         </svg>
       ) : (
-        // آیکون ماه (برای رفتن به dark)
+        // آیکون ماه
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

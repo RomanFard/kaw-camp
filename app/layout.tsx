@@ -10,7 +10,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { ProductsProvider } from "@/components/context/ProductsContext";
 import { SiteSettingsProvider } from "@/components/context/SiteSettingsContext";
 import { HeroSlideProvider } from "@/components/context/HeroSlideContext";
-import MobileBottomNav from "@/components/MobileBottomNav";
+
 import ToastContainer from "@/components/ToastContainer";
 
 export const metadata: Metadata = {
@@ -76,7 +76,7 @@ export default function RootLayout({
                   <CartProvider>
                     <WishlistProvider>
                       {children}
-                      <MobileBottomNav />
+                    
                       <FloatingButtons />
                       <ToastContainer />
                     </WishlistProvider>

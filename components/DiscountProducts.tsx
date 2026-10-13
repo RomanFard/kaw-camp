@@ -1,332 +1,319 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
+import Link from "next/link";
+import { useProducts } from "@/components/context/ProductsContext";
+import { useWishlist } from "@/components/context/WishlistContext";
+import { formatPrice } from "@/lib/utils";
+import type { Product } from "@/data/products";
 
-export type BrandItem = {
-  key: string;
-  nameFa: string;
-  nameEn: string;
-  photo: string;
-  href: string;
-};
+const PRODUCTS_TO_SHOW = 10;
+const VIRTUAL_DISCOUNT = 20; // درصد تخفیف مجازی برای fallback
 
-const DEFAULT_BRANDS: BrandItem[] = [
-  {
-    key: "naturehike",
-    nameFa: "نیچرهایک",
-    nameEn: "NatureHike",
-    photo: "/images/brands/naturehike.jpg",
-    href: "/products?brand=naturehike",
-  },
-  {
-    key: "shinetrip",
-    nameFa: "شاین تریپ",
-    nameEn: "Shine Trip",
-    photo: "/images/brands/shinetrip.jpg",
-    href: "/products?brand=shinetrip",
-  },
-  {
-    key: "mountainhiker",
-    nameFa: "ماونتین هایکر",
-    nameEn: "Mountainhiker",
-    photo: "/images/brands/mountainhiker.jpg",
-    href: "/products?brand=mountainhiker",
-  },
-  {
-    key: "blackdog",
-    nameFa: "بلک داگ",
-    nameEn: "BLACK DOG",
-    photo: "/images/brands/blackdog.jpg",
-    href: "/products?brand=blackdog",
-  },
-];
+const HEART_PATH =
+  "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z";
 
-const PIXELS_PER_SECOND = 40;
-const BUTTON_STEP = 300;
-const BUTTON_DURATION = 600;
+const HEART_FILLED_PATH =
+  "M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z";
 
-function easeInOut(t: number) {
-  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const BAG_PATH =
+  "M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z";
+
+const CHEVRON_LEFT = "M15.75 19.5L8.25 12l7.5-7.5";
+const CHEVRON_RIGHT = "M8.25 4.5l7.5 7.5-7.5 7.5";
+
+function Icon({
+  d,
+  className,
+  strokeWidth = 2,
+}: {
+  d: string;
+  className?: string;
+  strokeWidth?: number;
+}) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={strokeWidth}
+      stroke="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+    </svg>
+  );
 }
 
-export default function BrandShowcase() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const hoverRef = useRef(false);
-  const offsetRef = useRef(0);
+type DisplayProduct = Product & {
+  __displayPrice: number;
+  __displayOldPrice: number | null;
+  __displayDiscount: number;
+};
 
-  const animRef = useRef<{
-    from: number;
-    to: number;
-    start: number;
-  } | null>(null);
+function ProductCard({ product }: { product: DisplayProduct }) {
+  const { isInWishlist, toggleItem } = useWishlist();
+  const inWishlist = isInWishlist(product.id);
 
-  const dragRef = useRef({
-    active: false,
-    moved: false,
-    startX: 0,
-    startOffset: 0,
-    pointerId: -1,
-  });
-
-  const items = DEFAULT_BRANDS;
-  const loopItems = useMemo(() => [...items, ...items, ...items], [items]);
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    let frameId: number;
-    let lastTime = performance.now();
-
-    function apply() {
-      if (!track) return;
-      const third = track.offsetWidth / 3;
-      if (third > 0) {
-        offsetRef.current = ((offsetRef.current % third) + third) % third;
-      }
-      track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
-    }
-
-    function step(time: number) {
-      const delta = Math.min(time - lastTime, 50);
-      lastTime = time;
-
-      const anim = animRef.current;
-      if (anim) {
-        const t = Math.min(1, (time - anim.start) / BUTTON_DURATION);
-        offsetRef.current = anim.from + (anim.to - anim.from) * easeInOut(t);
-        if (t >= 1) animRef.current = null;
-      } else if (!hoverRef.current && !dragRef.current.active) {
-        offsetRef.current += (PIXELS_PER_SECOND * delta) / 1000;
-      }
-
-      apply();
-      frameId = requestAnimationFrame(step);
-    }
-
-    frameId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frameId);
-  }, [items.length]);
-
-  function scrollBy(dir: "left" | "right") {
-    const track = trackRef.current;
-    if (!track) return;
-
-    const current = animRef.current ? animRef.current.to : offsetRef.current;
-    animRef.current = {
-      from: offsetRef.current,
-      to: current + (dir === "left" ? -BUTTON_STEP : BUTTON_STEP),
-      start: performance.now(),
-    };
-  }
-
-  function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-
-    animRef.current = null;
-    const d = dragRef.current;
-    d.active = true;
-    d.moved = false;
-    d.startX = e.clientX;
-    d.startOffset = offsetRef.current;
-    d.pointerId = e.pointerId;
-  }
-
-  function handlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    const d = dragRef.current;
-    if (!d.active) return;
-
-    const dx = e.clientX - d.startX;
-
-    if (!d.moved) {
-      if (Math.abs(dx) < 5) return;
-      d.moved = true;
-      e.currentTarget.setPointerCapture(d.pointerId);
-      e.currentTarget.style.cursor = "grabbing";
-    }
-
-    offsetRef.current = d.startOffset - dx;
-  }
-
-  function endDrag(e: React.PointerEvent<HTMLDivElement>) {
-    const d = dragRef.current;
-    if (!d.active) return;
-
-    d.active = false;
-    e.currentTarget.style.cursor = "";
-    if (e.currentTarget.hasPointerCapture?.(d.pointerId)) {
-      e.currentTarget.releasePointerCapture(d.pointerId);
-    }
-  }
-
-  function handleClickCapture(e: React.MouseEvent) {
-    if (dragRef.current.moved) {
-      e.preventDefault();
-      e.stopPropagation();
-      dragRef.current.moved = false;
-    }
-  }
+  const hasDiscount =
+    !!product.__displayOldPrice && product.__displayDiscount > 0;
+  const secondImage = product.images?.[1];
 
   return (
-    <section className="relative py-10 md:py-20">
-      {/* Header */}
-      <div className="mx-auto max-w-[1400px] px-4 text-center md:px-12 lg:px-16">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#E84C4C]/30 bg-[#E84C4C]/5 px-3 py-1 backdrop-blur-sm md:mb-4 md:px-4 md:py-1.5">
-          <span className="text-[10px] font-bold tracking-[0.15em] text-[#E84C4C] md:text-xs">
-            BRANDS
+    <div className="group relative">
+      <Link
+        href={`/product/${product.id}`}
+        className="relative block aspect-[3/4] w-full overflow-hidden bg-theme-surface"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          draggable={false}
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+
+        {secondImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={secondImage}
+            alt={`${product.name} — نمای دوم`}
+            loading="lazy"
+            draggable={false}
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+          />
+        )}
+
+        {!product.inStock && (
+          <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-xs font-bold text-white">
+            ناموجود
           </span>
-        </div>
+        )}
 
-        <h2 className="text-xl font-black tracking-tight text-theme md:text-4xl lg:text-5xl">
-          برندهای <span className="text-accent">معتبر</span>
-        </h2>
+        {/* ─── بج تخفیف — پایین چپ، مشکی ─── */}
+        {hasDiscount && (
+          <span className="absolute bottom-2 left-2 z-10 rounded-sm bg-black px-2.5 py-1.5 text-[12px] font-black leading-none text-white shadow-lg md:bottom-3 md:left-3 md:px-3 md:py-2 md:text-[14px]">
+            {product.__displayDiscount}٪
+          </span>
+        )}
+      </Link>
 
-        <p className="mt-2 text-[11px] text-theme-muted md:mt-3 md:text-sm">
-          با بهترین برندهای جهانی کمپینگ و کوهنوردی همکاری می‌کنیم
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between p-2 md:p-3">
+        <button
+          type="button"
+          aria-label="افزودن به سبد"
+          className="pointer-events-auto flex h-7 w-7 items-center justify-center text-black transition hover:opacity-60 md:h-8 md:w-8"
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <Icon d={BAG_PATH} className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.6} />
+        </button>
+
+        <button
+          type="button"
+          aria-label="افزودن به علاقه‌مندی"
+          className="pointer-events-auto flex h-7 w-7 items-center justify-center text-black transition hover:opacity-60 md:h-8 md:w-8"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleItem(product, "product");
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill={inWishlist ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth={1.6}
+            className="h-5 w-5 md:h-6 md:w-6"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={inWishlist ? HEART_FILLED_PATH : HEART_PATH}
+            />
+          </svg>
+        </button>
+      </div>
+
+      <Link href={`/product/${product.id}`} className="mt-2.5 block md:mt-3">
+        <h3 className="line-clamp-1 text-[13px] font-semibold text-black md:text-[14px] dark:text-white">
+          {product.name}
+        </h3>
+
+        <p className="mt-0.5 line-clamp-1 text-[12px] text-black/60 md:text-[13px] dark:text-white/60">
+          {product.inStock ? "موجود در انبار" : "ناموجود"}
         </p>
 
-        <div className="mx-auto mt-3 h-[2px] w-12 bg-accent md:mt-4 md:w-16" />
-      </div>
+        {/* ─── قیمت‌ها — همه مشکی ─── */}
+        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+          <span className="text-[15px] font-black text-black md:text-[16px] dark:text-white">
+            {formatPrice(product.__displayPrice)}
+          </span>
 
-      {/* Slider */}
-      <div className="relative mx-auto mt-6 w-full max-w-[1400px] px-4 md:mt-10 md:px-12 lg:px-16">
-        {/* فلش چپ */}
-        <button
-          type="button"
-          onClick={() => scrollBy("left")}
-          aria-label="قبلی"
-          className="absolute -left-14 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-theme bg-theme-card/95 text-theme backdrop-blur-sm transition hover:border-accent hover:bg-accent hover:text-white xl:flex"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 19.5L8.25 12l7.5-7.5"
-            />
-          </svg>
-        </button>
+          {product.__displayOldPrice && (
+            <span className="text-[12px] text-black/50 line-through md:text-[13px] dark:text-white/50">
+              {formatPrice(product.__displayOldPrice)}
+            </span>
+          )}
+        </div>
+      </Link>
+    </div>
+  );
+}
 
-        {/* فلش راست */}
-        <button
-          type="button"
-          onClick={() => scrollBy("right")}
-          aria-label="بعدی"
-          className="absolute -right-14 top-1/2 z-30 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-theme bg-theme-card/95 text-theme backdrop-blur-sm transition hover:border-accent hover:bg-accent hover:text-white xl:flex"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 4.5l7.5 7.5-7.5 7.5"
-            />
-          </svg>
-        </button>
+export default function DiscountProducts() {
+  const { products, loading } = useProducts();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-        {/* قاب نمایش */}
-        <div
-          dir="ltr"
-          onMouseEnter={() => {
-            hoverRef.current = true;
-          }}
-          onMouseLeave={() => {
-            hoverRef.current = false;
-          }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-          onClickCapture={handleClickCapture}
-          className="cursor-grab select-none overflow-hidden"
-          style={{ touchAction: "pan-y" }}
-        >
-          {/* ریل متحرک */}
-          <div
-            ref={trackRef}
-            dir="rtl"
-            className="flex w-max"
-            style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-          >
-            {loopItems.map((brand, idx) => (
-              <a
-                key={`${brand.key}-${idx}`}
-                draggable={false}
-                href={brand.href}
-                className="group/card relative ml-2.5 w-[180px] flex-shrink-0 overflow-hidden rounded-lg border border-theme bg-theme-card transition-colors duration-300 hover:border-accent/50 sm:ml-3 sm:w-[210px] md:ml-5 md:w-[260px] md:rounded-xl lg:w-[300px]"
+  const displayProducts = useMemo<DisplayProduct[]>(() => {
+    const discounted = [...products]
+      .filter((p) => p.oldPrice && p.oldPrice > p.price)
+      .sort((a, b) => {
+        const aD = ((a.oldPrice! - a.price) / a.oldPrice!) * 100;
+        const bD = ((b.oldPrice! - b.price) / b.oldPrice!) * 100;
+        return bD - aD;
+      })
+      .slice(0, PRODUCTS_TO_SHOW)
+      .map((p) => ({
+        ...p,
+        __displayPrice: p.price,
+        __displayOldPrice: p.oldPrice ?? null,
+        __displayDiscount: Math.round(
+          ((p.oldPrice! - p.price) / p.oldPrice!) * 100
+        ),
+      }));
+
+    if (discounted.length > 0) return discounted;
+
+    // ─── fallback: جدیدترین‌ها با تخفیف مجازی ───
+    return [...products]
+      .sort((a, b) => Number(b.id) - Number(a.id))
+      .slice(0, PRODUCTS_TO_SHOW)
+      .map((p) => {
+        const virtualPrice = Math.round(
+          p.price * (1 - VIRTUAL_DISCOUNT / 100)
+        );
+        return {
+          ...p,
+          __displayPrice: virtualPrice,
+          __displayOldPrice: p.price,
+          __displayDiscount: VIRTUAL_DISCOUNT,
+        };
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products]);
+
+  function scrollPrev() {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: el.clientWidth * 0.8, behavior: "smooth" });
+  }
+
+  function scrollNext() {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: -el.clientWidth * 0.8, behavior: "smooth" });
+  }
+
+  if (loading) {
+    return (
+      <div className="w-full px-3 sm:px-6 md:px-7">
+        <section className="py-10 md:py-14">
+          <div className="mb-6 flex items-center justify-between md:mb-8">
+            <div className="h-7 w-32 animate-pulse bg-theme-surface" />
+            <div className="h-5 w-20 animate-pulse bg-theme-surface" />
+          </div>
+          <div className="flex gap-2 md:gap-2.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-[58%] shrink-0 sm:w-[calc((100%-16px)/3)] md:w-[calc((100%-20px)/4)] lg:w-[calc((100%-40px)/5)]"
               >
-                {/* تصویر برند */}
-                <div className="relative aspect-[4/5] overflow-hidden bg-theme-surface">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={brand.photo}
-                    alt={brand.nameFa}
-                    loading="lazy"
-                    draggable={false}
-                    className="h-full w-full object-cover object-center transition duration-700 group-hover/card:scale-110"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      target.style.display = "none";
-                    }}
-                  />
-
-                  {/* gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent transition duration-500 group-hover/card:from-black/95 group-hover/card:via-black/55" />
-
-                  {/* آیکون گوشه بالا راست */}
-                  <div className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-accent/60 bg-black/40 backdrop-blur transition duration-500 group-hover/card:border-accent group-hover/card:bg-accent md:right-3 md:top-3 md:h-8 md:w-8">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2.5}
-                      stroke="currentColor"
-                      className="h-3 w-3 text-white md:h-3.5 md:w-3.5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
-                      />
-                    </svg>
-                  </div>
-
-                  {/* اسم برند روی تصویر */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2.5 md:p-4">
-                    <div className="mb-1.5 h-[2px] w-5 bg-accent transition-all duration-500 group-hover/card:w-10 md:mb-2 md:h-[3px] md:w-6 md:group-hover/card:w-12" />
-
-                    <h3 className="text-sm font-black leading-tight text-white transition duration-500 group-hover/card:text-accent md:text-lg">
-                      {brand.nameFa}
-                    </h3>
-
-                    <p
-                      dir="ltr"
-                      className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/60 md:mt-1 md:text-[10px]"
-                    >
-                      {brand.nameEn}
-                    </p>
-                  </div>
-
-                  {/* خط accent پایین */}
-                  <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover/card:w-full md:h-[3px]" />
-                </div>
-              </a>
+                <div className="aspect-[3/4] w-full animate-pulse bg-theme-surface" />
+                <div className="mt-2.5 h-4 w-3/4 animate-pulse bg-theme-surface" />
+                <div className="mt-2 h-4 w-1/3 animate-pulse bg-theme-surface" />
+              </div>
             ))}
           </div>
-        </div>
+        </section>
       </div>
-    </section>
+    );
+  }
+
+  if (displayProducts.length === 0) return null;
+
+  return (
+    <div className="w-full px-3 sm:px-6 md:px-7">
+      <section className="py-10 md:py-14">
+        <div className="mb-6 flex items-end justify-between md:mb-8">
+          <div className="flex items-baseline gap-4">
+            <h2 className="text-lg font-black tracking-tight text-theme md:text-xl lg:text-2xl">
+              تخفیف‌های ویژه
+            </h2>
+
+            <Link
+              href="/products?sort=discount"
+              className="hidden text-[12px] font-semibold text-theme-muted underline underline-offset-4 transition hover:text-theme md:inline md:text-[13px]"
+            >
+              مشاهده همه
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-3 md:gap-1">
+            <Link
+              href="/products?sort=discount"
+              className="text-[12px] font-semibold text-theme-muted underline underline-offset-4 transition hover:text-theme md:hidden"
+            >
+              مشاهده همه
+            </Link>
+
+            <div className="hidden items-center gap-1 md:flex">
+              <button
+                type="button"
+                aria-label="قبلی"
+                onClick={scrollPrev}
+                className="flex h-9 w-9 items-center justify-center text-theme transition hover:opacity-50"
+              >
+                <Icon d={CHEVRON_RIGHT} strokeWidth={2} className="h-6 w-6" />
+              </button>
+
+              <button
+                type="button"
+                aria-label="بعدی"
+                onClick={scrollNext}
+                className="flex h-9 w-9 items-center justify-center text-theme transition hover:opacity-50"
+              >
+                <Icon d={CHEVRON_LEFT} strokeWidth={2} className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          ref={scrollRef}
+          className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 scrollbar-hide md:gap-2.5"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {displayProducts.map((product) => (
+            <div
+              key={product.id}
+              className="w-[58%] shrink-0 snap-start sm:w-[calc((100%-16px)/3)] md:w-[calc((100%-20px)/4)] lg:w-[calc((100%-40px)/5)]"
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </div>
   );
 }

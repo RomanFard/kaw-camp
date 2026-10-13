@@ -1,542 +1,301 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
+import Link from "next/link";
 import { useProducts } from "@/components/context/ProductsContext";
+import { useWishlist } from "@/components/context/WishlistContext";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/data/products";
 
-const SPEED = 0.5;
-const STEP_DEG = 26;
-const GAP = 1.04;
-const PERSPECTIVE = 2400;
-const MOBILE_MAX = 640;
-const RESUME_DELAY = 2000;
+const PRODUCTS_TO_SHOW = 10;
 
-// 🆕 تعداد محصولات هر ردیف و کل
-const PRODUCTS_PER_ROW = 12;
-const TOTAL_PRODUCTS = PRODUCTS_PER_ROW * 2;
+const HEART_PATH =
+  "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z";
 
-const mod = (a: number, m: number) => ((a % m) + m) % m;
-const wrapP = (x: number, n: number) => mod(x + n / 2, n) - n / 2;
+const HEART_FILLED_PATH =
+  "M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z";
 
-// ═══════════════════════════════════════════
-// Carousel3D — کاروسل ۳بعدی
-// ═══════════════════════════════════════════
-type RowProps = {
-  products: Product[];
-  reverse?: boolean;
-};
+const BAG_PATH =
+  "M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z";
 
-function Carousel3D({ products, reverse = false }: RowProps) {
-  const [wrapW, setWrapW] = useState(1200);
-  const [dot, setDot] = useState(0);
+const CHEVRON_LEFT = "M15.75 19.5L8.25 12l7.5-7.5";
+const CHEVRON_RIGHT = "M8.25 4.5l7.5 7.5-7.5 7.5";
 
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+function Icon({
+  d,
+  className,
+  strokeWidth = 2,
+}: {
+  d: string;
+  className?: string;
+  strokeWidth?: number;
+}) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={strokeWidth}
+      stroke="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+    </svg>
+  );
+}
 
-  const posRef = useRef(0);
-  const velRef = useRef(0);
-  const targetRef = useRef<number | null>(null);
-  const dotRef = useRef(0);
-  const dragStartX = useRef<number | null>(null);
-  const dragged = useRef(false);
+function ProductCard({ product }: { product: Product }) {
+  const { isInWishlist, toggle } = useWishlist();
+  const inWishlist = isInWishlist(product.id);
+  const hasDiscount = !!product.oldPrice;
+  const discount = product.oldPrice
+    ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+    : 0;
 
-  const hoverRef = useRef(false);
-  const pauseUntilRef = useRef(0);
-  const activeCardIdxRef = useRef<number | null>(null);
-
-  const reverseRef = useRef(reverse);
-  reverseRef.current = reverse;
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const update = () => setWrapW(el.offsetWidth || 1200);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const n = products.length;
-  const isMobile = wrapW < MOBILE_MAX;
-
-  const size = isMobile
-    ? Math.round(Math.min(150, Math.max(90, wrapW * 0.32)))
-    : Math.round(Math.min(280, Math.max(120, wrapW * 0.22)));
-
-  const radius = (size * GAP) / 2 / Math.tan((STEP_DEG / 2) * (Math.PI / 180));
-
-  const nRef = useRef(n);
-  const radiusRef = useRef(radius);
-  nRef.current = n;
-  radiusRef.current = radius;
-
-  const applyRef = useRef<() => void>(() => {});
-  applyRef.current = () => {
-    const nn = nRef.current;
-    const R = radiusRef.current;
-    const pos = posRef.current;
-    if (nn === 0) return;
-
-    const fadeEnd = Math.min(2.9, nn / 2 - 0.05);
-    const fadeStart = fadeEnd - 0.6;
-
-    for (let i = 0; i < nn; i++) {
-      const el = cardRefs.current[i];
-      if (!el) continue;
-
-      const p = wrapP(i - pos - 0.5, nn);
-      const a = Math.abs(p);
-      const beyond = Math.max(0, a - 0.5);
-
-      const opacity =
-        a <= fadeStart
-          ? 1
-          : Math.max(0, 1 - (a - fadeStart) / (fadeEnd - fadeStart));
-      const textOpacity = 1 - Math.min(1, beyond / 0.6);
-
-      const angle = (p * STEP_DEG).toFixed(3);
-      el.style.transform = `translate(-50%, -50%) rotateY(${angle}deg) translateZ(${R.toFixed(1)}px)`;
-      el.style.filter =
-        beyond > 0.02 ? `blur(${(beyond * 3.2).toFixed(2)}px)` : "none";
-      el.style.opacity = opacity.toFixed(3);
-      el.style.pointerEvents = opacity > 0.3 ? "auto" : "none";
-      el.style.setProperty("--t", textOpacity.toFixed(3));
-
-      const inner = el.firstElementChild as HTMLElement | null;
-      if (inner) {
-        const isActive =
-          activeCardIdxRef.current === i && dragStartX.current === null;
-        if (isActive) {
-          if (!inner.classList.contains("is-active"))
-            inner.classList.add("is-active");
-        } else {
-          if (inner.classList.contains("is-active"))
-            inner.classList.remove("is-active");
-        }
-      }
-    }
-
-    const d = mod(Math.round(pos), nn);
-    if (d !== dotRef.current) {
-      dotRef.current = d;
-      setDot(d);
-    }
-  };
-
-  useLayoutEffect(() => {
-    applyRef.current();
-  }, [size, n]);
-
-  useEffect(() => {
-    const reduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0;
-    let last = performance.now();
-
-    const loop = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-
-      if (targetRef.current !== null) {
-        const diff = targetRef.current - posRef.current;
-        if (Math.abs(diff) < 0.0005) {
-          posRef.current = targetRef.current;
-          targetRef.current = null;
-        } else {
-          posRef.current += diff * (1 - Math.exp(-dt * 5));
-        }
-        velRef.current = 0;
-      } else {
-        const canMove =
-          !hoverRef.current &&
-          dragStartX.current === null &&
-          Date.now() >= pauseUntilRef.current;
-
-        const dir = reverseRef.current ? -1 : 1;
-        const goal =
-          !canMove || reduced || nRef.current < 2 ? 0 : SPEED * dir;
-        velRef.current += (goal - velRef.current) * (1 - Math.exp(-dt * 3));
-        posRef.current += velRef.current * dt;
-      }
-
-      applyRef.current();
-      raf = requestAnimationFrame(loop);
-    };
-
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  const goNext = () => {
-    targetRef.current = (targetRef.current ?? Math.floor(posRef.current)) + 1;
-  };
-  const goPrev = () => {
-    targetRef.current = (targetRef.current ?? Math.ceil(posRef.current)) - 1;
-  };
-  const goTo = (i: number) => {
-    targetRef.current = posRef.current + wrapP(i - posRef.current, nRef.current);
-  };
-
-  const edge = `calc(50% - ${Math.round(size * GAP)}px)`;
-  const fadeMask = `linear-gradient(to right,
-    transparent 0%,
-    rgba(0,0,0,0.12) calc(${edge} * 0.25),
-    rgba(0,0,0,0.35) calc(${edge} * 0.5),
-    rgba(0,0,0,0.65) calc(${edge} * 0.78),
-    black ${edge},
-    black calc(100% - ${edge}),
-    rgba(0,0,0,0.65) calc(100% - ${edge} * 0.78),
-    rgba(0,0,0,0.35) calc(100% - ${edge} * 0.5),
-    rgba(0,0,0,0.12) calc(100% - ${edge} * 0.25),
-    transparent 100%)`;
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    dragStartX.current = e.clientX;
-    dragged.current = false;
-    hoverRef.current = true;
-    activeCardIdxRef.current = null;
-  };
-
-  const onPointerUp = (e: React.PointerEvent) => {
-    if (dragStartX.current !== null) {
-      const dx = e.clientX - dragStartX.current;
-      if (Math.abs(dx) > 50) {
-        dragged.current = true;
-        if (dx < 0) goNext();
-        else goPrev();
-      }
-    }
-    dragStartX.current = null;
-    pauseUntilRef.current = Date.now() + RESUME_DELAY;
-  };
-
-  if (n === 0) return null;
+  // 🆕 عکس دوم (اگه موجود باشه)
+  const secondImage = product.images?.[1];
 
   return (
-    <div>
-      <div
-        ref={wrapRef}
-        dir="ltr"
-        className="relative w-full select-none touch-pan-y"
-        style={{
-          height: size + 100,
-          perspective: `${PERSPECTIVE}px`,
-          WebkitMaskImage: fadeMask,
-          maskImage: fadeMask,
-        }}
-        onPointerEnter={(e) => {
-          if (e.pointerType !== "mouse") return;
-          hoverRef.current = true;
-        }}
-        onPointerLeave={(e) => {
-          if (e.pointerType !== "mouse") return;
-          hoverRef.current = false;
-          pauseUntilRef.current = Date.now() + RESUME_DELAY;
-          activeCardIdxRef.current = null;
-        }}
-        onTouchStart={() => {
-          hoverRef.current = true;
-        }}
-        onTouchEnd={() => {
-          hoverRef.current = false;
-          pauseUntilRef.current = Date.now() + RESUME_DELAY;
-          activeCardIdxRef.current = null;
-        }}
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerCancel={() => {
-          dragStartX.current = null;
-          hoverRef.current = false;
-          pauseUntilRef.current = Date.now() + RESUME_DELAY;
-          activeCardIdxRef.current = null;
-        }}
+    <div className="group relative">
+      <Link
+        href={`/product/${product.id}`}
+        className="relative block aspect-[3/4] w-full overflow-hidden bg-theme-surface"
       >
-        <div
-          className="absolute inset-0"
-          style={{
-            transformStyle: "preserve-3d",
-            transform: `translateZ(${-radius}px)`,
+        {/* ─── عکس اول (پیش‌فرض) ─── */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          draggable={false}
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+
+        {/* ─── عکس دوم (فقط اگه موجود باشه) — fade-in روی hover ─── */}
+        {secondImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={secondImage}
+            alt={`${product.name} — نمای دوم`}
+            loading="lazy"
+            draggable={false}
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+          />
+        )}
+
+        {/* ناموجود */}
+        {!product.inStock && (
+          <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-xs font-bold text-white">
+            ناموجود
+          </span>
+        )}
+
+        {/* تخفیف — بالا چپ */}
+        {hasDiscount && discount > 0 && (
+          <span className="absolute left-2 top-2 z-10 rounded-sm bg-accent px-1.5 py-0.5 text-[10px] font-black text-white md:left-3 md:top-3">
+            {discount}٪
+          </span>
+        )}
+
+        {/* بج «جدید» — پایین چپ */}
+        <span className="absolute bottom-2 left-2 z-10 bg-white px-2.5 py-1 text-[10px] font-bold text-black md:bottom-3 md:left-3 md:text-[11px]">
+          جدید
+        </span>
+      </Link>
+
+      {/* ─── آیکون‌های شناور بالا ─── */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between p-2 md:p-3">
+        <button
+          type="button"
+          aria-label="افزودن به سبد"
+          className="pointer-events-auto flex h-7 w-7 items-center justify-center text-black transition hover:opacity-60 md:h-8 md:w-8"
+          onClick={(e) => {
+            e.preventDefault();
+            // TODO: add to cart
           }}
         >
-          {products.map((product, i) => {
-            const hasDiscount = !!product.oldPrice;
-            const discount = product.oldPrice
-              ? Math.round(
-                  ((product.oldPrice - product.price) / product.oldPrice) * 100
-                )
-              : 0;
+          <Icon d={BAG_PATH} className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.6} />
+        </button>
 
-            return (
-              <a
-                key={`${product.id}-${i}`}
-                ref={(el) => {
-                  cardRefs.current[i] = el;
-                }}
-                href={`/product/${product.id}`}
-                onPointerEnter={(e) => {
-                  if (e.pointerType !== "mouse") return;
-                  activeCardIdxRef.current = i;
-                }}
-                onPointerLeave={(e) => {
-                  if (e.pointerType !== "mouse") return;
-                  if (activeCardIdxRef.current === i)
-                    activeCardIdxRef.current = null;
-                }}
-                onTouchStart={() => {
-                  activeCardIdxRef.current = i;
-                }}
-                onTouchEnd={() => {
-                  if (activeCardIdxRef.current === i)
-                    activeCardIdxRef.current = null;
-                }}
-                onClick={(e) => {
-                  if (dragged.current) {
-                    e.preventDefault();
-                    dragged.current = false;
-                    return;
-                  }
-                  const p = wrapP(i - posRef.current - 0.5, nRef.current);
-                  if (Math.abs(p) > 0.55) {
-                    e.preventDefault();
-                    if (p < 0) goTo(i);
-                    else goTo(i - 1);
-                  }
-                }}
-                draggable={false}
-                className="group absolute left-1/2 top-1/2 block"
-                style={{
-                  width: size,
-                  height: size,
-                  willChange: "transform, filter, opacity",
-                }}
-              >
-                <div className="kaw-card-inner">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    loading="lazy"
-                    draggable={false}
-                    className="h-full w-full object-cover object-center"
-                  />
+        <button
+          type="button"
+          aria-label="افزودن به علاقه‌مندی"
+          className={
+            "pointer-events-auto flex h-7 w-7 items-center justify-center transition hover:opacity-60 md:h-8 md:w-8 " +
+            (inWishlist ? "text-red-500" : "text-black")
+          }
+          onClick={(e) => {
+            e.preventDefault();
+            toggle(product.id);
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill={inWishlist ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth={1.6}
+            className="h-5 w-5 md:h-6 md:w-6"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={inWishlist ? HEART_FILLED_PATH : HEART_PATH}
+            />
+          </svg>
+        </button>
+      </div>
 
-                  {/* گرادیان تیره */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+      {/* ─── اطلاعات ─── */}
+      <Link href={`/product/${product.id}`} className="mt-2.5 block md:mt-3">
+        <h3 className="line-clamp-1 text-[13px] font-semibold text-theme md:text-[14px]">
+          {product.name}
+        </h3>
 
-                  {/* بج تخفیف */}
-                  {hasDiscount && discount > 0 && (
-                    <span className="absolute right-2 top-2 rounded-md bg-accent px-1.5 py-0.5 text-[9px] font-black text-white shadow-lg md:text-[11px]">
-                      {discount}٪
-                    </span>
-                  )}
+        <p className="mt-0.5 line-clamp-1 text-[12px] text-theme-muted md:text-[13px]">
+          {product.inStock ? "موجود در انبار" : "ناموجود"}
+        </p>
 
-                  {/* ناموجود */}
-                  {!product.inStock && (
-                    <span className="absolute inset-0 flex items-center justify-center bg-black/70 text-xs font-bold text-white md:text-sm">
-                      ناموجود
-                    </span>
-                  )}
-
-                  {/* اطلاعات پایین */}
-                  <div
-                    dir="rtl"
-                    className="absolute bottom-0 left-0 right-0 p-2 md:p-3"
-                    style={{ opacity: "var(--t, 1)" }}
-                  >
-                    <div className="mb-1 h-[2px] w-6 bg-accent md:mb-1.5" />
-                    <h3 className="line-clamp-1 text-[10px] font-black text-white md:text-sm">
-                      {product.name}
-                    </h3>
-                    <div className="mt-1 flex items-center gap-2">
-                      {product.oldPrice && (
-                        <span className="text-[8px] text-white/60 line-through md:text-[10px]">
-                          {formatPrice(product.oldPrice)}
-                        </span>
-                      )}
-                      <span className="text-[10px] font-black text-accent md:text-xs">
-                        {formatPrice(product.price)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            );
-          })}
+        <div className="mt-1.5 flex items-center gap-2">
+          <span className="text-[14px] font-bold text-theme md:text-[15px]">
+            {formatPrice(product.price)}
+          </span>
+          {product.oldPrice && (
+            <span className="text-[12px] text-theme-muted line-through md:text-[13px]">
+              {formatPrice(product.oldPrice)}
+            </span>
+          )}
         </div>
-
-        <button
-          type="button"
-          aria-label="قبلی"
-          onClick={goPrev}
-          onPointerDown={(e) => e.stopPropagation()}
-          onPointerUp={(e) => e.stopPropagation()}
-          className="absolute left-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-accent hover:text-accent md:left-6 md:h-9 md:w-9"
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          aria-label="بعدی"
-          onClick={goNext}
-          onPointerDown={(e) => e.stopPropagation()}
-          onPointerUp={(e) => e.stopPropagation()}
-          className="absolute right-2 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition hover:border-accent hover:text-accent md:right-6 md:h-9 md:w-9"
-        >
-          ›
-        </button>
-      </div>
-
-      <div className="mt-4 flex items-center justify-center gap-2">
-        {products.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            aria-label={`محصول ${i + 1}`}
-            onClick={() => goTo(i)}
-            className={
-              "h-1.5 rounded-full transition-all duration-500 " +
-              (i === dot ? "w-8 bg-accent" : "w-2 bg-white/25 hover:bg-white/50")
-            }
-          />
-        ))}
-      </div>
-
-      <style jsx>{`
-        .kaw-card-inner {
-          position: absolute;
-          inset: 0;
-          overflow: hidden;
-          border-radius: 0.75rem;
-          transform: scale(1);
-          transform-origin: center center;
-          transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-            box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-          box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.85);
-          will-change: transform;
-        }
-        .kaw-card-inner.is-active {
-          transform: scale(1.18);
-          box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.85),
-            0 0 28px rgba(232, 76, 76, 0.45);
-          z-index: 10;
-        }
-        @media (max-width: 640px) {
-          .kaw-card-inner.is-active {
-            transform: scale(1.2);
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .kaw-card-inner {
-            transition: none;
-          }
-        }
-      `}</style>
+      </Link>
     </div>
   );
 }
 
-// ═══════════════════════════════════════════
-// کامپوننت اصلی
-// ═══════════════════════════════════════════
 export default function CategoryGrid() {
   const { products, loading } = useProducts();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 🆕 ۲۴ محصول جدید (بر اساس id نزولی)
   const latestProducts = useMemo(() => {
     return [...products]
       .sort((a, b) => Number(b.id) - Number(a.id))
-      .slice(0, TOTAL_PRODUCTS);
+      .slice(0, PRODUCTS_TO_SHOW);
   }, [products]);
 
-  // 🆕 تقسیم به دو گروه مجزا
-  const row1Products = useMemo(
-    () => latestProducts.slice(0, PRODUCTS_PER_ROW),
-    [latestProducts]
-  );
-  const row2Products = useMemo(
-    () => latestProducts.slice(PRODUCTS_PER_ROW, TOTAL_PRODUCTS),
-    [latestProducts]
-  );
+  function scrollPrev() {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: el.clientWidth * 0.8, behavior: "smooth" });
+  }
 
-  // حالت loading
+  function scrollNext() {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: -el.clientWidth * 0.8, behavior: "smooth" });
+  }
+
   if (loading) {
     return (
-      <section className="relative py-12 md:py-16">
-        <div className="relative w-full overflow-hidden bg-theme py-12 md:py-16">
-          <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
-            <div className="mb-10 text-center">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3.5 py-1.5 backdrop-blur-sm">
-                <span className="text-[11px] font-bold tracking-[0.15em] text-accent md:text-xs">
-                  OUR WORK
-                </span>
-              </div>
-              <h2 className="text-2xl font-black tracking-tight text-theme md:text-3xl lg:text-4xl">
-                <span className="text-accent">جدیدترین</span> ها
-              </h2>
-              <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-accent" />
-              <p className="mt-6 text-xs text-theme-muted">در حال بارگذاری...</p>
-            </div>
+      <div className="w-full px-3 sm:px-6 md:px-7">
+        <section className="py-10 md:py-14">
+          <div className="mb-6 flex items-center justify-between md:mb-8">
+            <div className="h-7 w-32 animate-pulse bg-theme-surface" />
+            <div className="h-5 w-20 animate-pulse bg-theme-surface" />
           </div>
-        </div>
-      </section>
+          <div className="flex gap-2 md:gap-2.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-[58%] shrink-0 sm:w-[calc((100%-16px)/3)] md:w-[calc((100%-20px)/4)] lg:w-[calc((100%-40px)/5)]"
+              >
+                <div className="aspect-[3/4] w-full animate-pulse bg-theme-surface" />
+                <div className="mt-2.5 h-4 w-3/4 animate-pulse bg-theme-surface" />
+                <div className="mt-2 h-4 w-1/3 animate-pulse bg-theme-surface" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     );
   }
 
-  // اگه محصولی نیست
-  if (latestProducts.length === 0) {
-    return null;
-  }
+  if (latestProducts.length === 0) return null;
 
   return (
-    <section className="relative py-12 md:py-16">
-      <div className="relative w-full overflow-hidden bg-theme py-12 md:py-16">
-        <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
-          <div className="mb-10 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3.5 py-1.5 backdrop-blur-sm">
-              <span className="text-[11px] font-bold tracking-[0.15em] text-accent md:text-xs">
-                OUR WORK
-              </span>
-            </div>
-
-            <h2 className="text-2xl font-black tracking-tight text-theme md:text-3xl lg:text-4xl">
-              <span className="text-accent">جدیدترین</span> ها
+    <div className="w-full px-3 sm:px-6 md:px-7">
+      <section className="py-10 md:py-14">
+        {/* ─── هدر سکشن ─── */}
+        <div className="mb-6 flex items-end justify-between md:mb-8">
+          {/* راست: تیتر + «مشاهده همه» (فقط دسکتاپ، کنار تیتر) */}
+          <div className="flex items-baseline gap-4">
+            <h2 className="text-lg font-black tracking-tight text-theme md:text-xl lg:text-2xl">
+              جدیدترین‌ها
             </h2>
 
-            <div className="mx-auto mt-4 h-[3px] w-14 rounded-full bg-accent" />
-
-            {/* لینک مشاهده همه */}
-            <a
+            <Link
               href="/products?sort=newest"
-              className="mt-4 inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/5 px-4 py-2 text-[11px] font-bold text-accent transition hover:bg-accent hover:text-white md:text-xs"
+              className="hidden text-[12px] font-semibold text-theme-muted underline underline-offset-4 transition hover:text-theme md:inline md:text-[13px]"
             >
-              مشاهده همه محصولات
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-                stroke="currentColor"
-                className="h-3 w-3"
+              مشاهده همه
+            </Link>
+          </div>
+
+          {/* چپ: «مشاهده همه» (موبایل) + فلش‌ها (دسکتاپ) */}
+          <div className="flex items-center gap-3 md:gap-1">
+            {/* مشاهده همه — فقط موبایل */}
+            <Link
+              href="/products?sort=newest"
+              className="text-[12px] font-semibold text-theme-muted underline underline-offset-4 transition hover:text-theme md:hidden"
+            >
+              مشاهده همه
+            </Link>
+
+            {/* فلش‌ها — فقط دسکتاپ */}
+            <div className="hidden items-center gap-1 md:flex">
+              <button
+                type="button"
+                aria-label="قبلی"
+                onClick={scrollPrev}
+                className="flex h-9 w-9 items-center justify-center text-theme transition hover:opacity-50"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 19.5L8.25 12l7.5-7.5"
-                />
-              </svg>
-            </a>
+                <Icon d={CHEVRON_RIGHT} strokeWidth={2} className="h-6 w-6" />
+              </button>
+
+              <button
+                type="button"
+                aria-label="بعدی"
+                onClick={scrollNext}
+                className="flex h-9 w-9 items-center justify-center text-theme transition hover:opacity-50"
+              >
+                <Icon d={CHEVRON_LEFT} strokeWidth={2} className="h-6 w-6" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* 🆕 دو ردیف کاروسل — محصولات مجزا */}
-        <Carousel3D products={row1Products} />
-        <div className="mt-2 md:mt-4">
-          <Carousel3D products={row2Products} reverse />
+        {/* ─── اسکرول افقی ─── */}
+        <div
+          ref={scrollRef}
+          className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 scrollbar-hide md:gap-2.5"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {latestProducts.map((product) => (
+            <div
+              key={product.id}
+              className="w-[58%] shrink-0 snap-start sm:w-[calc((100%-16px)/3)] md:w-[calc((100%-20px)/4)] lg:w-[calc((100%-40px)/5)]"
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
         </div>
-      </div>
-    </section>
+      </section>
+
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </div>
   );
 }

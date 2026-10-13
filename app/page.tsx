@@ -4,26 +4,18 @@ import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import Header from "@/components/Header";
 import HeroVideo from "@/components/HeroVideo";
+import HeroBannerImage from "@/components/HeroBannerImage";
 import CategoryGrid from "@/components/CategoryGrid";
+import DiscountProducts from "@/components/DiscountProducts";
 import BrandShowcase from "@/components/BrandShowcase";
 import LatestProducts from "@/components/LatestProducts";
-import CategoryShowcase, {
-  CategoryShowcaseData,
-  DEFAULT_CATEGORY_SHOWCASE,
-} from "@/components/CategoryShowcase";
-import BlackDogSteps, {
-  BlackDogStepsData,
-  DEFAULT_BLACK_DOG_STEPS,
-} from "@/components/BlackDogSteps";
-import { getAppContent } from "@/lib/supabase/appContent";
-import SpecialDiscountSlot from "@/components/SpecialDiscountSlot";
-import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import LiveBackground from "@/components/LiveBackground";
 import SnowBackground from "@/components/SnowBackground";
 import { useDevicePerformance } from "@/hooks/useDevicePerformance";
 import { useSiteSettings } from "@/components/context/SiteSettingsContext";
 import NewsletterSection from "@/components/NewsletterSection";
+import CategoryLinks from "@/components/CategoryLinks";
 
 export default function Home() {
   const { mounted, level } = useDevicePerformance();
@@ -31,37 +23,8 @@ export default function Home() {
   const { settings } = useSiteSettings();
   const [isClient, setIsClient] = useState(false);
 
-  const [blackDogData, setBlackDogData] =
-    useState<BlackDogStepsData>(DEFAULT_BLACK_DOG_STEPS);
-  const [categoryShowcaseData, setCategoryShowcaseData] =
-    useState<CategoryShowcaseData>(DEFAULT_CATEGORY_SHOWCASE);
-
   useEffect(() => {
     setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const saved = await getAppContent<BlackDogStepsData>("black_dog_steps");
-        if (saved) setBlackDogData(saved);
-      } catch (e) {
-        console.error("black_dog_steps load error", e);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const saved = await getAppContent<CategoryShowcaseData>(
-          "category_showcase"
-        );
-        if (saved) setCategoryShowcaseData(saved);
-      } catch (e) {
-        console.error("category_showcase load error", e);
-      }
-    })();
   }, []);
 
   const showBackground =
@@ -118,13 +81,64 @@ export default function Home() {
         <Header />
         <HeroVideo />
         <LatestProducts />
-        <BlackDogSteps data={blackDogData} />
-        <BrandShowcase />
-        
-        <SpecialDiscountSlot />
+        <HeroBannerImage />
+        <DiscountProducts />
+
+        {/* ─── برندها — دو اسلاید ─── */}
+        <BrandShowcase
+          brands={[
+            {
+              key: "naturehike",
+              nameFa: "نیچرهایک",
+              nameEn: "NatureHike",
+              matchNames: ["naturehike", "نیچرهایک", "نیچر هایک"],
+            },
+            {
+              key: "shinetrip",
+              nameFa: "شاین تریپ",
+              nameEn: "Shine Trip",
+              matchNames: ["shinetrip", "shine trip", "شاین تریپ"],
+            },
+          ]}
+          productsPerBrand={4}
+        />
+
+        <BrandShowcase
+          brands={[
+            {
+              key: "mountainhiker",
+              nameFa: "ماونتین هایکر",
+              nameEn: "Mountainhiker",
+              matchNames: [
+                "mountainhiker",
+                "mountain hiker",
+                "ماونتین هایکر",
+                "ماونتین‌هایکر",
+              ],
+            },
+            {
+              key: "blackdog",
+              nameFa: "بلک داگ",
+              nameEn: "BLACK DOG",
+              matchNames: [
+                "blackdog",
+                "black dog",
+                "black-dog",
+                "بلک داگ",
+                "بلک‌داگ",
+              ],
+            },
+          ]}
+          productsPerBrand={4}
+        />
+
         <CategoryGrid />
-        <ContactSection />
+        {/* 🆕 لینک همهٔ دسته‌بندی‌ها (سبک Gymshark) */}
+        <CategoryLinks />
+
         <NewsletterSection />
+
+
         <Footer />
       </div>
     </main>

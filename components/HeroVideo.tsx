@@ -13,7 +13,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
   {
     id: "fallback-1",
     order_index: 0,
-    eyebrow: "KAW CAMP — فروشگاه تخصصی",
+    eyebrow: "",
     title_line1: "تجهیزات",
     title_line2: "کوهنوردی حرفه‌ای",
     description:
@@ -28,9 +28,8 @@ const FALLBACK_SLIDES: HeroSlide[] = [
   },
 ];
 
-// ارتفاع یکسان برای اسکلت لود و اسلایدر تا هنگام لود پرش نداشته باشیم
-// موبایل: ارتفاع خودکار (عکس کامل بالا، متن زیرش). دسکتاپ: ارتفاع ثابت با متن روی عکس
-const SECTION_SIZE = "md:h-[700px] lg:h-screen lg:max-h-[900px]";
+const SECTION_SIZE =
+  "aspect-[3/4] sm:aspect-[2/3] md:aspect-auto md:h-[600px] lg:h-[700px] xl:h-[760px]";
 
 export default function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -44,14 +43,12 @@ export default function HeroVideo() {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
-  // ─── آپدیت context ───
   useEffect(() => {
     if (slides.length > 0) {
       setSlideState(current, slides.length);
     }
   }, [current, slides.length, setSlideState]);
 
-  // ─── لود اسلایدها از Supabase ───
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -64,13 +61,15 @@ export default function HeroVideo() {
 
   const slide = slides[current] || FALLBACK_SLIDES[0];
 
-  // دکمه‌ی تخفیف‌ها همیشه قرمز است، مستقل از رنگ تم
-  const isDiscountPrimary = !!slide.primary_label?.includes("تخفیف");
-
   useEffect(() => {
-    if (videoRef.current && slide?.video) {
-      videoRef.current.load();
-      videoRef.current.play().catch(() => {});
+    const videoEl = videoRef.current;
+    if (videoEl && slide?.video) {
+      videoEl.muted = true;
+      videoEl.playsInline = true;
+      videoEl.load();
+      videoEl.play().catch((err) => {
+        console.warn("Autoplay blocked or failed:", err);
+      });
     }
     setTextKey((k) => k + 1);
   }, [current, slide?.video]);
@@ -91,7 +90,6 @@ export default function HeroVideo() {
     setCurrent((c) => (c - 1 + slides.length) % slides.length);
   }
 
-  // ─── هندلرهای swipe ───
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
@@ -103,13 +101,9 @@ export default function HeroVideo() {
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     const dy = e.changedTouches[0].clientY - touchStartY.current;
 
-    // فقط اگه حرکت افقی بیشتر از عمودی بود
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
-      if (dx < 0) {
-        goNext();
-      } else {
-        goPrev();
-      }
+      if (dx < 0) goNext();
+      else goPrev();
     }
 
     touchStartX.current = null;
@@ -119,272 +113,185 @@ export default function HeroVideo() {
 
   if (loading) {
     return (
-      <section
-        dir="rtl"
-        className={`relative h-[480px] w-full overflow-hidden bg-black ${SECTION_SIZE}`}
-      >
-        <div className="h-full w-full animate-pulse bg-zinc-900" />
-      </section>
+      <div className="w-full px-3 sm:px-6 md:px-7">
+        <section
+          dir="rtl"
+          className={`relative w-full overflow-hidden bg-black ${SECTION_SIZE}`}
+        >
+          <div className="h-full w-full animate-pulse bg-zinc-900" />
+        </section>
+      </div>
     );
   }
 
   return (
-    <section
-      dir="rtl"
-      className={`relative w-full overflow-hidden bg-black ${SECTION_SIZE}`}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* ─── تصاویر ───
-          موبایل: قاب با نسبت ثابت بالای صفحه تا عکس کم بریده شود
-          دسکتاپ: تمام‌قد پشت متن */}
-      <div className="relative aspect-[16/10] w-full md:absolute md:inset-0 md:aspect-auto md:h-full">
-      {slides.map((s, i) => {
-        const isActive = i === current;
-        return (
-          <div
-            key={s.id || i}
-            className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out"
-            style={{ opacity: isActive ? 1 : 0 }}
-          >
-            {s.video ? (
-              <video
-                ref={i === current ? videoRef : null}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                poster={s.poster}
-                className="h-full w-full object-cover object-center"
+    <div className="w-full px-3 sm:px-6 md:px-7">
+      <section
+        dir="rtl"
+        className={`relative w-full overflow-hidden bg-black ${SECTION_SIZE}`}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* ─── تصاویر و ویدیو ─── */}
+        <div className="absolute inset-0">
+          {slides.map((s, i) => {
+            const isActive = i === current;
+            return (
+              <div
+                key={s.id || i}
+                className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out"
+                style={{ opacity: isActive ? 1 : 0 }}
               >
-                <source src={s.video} type="video/mp4" />
-              </video>
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={s.poster}
-                alt={s.title_line1}
-                className={`h-full w-full object-cover object-center transition-transform duration-[8000ms] ease-out ${
-                  isActive ? "md:scale-110" : "scale-100"
-                }`}
-              />
-            )}
-          </div>
-        );
-      })}
-
-      {/* ─── Overlay ───
-          موبایل: تیره‌شدن از پایین، تا عکس در بالا دیده شود و متن پایین بنشیند
-          دسکتاپ: تیره‌شدن از سمت راست مثل قبل */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent md:bg-gradient-to-l md:from-black md:via-black/70 md:to-black/30" />
-      </div>
-
-      {/* ─── محتوا ─── */}
-      <div className="relative z-10 -mt-12 flex items-end pb-14 md:absolute md:inset-0 md:mt-0 md:h-full md:items-center md:overflow-hidden md:pb-0">
-        <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-16">
-          <div
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-            className="max-w-2xl text-right"
-          >
-            <div key={textKey}>
-              {/* Eyebrow */}
-              {slide.eyebrow && (
-                <div className="animate-hero-1 mb-3 flex items-center justify-start gap-3 md:mb-4">
-                  <span className="h-[2px] w-10 bg-accent" />
-                  <span className="text-xs font-bold tracking-wider text-accent md:text-sm">
-                    {slide.eyebrow}
-                  </span>
-                </div>
-              )}
-
-              {/* خط اول عنوان */}
-              <h1 className="animate-hero-2 mb-0 text-3xl font-black leading-[1.15] text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-                {slide.title_line1}
-              </h1>
-
-              {/* خط دوم عنوان */}
-              <h1 className="animate-hero-3 mb-3 text-3xl font-black leading-[1.15] text-accent drop-shadow-2xl md:mb-5 md:text-6xl lg:text-7xl">
-                {slide.title_line2}
-              </h1>
-
-              {/* توضیحات */}
-              {slide.description && (
-                <p className="animate-hero-4 mb-5 max-w-xl text-xs leading-6 text-zinc-200 md:mb-8 md:text-base md:leading-8">
-                  {slide.description}
-                </p>
-              )}
-
-              {/* دکمه‌ها */}
-              <div className="animate-hero-5 flex flex-wrap items-center justify-start gap-3">
-                {slide.primary_label && slide.primary_href && (
-                  <a
-                    href={slide.primary_href}
-                    className={`group inline-flex items-center gap-2 rounded-lg px-5 py-3 text-xs font-bold text-white shadow-xl transition md:px-8 md:py-3.5 md:text-base ${
-                      isDiscountPrimary
-                        ? "bg-[#dc2626] shadow-[#dc2626]/30 hover:bg-[#b91c1c]"
-                        : "bg-accent shadow-accent/30 hover:bg-accent-hover"
+                {s.video ? (
+                  <video
+                    ref={i === current ? videoRef : null}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    poster={s.poster}
+                    className="h-full w-full object-cover object-center"
+                  >
+                    <source src={s.video} type="video/mp4" />
+                  </video>
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={s.poster}
+                    alt={s.title_line1}
+                    className={`h-full w-full object-cover object-center transition-transform duration-[8000ms] ease-out ${
+                      isActive ? "md:scale-110" : "scale-100"
                     }`}
-                  >
-                    <span>{slide.primary_label}</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2.5}
-                      stroke="currentColor"
-                      className="h-4 w-4 transition group-hover:-translate-x-1"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-                      />
-                    </svg>
-                  </a>
+                  />
+                )}
+              </div>
+            );
+          })}
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent md:bg-gradient-to-tr md:from-black/90 md:via-black/40 md:to-transparent" />
+        </div>
+
+        {/* ─── محتوا ─── */}
+        <div className="relative z-10 flex h-full items-end pb-8 md:pb-14 lg:pb-16">
+          <div className="w-full px-5 sm:px-6 md:px-10 lg:px-14">
+            <div
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+              className="max-w-md text-right sm:max-w-lg"
+              dir="rtl"
+            >
+              <div key={textKey}>
+                <h1 className="animate-hero-1 mb-1 text-2xl font-black leading-[1.15] text-white drop-shadow-2xl md:text-4xl lg:text-5xl">
+                  {slide.title_line1}
+                </h1>
+
+                <h1 className="animate-hero-2 mb-3 text-2xl font-black leading-[1.15] text-white drop-shadow-2xl md:mb-4 md:text-4xl lg:text-5xl">
+                  {slide.title_line2}
+                </h1>
+
+                {slide.description && (
+                  <p className="animate-hero-3 mb-5 max-w-md text-[11px] leading-5 text-white/90 md:mb-6 md:text-[13px] md:leading-6">
+                    {slide.description}
+                  </p>
                 )}
 
-                {slide.secondary_label && slide.secondary_href && (
-                  <a
-                    href={slide.secondary_href}
-                    className="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 bg-transparent px-5 py-3 text-xs font-bold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/10 md:px-8 md:py-3.5 md:text-base"
-                  >
-                    {slide.secondary_label}
-                  </a>
-                )}
+                {/* ─── دکمه‌ها — تراز راست با متن ─── */}
+                <div className="animate-hero-4 flex flex-wrap items-center justify-start gap-2 md:gap-3">
+                  {slide.primary_label && slide.primary_href && (
+                    <a
+                      href={slide.primary_href}
+                      className="inline-flex items-center justify-center rounded-none bg-white px-6 py-2.5 text-[12px] font-bold text-black transition hover:bg-white/90 md:px-8 md:py-3 md:text-[13px]"
+                    >
+                      {slide.primary_label}
+                    </a>
+                  )}
+
+                  {slide.secondary_label && slide.secondary_href && (
+                    <a
+                      href={slide.secondary_href}
+                      className="inline-flex items-center justify-center rounded-none border-2 border-white bg-transparent px-6 py-2.5 text-[12px] font-bold text-white transition hover:bg-white hover:text-black md:px-8 md:py-3 md:text-[13px]"
+                    >
+                      {slide.secondary_label}
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ─── فلش راست ─── */}
-      {slides.length > 1 && (
-        <button
-          type="button"
-          onClick={goNext}
-          aria-label="اسلاید بعدی"
-          className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-accent lg:flex"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="h-8 w-8"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 19.5L8.25 12l7.5-7.5"
-            />
-          </svg>
-        </button>
-      )}
-
-      {/* ─── فلش چپ ─── */}
-      {slides.length > 1 && (
-        <button
-          type="button"
-          onClick={goPrev}
-          aria-label="اسلاید قبلی"
-          className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-accent lg:flex"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="h-8 w-8"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 4.5l7.5 7.5-7.5 7.5"
-            />
-          </svg>
-        </button>
-      )}
-
-      {/* ─── نقطه‌ها ─── */}
-      {slides.length > 1 && (
-        <div className="absolute bottom-4 right-1/2 z-20 flex translate-x-1/2 items-center gap-3 md:bottom-8">
-          {slides.map((_, i) => (
+        {/* ─── فلش‌ها ─── */}
+        {slides.length > 1 && (
+          <>
             <button
-              key={i}
               type="button"
-              onClick={() => setCurrent(i)}
-              aria-label={`اسلاید ${i + 1}`}
-              className="group relative h-1 overflow-hidden rounded-full bg-white/30 transition-all duration-300"
-              style={{ width: i === current ? "40px" : "20px" }}
+              onClick={goNext}
+              aria-label="اسلاید بعدی"
+              className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-white lg:flex"
             >
-              {i === current && !paused && (
-                <span
-                  key={current}
-                  className="absolute inset-y-0 right-0 bg-accent"
-                  style={{
-                    animation: `heroProgress ${AUTOPLAY_MS}ms linear forwards`,
-                  }}
-                />
-              )}
-              {i === current && paused && (
-                <span className="absolute inset-0 bg-accent" />
-              )}
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-8 w-8">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
             </button>
-          ))}
-        </div>
-      )}
 
-      {/* ─── دایره تزئینی ─── */}
-      <div className="pointer-events-none absolute right-8 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center lg:flex xl:right-16">
-        <div className="absolute inset-0 animate-ping rounded-full border-2 border-accent/40" />
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-accent">
-          <div className="h-2 w-2 rounded-full bg-accent" />
-        </div>
-      </div>
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label="اسلاید قبلی"
+              className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center text-white/70 transition hover:scale-110 hover:text-white lg:flex"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-8 w-8">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+          </>
+        )}
 
-      <style jsx global>{`
-        @keyframes heroProgress {
-          from {
-            width: 0%;
-          }
-          to {
-            width: 100%;
-          }
-        }
+        {/* ─── نقطه‌ها ─── */}
+        {slides.length > 1 && (
+          <div className="absolute bottom-3 right-1/2 z-20 flex translate-x-1/2 items-center gap-3 md:bottom-6">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setCurrent(i)}
+                aria-label={`اسلاید ${i + 1}`}
+                className="group relative h-1 overflow-hidden rounded-full bg-white/30 transition-all duration-300"
+                style={{ width: i === current ? "40px" : "20px" }}
+              >
+                {i === current && !paused && (
+                  <span
+                    key={current}
+                    className="absolute inset-y-0 right-0 bg-white"
+                    style={{ animation: `heroProgress ${AUTOPLAY_MS}ms linear forwards` }}
+                  />
+                )}
+                {i === current && paused && (
+                  <span className="absolute inset-0 bg-white" />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
 
-        @keyframes heroSlideIn {
-          0% {
-            opacity: 0;
-            transform: translateX(120px);
-            filter: blur(8px);
+        <style jsx global>{`
+          @keyframes heroProgress {
+            from { width: 0%; }
+            to { width: 100%; }
           }
-          100% {
-            opacity: 1;
-            transform: translateX(0);
-            filter: blur(0);
-          }
-        }
 
-        .animate-hero-1 {
-          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0s both;
-        }
-        .animate-hero-2 {
-          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
-        }
-        .animate-hero-3 {
-          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
-        }
-        .animate-hero-4 {
-          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
-        }
-        .animate-hero-5 {
-          animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
-        }
-      `}</style>
-    </section>
+          @keyframes heroSlideIn {
+            0% { opacity: 0; transform: translateX(-40px); filter: blur(8px); }
+            100% { opacity: 1; transform: translateX(0); filter: blur(0); }
+          }
+
+          .animate-hero-1 { animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
+          .animate-hero-2 { animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+          .animate-hero-3 { animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+          .animate-hero-4 { animation: heroSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+        `}</style>
+      </section>
+    </div>
   );
 }

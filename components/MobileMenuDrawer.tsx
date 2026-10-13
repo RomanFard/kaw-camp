@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/context/CartContext";
+import { useWishlist } from "@/components/context/WishlistContext";
 import { getAppContent } from "@/lib/supabase/appContent";
 import { megaMenu as defaultMenu } from "@/lib/megaMenu";
 import type { MobileMenuCategory } from "@/lib/contentTypes";
@@ -18,6 +19,46 @@ type MegaMenuCategory = {
   groups: { title: string; items: { label: string; href: string }[] }[];
 };
 
+const CHEVRON_PATH = "M15.75 19.5L8.25 12l7.5-7.5";
+const HEART_PATH =
+  "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z";
+const SEARCH_PATH = "M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z";
+const CLOSE_PATH = "M6 18L18 6M6 6l12 12";
+
+function Icon({
+  d,
+  className,
+  strokeWidth = 2,
+}: {
+  d: string;
+  className?: string;
+  strokeWidth?: number;
+}) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={strokeWidth}
+      stroke="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+    </svg>
+  );
+}
+
+function getVisibleGroups(category: MegaMenuCategory) {
+  return category.groups
+    .filter((g) => !g.title.includes("برند") && !g.title.includes("ظرفیت"))
+    .sort((a, b) => {
+      const aUse = a.title.includes("استفاده") ? 0 : 1;
+      const bUse = b.title.includes("استفاده") ? 0 : 1;
+      return aUse - bUse;
+    });
+}
+
 export default function MobileMenuDrawer({
   isOpen,
   onClose,
@@ -26,14 +67,14 @@ export default function MobileMenuDrawer({
   onClose: () => void;
 }) {
   const [view, setView] = useState<View>({ type: "main" });
-  const [openGroups, setOpenGroups] = useState<number[]>([0]);
   const [menuItems, setMenuItems] = useState<MobileMenuCategory[]>(
     defaultMenu as MobileMenuCategory[]
   );
   const [searchOpen, setSearchOpen] = useState(false);
-  const [submenuVisible, setSubmenuVisible] = useState(false);
   const { totalItems } = useCart();
+  const { totalItems: wishlistCount } = useWishlist();
 
+  // body scroll lock
   useEffect(() => {
     if (isOpen) {
       const scrollY = window.scrollY;
@@ -56,6 +97,7 @@ export default function MobileMenuDrawer({
     }
   }, [isOpen]);
 
+  // load menu
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -66,15 +108,6 @@ export default function MobileMenuDrawer({
       cancelled = true;
     };
   }, []);
-
-  useLayoutEffect(() => {
-    if (view.type === "category") {
-      requestAnimationFrame(() => setSubmenuVisible(true));
-      return () => setSubmenuVisible(false);
-    } else {
-      setSubmenuVisible(false);
-    }
-  }, [view.type]);
 
   const currentCategory =
     view.type === "category"
@@ -87,27 +120,22 @@ export default function MobileMenuDrawer({
     onClose();
     window.setTimeout(() => {
       setView({ type: "main" });
-      setOpenGroups([0]);
     }, 300);
   }
 
   function goToCategory(key: string) {
     setView({ type: "category", key });
-    setOpenGroups([0]);
   }
 
   function backToMain() {
     setView({ type: "main" });
   }
 
-  function toggleGroup(i: number) {
-    setOpenGroups((prev) =>
-      prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]
-    );
-  }
+  const isCategoryView = view.type === "category";
 
   return (
     <>
+      {/* overlay */}
       <div
         onClick={closeAll}
         aria-hidden="true"
@@ -120,183 +148,90 @@ export default function MobileMenuDrawer({
       <aside
         dir="rtl"
         className={
-          "fixed inset-y-0 right-0 z-[210] flex h-[100dvh] w-full max-w-full flex-col bg-theme-card shadow-2xl transition-transform duration-300 md:max-w-[420px] " +
+          "fixed inset-y-0 right-0 z-[210] flex h-[100dvh] w-full max-w-full flex-col bg-theme shadow-2xl transition-transform duration-300 md:max-w-[420px] " +
           (isOpen ? "visible translate-x-0" : "invisible translate-x-full")
         }
       >
-        <header className="flex flex-shrink-0 items-center justify-between border-b border-theme bg-theme-card px-3 py-2.5">
+        {/* ═══ بالای drawer: X + قلب ═══ */}
+        <div className="flex flex-shrink-0 items-center justify-between px-5 py-3">
           <button
             type="button"
             onClick={closeAll}
             aria-label="بستن"
-            className="flex h-9 w-9 items-center justify-center text-theme"
+            className="flex h-9 w-9 items-center justify-center text-theme transition hover:opacity-60"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <Icon d={CLOSE_PATH} className="h-6 w-6" strokeWidth={1.8} />
           </button>
 
           <Link
-            href="/"
+            href="/wishlist"
             onClick={closeAll}
-            className="text-base font-black tracking-[0.2em] text-theme"
+            aria-label="علاقه‌مندی"
+            className="relative flex h-9 w-9 items-center justify-center text-theme transition hover:opacity-60"
           >
-            KAW CAMP
+            <Icon d={HEART_PATH} className="h-6 w-6" strokeWidth={1.8} />
+            {wishlistCount > 0 && (
+              <span className="absolute -left-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-blue-600 px-1 text-[9px] font-bold text-white">
+                {wishlistCount}
+              </span>
+            )}
           </Link>
+        </div>
 
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={() => {
-                closeAll();
-                window.setTimeout(() => setSearchOpen(true), 350);
-              }}
-              className="flex h-9 w-9 items-center justify-center text-theme"
-              aria-label="جستجو"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </button>
+        {/* ═══ فیلد جستجو ═══ */}
+        <div className="flex-shrink-0 px-5 pb-3">
+          <button
+            type="button"
+            onClick={() => {
+              closeAll();
+              window.setTimeout(() => setSearchOpen(true), 350);
+            }}
+            className="flex h-12 w-full items-center gap-3 bg-theme-surface px-4 text-[14px] text-theme-muted transition hover:opacity-80"
+          >
+            <Icon
+              d={SEARCH_PATH}
+              className="h-[18px] w-[18px] flex-shrink-0 text-theme"
+              strokeWidth={2}
+            />
+            <span className="flex-1 truncate text-right">
+              دنبال چی می‌گردی؟
+            </span>
+          </button>
+        </div>
 
-            <Link
-              href="/login"
-              onClick={closeAll}
-              className="flex h-9 w-9 items-center justify-center text-theme"
-              aria-label="حساب کاربری"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                />
-              </svg>
-            </Link>
-
-            <Link
-              href="/cart"
-              onClick={closeAll}
-              className="relative flex h-9 w-9 items-center justify-center text-theme"
-              aria-label="کوله"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="h-5 w-5"
-              >
-                <path
-                  d="M11 1h2a0.5 0.5 0 0 1 0 1h-2a0.5 0.5 0 0 1 0-1z"
-                  opacity="0.55"
-                />
-                <path d="M8.5 3C8.5 2.2 9.2 1.5 10 1.5h4c0.8 0 1.5 0.7 1.5 1.5V4h-7V3z" />
-                <path d="M7 6.5C7 5.7 7.7 5 8.5 5h7c0.8 0 1.5 0.7 1.5 1.5V22c0 0.8-0.7 1.5-1.5 1.5h-7c-0.8 0-1.5-0.7-1.5-1.5V6.5z" />
-                <ellipse cx="6.3" cy="14" rx="0.9" ry="3.5" />
-                <ellipse cx="17.7" cy="14" rx="0.9" ry="3.5" />
-                <rect
-                  x="11.05"
-                  y="6.5"
-                  width="0.55"
-                  height="15.5"
-                  rx="0.27"
-                  fill="#fff"
-                  opacity="0.9"
-                />
-                <rect
-                  x="12.4"
-                  y="6.5"
-                  width="0.55"
-                  height="15.5"
-                  rx="0.27"
-                  fill="#fff"
-                  opacity="0.9"
-                />
-              </svg>
-              {totalItems > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-white">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
-          </div>
-        </header>
-
-        <div className="flex-1 overflow-y-auto">
-          <div className={view.type === "category" ? "hidden md:block" : ""}>
+        {/* ═══ بدنه با اسلاید نرم (جهت معکوس) ═══ */}
+        <div className="relative flex-1 overflow-hidden">
+          {/* ─── نمای اصلی: وقتی دسته باز می‌شه، می‌ره راست ─── */}
+          <div
+            className={
+              "absolute inset-0 overflow-y-auto transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform " +
+              (isCategoryView ? "translate-x-full" : "translate-x-0")
+            }
+          >
             <MainView
               menuItems={menuItems}
               onCategory={goToCategory}
               onClose={closeAll}
-              activeKey={view.type === "category" ? view.key : undefined}
             />
           </div>
 
-          {view.type === "category" && currentCategory && (
-            <div className="md:hidden">
+          {/* ─── نمای دسته: از چپ میاد ─── */}
+          <div
+            className={
+              "absolute inset-0 overflow-y-auto transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform " +
+              (isCategoryView ? "translate-x-0" : "-translate-x-full")
+            }
+          >
+            {currentCategory && (
               <CategoryView
                 category={currentCategory}
-                openGroups={openGroups}
-                onToggleGroup={toggleGroup}
                 onBack={backToMain}
                 onClose={closeAll}
               />
-            </div>
-          )}
-        </div>
-      </aside>
-
-      {view.type === "category" && currentCategory && (
-        <div
-          dir="rtl"
-          className="fixed bottom-0 right-[420px] top-0 z-[209] hidden w-[520px] flex-col border-r border-theme bg-theme-card shadow-2xl md:flex"
-          style={{
-            transform: submenuVisible ? "translateX(0)" : "translateX(-100%)",
-            opacity: submenuVisible ? 1 : 0,
-            transition:
-              "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease",
-          }}
-        >
-          <div className="flex-1 overflow-y-auto">
-            <CategoryView
-              category={currentCategory}
-              openGroups={openGroups}
-              onToggleGroup={toggleGroup}
-              onBack={backToMain}
-              onClose={closeAll}
-            />
+            )}
           </div>
         </div>
-      )}
+      </aside>
 
       {searchOpen && (
         <SearchPanel
@@ -308,148 +243,106 @@ export default function MobileMenuDrawer({
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Main View
+   ═══════════════════════════════════════════════════════════════ */
 function MainView({
   menuItems,
   onCategory,
   onClose,
-  activeKey,
 }: {
   menuItems: MobileMenuCategory[];
   onCategory: (key: string) => void;
   onClose: () => void;
-  activeKey?: string;
 }) {
   return (
-    <div className="pb-6">
+    <div className="pb-8 pt-1">
       <ul>
-        {menuItems.map((cat) => {
-          const isActive = activeKey === cat.key;
-          return (
-            <li key={cat.key}>
-              <button
-                type="button"
-                onClick={() => onCategory(cat.key)}
-                className={
-                  "flex w-full items-center justify-between border-b border-theme/40 px-5 py-3.5 text-right text-sm font-bold transition " +
-                  (isActive
-                    ? "bg-accent/10 text-accent"
-                    : "text-theme hover:bg-theme-surface")
-                }
-              >
-                <span>{cat.label}</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.2}
-                  stroke="currentColor"
-                  className={
-                    "h-3.5 w-3.5 " + (isActive ? "text-accent" : "text-theme-muted")
-                  }
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 19.5L8.25 12l7.5-7.5"
-                  />
-                </svg>
-              </button>
-            </li>
-          );
-        })}
+        {menuItems.map((cat) => (
+          <li key={cat.key}>
+            <button
+              type="button"
+              onClick={() => onCategory(cat.key)}
+              className="group flex w-full items-center justify-between px-5 py-[16px] text-[15px] font-semibold text-theme"
+            >
+              <span className="relative inline-block pb-1">
+                {cat.label}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 bottom-0 h-0.5 origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100"
+                />
+              </span>
+              <Icon d={CHEVRON_PATH} strokeWidth={2.2} className="h-4 w-4" />
+            </button>
+          </li>
+        ))}
 
         <li>
           <Link
             href="/products"
             onClick={onClose}
-            className="flex items-center justify-between border-b border-theme/40 px-5 py-3.5 text-sm font-bold text-theme transition hover:bg-theme-surface"
+            className="group flex items-center justify-between px-5 py-[16px] text-[15px] font-semibold text-theme"
           >
-            <span>سایر</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.2}
-              stroke="currentColor"
-              className="h-3.5 w-3.5 text-theme-muted"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5L8.25 12l7.5-7.5"
+            <span className="relative inline-block pb-1">
+              همه محصولات
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 h-0.5 origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100"
               />
-            </svg>
-          </Link>
-        </li>
-        <li className="px-4 py-2">
-          <Link
-            href="/products"
-            onClick={onClose}
-            className="flex items-center justify-center rounded-xl border-2 border-accent bg-accent/10 px-4 py-3 text-sm font-black text-accent transition hover:bg-accent hover:text-white"
-          >
-            همه محصولات
-          </Link>
-        </li>
-        <li className="px-4 py-2">
-          <Link
-            href="/brands"
-            onClick={onClose}
-            className="flex items-center justify-center rounded-xl border-2 border-theme bg-theme-surface px-4 py-3 text-sm font-black text-theme transition hover:border-accent hover:text-accent"
-          >
-            برندها
+            </span>
+            <Icon d={CHEVRON_PATH} strokeWidth={2.2} className="h-4 w-4" />
           </Link>
         </li>
       </ul>
 
-      <div className="mt-5 px-5">
+      <div className="mt-6 flex flex-col gap-3 px-5">
+        <Link
+          href="/products"
+          onClick={onClose}
+          className="flex items-center justify-center rounded border-2 border-accent bg-accent/10 px-4 py-3 text-[14px] font-extrabold text-accent transition hover:bg-accent hover:text-white"
+        >
+          مشاهده همه محصولات
+        </Link>
+        <Link
+          href="/brands"
+          onClick={onClose}
+          className="flex items-center justify-center rounded border-2 border-theme px-4 py-3 text-[14px] font-extrabold text-theme transition hover:border-accent hover:text-accent"
+        >
+          برندها
+        </Link>
+      </div>
+
+      <div className="mt-8 border-t border-theme/40 px-5 pt-6">
         <h4 className="mb-3 text-[11px] font-black tracking-widest text-theme-muted">
           پشتیبانی
         </h4>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <a
             href="mailto:mohamadxanzadeh@gmail.com"
-            className="flex items-center gap-2 text-sm text-theme"
+            className="flex items-center gap-2 text-[13px] text-theme-muted transition hover:text-theme"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
+            <Icon
+              d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
               strokeWidth={1.8}
-              stroke="currentColor"
-              className="h-5 w-5 text-theme-muted"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
-              />
-            </svg>
+              className="h-4 w-4"
+            />
             mohamadxanzadeh@gmail.com
           </a>
           <a
             href="tel:09180540019"
-            className="flex items-center gap-2 text-sm text-theme"
+            className="flex items-center gap-2 text-[13px] text-theme-muted transition hover:text-theme"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
+            <Icon
+              d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
               strokeWidth={1.8}
-              stroke="currentColor"
-              className="h-5 w-5 text-theme-muted"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
-              />
-            </svg>
+              className="h-4 w-4"
+            />
             ۰۹۱۸ ۰۵۴ ۰۰۱۹
           </a>
         </div>
       </div>
 
-      <div className="mt-6 border-t border-theme/40 px-5 pt-5">
+      <div className="mt-6 border-t border-theme/40 px-5 pb-6 pt-5">
         <h4 className="mb-3 text-[11px] font-black tracking-widest text-theme-muted">
           ما را دنبال کنید
         </h4>
@@ -492,207 +385,85 @@ function MainView({
     </div>
   );
 }
-function CapacityFilter({
-  categoryKey,
-  onApply,
-}: {
-  categoryKey: string;
-  onApply: () => void;
-}) {
-  // 🆕 آرایه از کوچیک به بزرگ (RTL: راست=کوچیک، چپ=بزرگ)
-  const CAPACITIES = [
-    "۱ نفره",
-    "۲ نفره",
-    "۳ نفره",
-    "۴ نفره",
-    "۵ نفره",
-    "۶ نفره",
-    "۷ نفره",
-    "۸ نفره",
-    "۱۰ نفره",
-    "۱۲ نفره و بالاتر",
-  ];
-  const MAX = CAPACITIES.length - 1;
 
-  // 🆕 پیش‌فرض: همه (index = MAX)
-  const [index, setIndex] = useState(MAX);
-  const percent = (index / MAX) * 100;
-  const isAll = index === MAX;
-
-  return (
-    <div className="border-b border-theme/40 px-5 py-5">
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-base font-bold text-theme">ظرفیت</span>
-        <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-black text-accent">
-          {isAll ? "همه ظرفیت‌ها" : `تا ${CAPACITIES[index]}`}
-        </span>
-      </div>
-
-      {/* اسلایدر RTL */}
-      <div dir="rtl" className="px-1">
-        <input
-          type="range"
-          min={0}
-          max={MAX}
-          step={1}
-          value={index}
-          onChange={(e) => setIndex(Number(e.target.value))}
-          className="kaw-range h-1.5 w-full cursor-pointer appearance-none rounded-full"
-          style={{
-            background: `linear-gradient(to left, var(--accent, #E84C4C) 0%, var(--accent, #E84C4C) ${percent}%, var(--theme-surface, #27272A) ${percent}%, var(--theme-surface, #27272A) 100%)`,
-          }}
-        />
-      </div>
-
-      {/* 🆕 برچسب‌ها: راست=کوچیک، چپ=بزرگ (RTL) */}
-      <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-theme-muted">
-        <span>۱ نفره</span>
-        <span>۱۲+ نفره</span>
-      </div>
-
-      <Link
-        href={
-          isAll
-            ? `/products?cat=${categoryKey}`
-            : `/products?cat=${categoryKey}&capacity=${encodeURIComponent(
-                CAPACITIES[index]
-              )}`
-        }
-        onClick={onApply}
-        className="mt-4 flex items-center justify-center rounded-lg bg-accent py-2.5 text-sm font-bold text-white transition hover:bg-accent-hover"
-      >
-        اعمال فیلتر
-      </Link>
-    </div>
-  );
-}
+/* ═══════════════════════════════════════════════════════════════
+   Category View — با خط accent زیر تیتر گروه‌ها
+   ═══════════════════════════════════════════════════════════════ */
 function CategoryView({
   category,
-  openGroups,
-  onToggleGroup,
   onBack,
   onClose,
 }: {
   category: MegaMenuCategory;
-  openGroups: number[];
-  onToggleGroup: (i: number) => void;
   onBack: () => void;
   onClose: () => void;
 }) {
-  const filteredGroups = category.groups.filter(
-    (g) => !g.title.includes("برند") && !g.title.includes("ظرفیت")
-  );
-
-  const sortedGroups = [...filteredGroups].sort((a, b) => {
-    const aUse = a.title.includes("استفاده") ? 0 : 1;
-    const bUse = b.title.includes("استفاده") ? 0 : 1;
-    return aUse - bUse;
-  });
-
-  const isTentCategory = category.groups.some((g) =>
-    g.title.includes("ظرفیت")
-  );
-
   return (
-    <div className="pb-6">
+    <div className="pb-10">
       <button
         type="button"
         onClick={onBack}
-        className="flex w-full items-center gap-2 border-b border-theme bg-theme-surface px-5 py-3.5 text-base font-bold text-accent transition hover:bg-accent hover:text-white"
+        className="flex items-center gap-2 border-b border-theme px-5 py-3.5 text-[14px] font-bold text-theme transition hover:opacity-60"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="h-5 w-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8.25 4.5l7.5 7.5-7.5 7.5"
-          />
-        </svg>
+        <Icon d="M8.25 4.5l7.5 7.5-7.5 7.5" strokeWidth={2.2} className="h-4 w-4" />
         <span>بازگشت</span>
       </button>
 
-      {sortedGroups.map((group, i) => {
-        const isOpen = openGroups.includes(i);
-        return (
-          <div key={i} className="border-b border-theme/40">
-            <button
-              type="button"
-              onClick={() => onToggleGroup(i)}
-              className="flex w-full items-center justify-between px-5 py-4 text-base font-bold text-theme transition hover:bg-theme-surface"
-            >
-              <span>{group.title}</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.2}
-                stroke="currentColor"
-                className={
-                  "h-4 w-4 text-theme-muted transition-transform duration-300 " +
-                  (isOpen ? "rotate-180" : "")
-                }
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                />
-              </svg>
-            </button>
+      <div className="px-5 pt-6">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8">
+          {getVisibleGroups(category).map((group) => (
+            <div key={group.title}>
+              {/* ─── تیتر گروه با خط accent زیرش ─── */}
+              <h4 className="mb-4 inline-block pb-1 text-[14px] font-extrabold text-theme">
+                <span className="relative inline-block">
+                  {group.title}
+                  <span
+                    aria-hidden="true"
+                    className="absolute -bottom-1 right-0 h-[2px] w-8 bg-accent"
+                  />
+                </span>
+              </h4>
 
-            <div
-              className={
-                "overflow-hidden transition-[max-height] duration-300 " +
-                (isOpen ? "max-h-[900px]" : "max-h-0")
-              }
-            >
-              <ul className="grid grid-cols-2 gap-2 px-4 pb-4">
-                {group.items.map((item) => (
-                  <li key={item.label}>
+              <ul className="mt-3 space-y-2.5">
+                {group.items.map((it) => (
+                  <li key={it.label}>
                     <Link
-                      href={item.href}
+                      href={it.href}
                       onClick={onClose}
-                      className="flex h-full items-center justify-center rounded-lg border border-theme/50 bg-theme-surface px-3 py-2.5 text-center text-xs font-semibold text-theme transition hover:border-accent hover:bg-accent/10 hover:text-accent"
+                      className="group/item text-[13px] text-theme-muted transition hover:text-theme"
                     >
-                      {item.label}
+                      <span className="relative inline-block pb-0.5">
+                        {it.label}
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-x-0 bottom-0 h-px origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover/item:scale-x-100"
+                        />
+                      </span>
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
-          </div>
-        );
-      })}
+          ))}
+        </div>
 
-      {isTentCategory && (
-        <CapacityFilter categoryKey={category.key} onApply={onClose} />
-      )}
-
-      {/* 🆕 «مشاهده همه» با کادر و استایل دکمه‌ای + عکس */}
-      <div className="mt-6 flex flex-col items-center px-6">
         <Link
           href={`/products?cat=${category.key}`}
           onClick={onClose}
-          className="flex w-full max-w-[260px] items-center justify-center rounded-xl border-2 border-accent bg-accent/10 px-4 py-3 text-sm font-black text-accent transition hover:bg-accent hover:text-white md:text-base"
+          className="mt-8 flex items-center justify-between rounded border-2 border-accent bg-accent/10 px-4 py-3 text-[14px] font-extrabold text-accent transition hover:bg-accent hover:text-white"
         >
-          مشاهده همه {category.label}
+          <span>مشاهده همه {category.label}</span>
+          <Icon d={CHEVRON_PATH} strokeWidth={2.2} className="h-4 w-4" />
         </Link>
 
         {category.photo && (
-          <div className="mt-5 w-full max-w-[240px] overflow-hidden rounded-xl border border-theme">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={category.photo}
-              alt={category.label}
-              className="h-auto w-full object-cover"
-            />
-          </div>
+          <Link
+            href={`/products?cat=${category.key}`}
+            onClick={onClose}
+            aria-label={category.label}
+            style={{ backgroundImage: `url(${category.photo})` }}
+            className="mt-4 block h-[190px] rounded bg-neutral-900 bg-cover bg-center"
+          />
         )}
       </div>
     </div>
