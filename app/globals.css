@@ -17,10 +17,36 @@ html:not(.dark):not(.light) body {
   --muted-light: #9CA3AF;
   --accent: #E84C4C;
   --accent-hover: #D63F3F;
+  --mobile-header-h: 60px;   /* 🆕 fallback اگه JS کار نکرد */
+  color-scheme: light;
+}
+:root {
+  --background: #E8E8E8;
+  --foreground: #0A0A0A;
+  --card: #FFFFFF;
+  --card-border: #E5E7EB;
+  --surface: #EEEEEE;
+  --muted: #6B7280;
+  --muted-light: #9CA3AF;
+  --accent: #E84C4C;
+  --accent-hover: #D63F3F;
   color-scheme: light;
 }
 
 /* ═══ Dark Theme ═══ */
+.dark {
+  --background: #050505;
+  --foreground: #FFFFFF;
+  --card: #0A0A0A;
+  --card-border: #27272A;
+  --surface: #18181B;
+  --muted: #A1A1AA;
+  --muted-light: #71717A;
+  --accent: #E84C4C;
+  --accent-hover: #D63F3F;
+  --mobile-header-h: 60px;   /* 🆕 */
+  color-scheme: dark;
+}
 .dark {
   --background: #050505;
   --foreground: #FFFFFF;
@@ -57,7 +83,7 @@ html:not(.dark):not(.light) body {
   /* ═══ HTML ═══ */
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     max-width: 100vw;
     scrollbar-width: thin;
     scrollbar-color: #c9c3b4 transparent;
@@ -69,7 +95,7 @@ html:not(.dark):not(.light) body {
 
   /* ═══ Body ═══ */
   body {
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     width: 100%;
     max-width: 100vw;
     position: relative;

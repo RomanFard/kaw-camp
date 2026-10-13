@@ -5,7 +5,6 @@ import Image from "next/image";
 import CartDropdown from "./CartDropdown";
 import SearchPanel from "./SearchPanel";
 import MobileMenuDrawer from "./MobileMenuDrawer";
-import ThemeToggle from "./ThemeToggle";
 import { useWishlist } from "@/components/context/WishlistContext";
 import { getAppContent } from "@/lib/supabase/appContent";
 import { megaMenu as defaultMenu } from "@/lib/megaMenu";
@@ -22,7 +21,6 @@ type MegaMenuCategory = {
 type MenuItem = {
   label: string;
   href: string;
-  /** اگر true باشد، ردیف‌ها از دسته‌های مگامنو (همان داده‌ی منوی موبایل) ساخته می‌شوند */
   mega?: boolean;
   children?: { label: string; href: string; highlight?: boolean }[];
   promos?: { label: string; href: string; image: string }[];
@@ -72,8 +70,12 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-const ANNOUNCEMENT_TEXT = "۱۵٪ تخفیف برای عضویت در خبرنامه — همین حالا عضو شو";
-const ANNOUNCEMENT_HREF = "/#newsletter";
+const ANNOUNCEMENTS = [
+  {
+    text: "۱۵٪ تخفیف برای عضویت در خبرنامه — همین حالا عضو شو",
+    href: "/#newsletter",
+  },
+];
 
 const HEART_PATH =
   "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z";
@@ -109,7 +111,6 @@ function Icon({
   );
 }
 
-// همان منطق منوی موبایل: گروه‌های «برند» و «ظرفیت» حذف می‌شوند و «استفاده» اول می‌آید
 function getVisibleGroups(category: MegaMenuCategory) {
   return category.groups
     .filter((g) => !g.title.includes("برند") && !g.title.includes("ظرفیت"))
@@ -126,15 +127,53 @@ export default function Header() {
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [panelTop, setPanelTop] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [announcementClosed, setAnnouncementClosed] = useState(false);
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [announcementPaused, setAnnouncementPaused] = useState(false);
   const [megaCats, setMegaCats] = useState<MegaMenuCategory[]>(
     defaultMenu as unknown as MegaMenuCategory[]
   );
+
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const desktopRef = useRef<HTMLDivElement | null>(null);
+  const mobileHeaderRef = useRef<HTMLDivElement>(null);
+
   const { totalItems: wishlistCount } = useWishlist();
 
   const menuOpen = openDropdown !== null;
+  const announcement = ANNOUNCEMENTS[announcementIndex];
+
+  // 🆕 اندازه‌گیری خودکار ارتفاع هدر موبایل
+  useEffect(() => {
+    const el = mobileHeaderRef.current;
+    if (!el) return;
+
+    const updateHeight = () => {
+      document.documentElement.style.setProperty(
+        "--mobile-header-h",
+        `${el.offsetHeight}px`
+      );
+    };
+
+    updateHeight();
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(el);
+    window.addEventListener("resize", updateHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateHeight);
+    };
+  }, []);
+
+  // چرخش پیام‌های نوار اعلان
+  useEffect(() => {
+    if (announcementPaused || ANNOUNCEMENTS.length < 2) return;
+    const id = setInterval(() => {
+      setAnnouncementIndex((i) => (i + 1) % ANNOUNCEMENTS.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [announcementPaused]);
 
   // دسته‌های محصولات از همان منبع منوی موبایل خوانده می‌شوند
   useEffect(() => {
@@ -155,7 +194,6 @@ export default function Header() {
     setOpenDropdown(null);
   }, []);
 
-  // وقتی منو بسته شد یا به آیتم دیگری رفتیم، زیرمنوی دسته را هم ببند
   useEffect(() => {
     if (openDropdown === null) setActiveCat(null);
   }, [openDropdown]);
@@ -184,7 +222,6 @@ export default function Header() {
     };
   }, []);
 
-  // بستن با Escape و با اسکرول
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -198,35 +235,67 @@ export default function Header() {
     };
   }, [menuOpen, closeNow]);
 
+  const renderAnnouncement = (heightClass: string) => (
+    <div className="bg-theme-surface text-theme">
+      <div
+        className={
+          "relative mx-auto flex items-center justify-center px-10 md:px-24 " +
+          heightClass
+        }
+      >
+        <a
+          href={announcement.href}
+          className="text-center text-[12px] font-medium underline underline-offset-2"
+        >
+          {announcement.text}
+        </a>
+        <button
+          type="button"
+          onClick={() => setAnnouncementPaused((p) => !p)}
+          aria-label={
+            announcementPaused ? "پخش پیام‌های اعلان" : "توقف پیام‌های اعلان"
+          }
+          className="absolute end-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-theme transition hover:opacity-60 md:end-14"
+        >
+          {announcementPaused ? (
+            <svg
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-3 w-3"
+              aria-hidden="true"
+            >
+              <path d="M7 4.5v15a1 1 0 001.5.86l12.5-7.5a1 1 0 000-1.72L8.5 3.64A1 1 0 007 4.5z" />
+            </svg>
+          ) : (
+            <svg
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-3 w-3"
+              aria-hidden="true"
+            >
+              <rect x="4" y="3" width="6" height="18" rx="1" />
+              <rect x="14" y="3" width="6" height="18" rx="1" />
+            </svg>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <header dir="rtl" className="w-full">
-        {/* ═══ نوار اعلان ═══ */}
-        {!announcementClosed && (
-          <div className="hidden bg-theme-surface text-theme md:block">
-            <div className="relative mx-auto flex h-12 items-center justify-center px-14">
-              <a
-                href={ANNOUNCEMENT_HREF}
-                className="text-center text-[12px] font-medium underline underline-offset-2"
-              >
-                {ANNOUNCEMENT_TEXT}
-              </a>
-              <button
-                type="button"
-                onClick={() => setAnnouncementClosed(true)}
-                aria-label="بستن نوار اعلان"
-                className="absolute end-7 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-theme transition hover:opacity-60"
-              >
-                <Icon d="M6 18L18 6M6 6l12 12" className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        )}
+        {/* ═══ نوار اعلان (دسکتاپ) ═══ */}
+        <div className="hidden md:block">{renderAnnouncement("h-[50px]")}</div>
 
         {/* ═══ موبایل ═══ */}
-        <div className="fixed left-0 right-0 top-0 z-[100] bg-theme md:hidden">
-          <div className="mx-auto max-w-[1400px] px-3 py-2.5 sm:px-6">
-            <div className="flex items-center gap-1">
+        <div
+          ref={mobileHeaderRef}
+          className="fixed left-0 right-0 top-0 z-[100] bg-theme md:hidden"
+        >
+          {renderAnnouncement("h-10")}
+          <div className="grid h-[56px] grid-cols-[1fr_auto_1fr] items-center px-3">
+            <div className="flex items-center justify-start">
               <button
                 type="button"
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -235,34 +304,22 @@ export default function Header() {
               >
                 <Icon d={MENU_PATH} strokeWidth={2.2} className="h-6 w-6" />
               </button>
+              <SearchButton />
+            </div>
 
-              <a href="/" className="flex-shrink-0">
-                <Image
-                  src="/images/logo.png"
-                  alt="کاو کمپ"
-                  width={60}
-                  height={60}
-                  className="h-8 w-auto dark:brightness-0 dark:invert"
-                />
-              </a>
+            <a href="/" className="flex items-center justify-center">
+              <LogoName className="h-[37px] w-[88px] translate-y-[7px]" />
+            </a>
 
-              <div className="min-w-0 flex-1">
-                <SearchButton />
-              </div>
-
+            <div className="flex items-center justify-end">
               <a
                 href="/login"
                 aria-label="حساب کاربری"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center text-theme transition hover:opacity-60"
+                className="flex h-10 w-10 items-center justify-center text-theme transition hover:opacity-60"
               >
-                <Icon d={USER_PATH} className="h-5 w-5" />
+                <Icon d={USER_PATH} className="h-6 w-6" />
               </a>
-
-              <div className="flex-shrink-0 [&_button]:h-9 [&_button]:w-9">
-                <ThemeToggle />
-              </div>
-
-              <div className="flex-shrink-0 [&_button]:h-9 [&_button]:w-9">
+              <div className="[&_button]:h-10 [&_button]:w-10">
                 <CartDropdown />
               </div>
             </div>
@@ -271,7 +328,7 @@ export default function Header() {
 
         {/* ═══ دسکتاپ ═══ */}
         <div ref={desktopRef} className="relative hidden bg-theme md:block">
-          <div className="grid h-[76px] grid-cols-[1fr_auto_1fr] items-center gap-6 px-7">
+          <div className="grid h-[76px] grid-cols-[1fr_auto_1fr] items-center gap-6 px-[34px]">
             <nav className="flex items-center">
               <ul className="flex items-center gap-8">
                 {menuItems.map((item) => {
@@ -283,7 +340,11 @@ export default function Header() {
                           href: `/products?cat=${c.key}`,
                           catKey: c.key,
                         })),
-                        { label: "همه محصولات", href: "/products", catKey: null },
+                        {
+                          label: "سایر",
+                          href: "/products?cat=other",
+                          catKey: null,
+                        },
                       ]
                     : (item.children ?? []).map((c) => ({
                         label: c.label,
@@ -308,11 +369,10 @@ export default function Header() {
                     >
                       <a
                         href={item.href}
-                        className="block text-[14px] font-semibold text-theme"
+                        className="block text-[14px] font-medium text-theme"
                       >
                         <span className="relative inline-block pb-1">
                           {item.label}
-                          {/* خط زیرین: آرام از چپ به راست پر می‌شود */}
                           <span
                             aria-hidden="true"
                             className={
@@ -327,7 +387,7 @@ export default function Header() {
 
                       {hasChildren && (
                         <>
-                          {/* ─── پنل اول ─── */}
+                          {/* ═══ پنل اول ═══ */}
                           <div
                             style={{
                               top: panelTop,
@@ -341,7 +401,7 @@ export default function Header() {
                                 : "invisible opacity-0")
                             }
                           >
-                            <ul className="pb-8 pt-5">
+                            <ul className="pb-4 pt-5">
                               {rows.map((row) => {
                                 const isActiveRow =
                                   row.catKey !== null &&
@@ -382,6 +442,24 @@ export default function Header() {
                               })}
                             </ul>
 
+                            {/* 🆕 دکمه‌های میانبر (مثل موبایل) */}
+                            <div className="mt-2 flex flex-col gap-2 border-t border-theme/40 px-4 py-4">
+                              <a
+                                href="/products"
+                                onClick={closeNow}
+                                className="flex items-center justify-center rounded border-2 border-accent bg-accent/10 px-4 py-2.5 text-[13px] font-extrabold text-accent transition hover:bg-accent hover:text-white"
+                              >
+                                مشاهده همه محصولات
+                              </a>
+                              <a
+                                href="/brands"
+                                onClick={closeNow}
+                                className="flex items-center justify-center rounded border-2 border-theme px-4 py-2.5 text-[13px] font-extrabold text-theme transition hover:border-accent hover:text-accent"
+                              >
+                                برندها
+                              </a>
+                            </div>
+
                             {item.promos && (
                               <div className="mt-auto flex flex-col gap-2 pe-2">
                                 {item.promos.map((promo) => (
@@ -404,7 +482,7 @@ export default function Header() {
                             )}
                           </div>
 
-                          {/* ─── پنل دوم: گروه‌ها و آیتم‌های دسته‌ی انتخاب‌شده ─── */}
+                          {/* ═══ پنل دوم ═══ */}
                           {activeCategory && (
                             <div
                               style={{
@@ -487,42 +565,25 @@ export default function Header() {
             </nav>
 
             <a href="/" className="flex items-center justify-center">
-              <Image
-                src="/images/logo.png"
-                alt="کاو کمپ"
-                width={300}
-                height={300}
+              <LogoName
+                className="h-[46px] w-[110px] translate-y-[9px]"
                 priority
-                className="h-[52px] w-auto dark:brightness-0 dark:invert"
               />
             </a>
 
-            <div className="flex items-center justify-end gap-2 lg:gap-3">
+            <div className="flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
-                className="flex h-11 w-[250px] items-center gap-3 rounded bg-theme-surface px-4 text-[14px] text-theme-muted transition hover:opacity-80"
+                className="me-4 flex h-11 w-[250px] items-center gap-3 border border-transparent bg-theme-surface px-4 text-[14px] text-theme-muted transition-colors hover:border-neutral-900 dark:hover:border-neutral-300"
               >
                 <Icon
                   d={SEARCH_PATH}
                   className="h-[18px] w-[18px] flex-shrink-0 text-theme"
                 />
-                <span className="flex-1 truncate text-right">
+                <span className="flex-1 truncate text-start">
                   دنبال چی می‌گردی؟
                 </span>
-              </button>
-
-              <div className="flex-shrink-0 [&_button]:h-11 [&_button]:w-11">
-                <ThemeToggle />
-              </div>
-
-              <button
-                type="button"
-                className="flex h-11 items-center gap-1 rounded px-3 text-[13px] font-semibold text-theme transition hover:opacity-60"
-                aria-label="واحد پول"
-              >
-                <span>۰</span>
-                <span className="text-theme-muted">تومان</span>
               </button>
 
               <a
@@ -552,7 +613,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ═══ لایه تیره و مات پشت منو (فقط دسکتاپ) ═══ */}
+        {/* ═══ لایه تیره و مات پشت منو ═══ */}
         <div
           aria-hidden="true"
           style={{ top: panelTop }}
@@ -577,6 +638,27 @@ export default function Header() {
   );
 }
 
+function LogoName({
+  className,
+  priority,
+}: {
+  className: string;
+  priority?: boolean;
+}) {
+  return (
+    <span className={"relative block overflow-hidden " + className}>
+      <Image
+        src="/images/logo.png"
+        alt="کاو کمپ"
+        width={300}
+        height={300}
+        priority={priority}
+        className="absolute inset-x-0 bottom-0 h-auto w-full dark:brightness-0 dark:invert"
+      />
+    </span>
+  );
+}
+
 function SearchButton() {
   const [open, setOpen] = useState(false);
 
@@ -585,10 +667,10 @@ function SearchButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-2 rounded bg-theme-surface px-3 py-2 text-xs text-theme-muted transition"
+        aria-label="جستجو"
+        className="flex h-10 w-10 items-center justify-center text-theme transition hover:opacity-60"
       >
-        <Icon d={SEARCH_PATH} className="h-4 w-4 flex-shrink-0 text-theme" />
-        <span className="flex-1 truncate text-right text-xs">جستجو...</span>
+        <Icon d={SEARCH_PATH} className="h-6 w-6" />
       </button>
 
       {open && <SearchPanel onClose={() => setOpen(false)} forceOpen={true} />}

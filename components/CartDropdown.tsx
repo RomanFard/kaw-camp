@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 import { getProductPlaceholder } from "@/lib/placeholder";
@@ -24,29 +24,54 @@ function getCategoryEmojiFromName(name: string) {
   return "📦";
 }
 
-function BackpackIcon({ className = "" }: { className?: string }) {
+// آیکن خطی کوله، هم‌سبک آیکن‌های قلب و کاربر در هدر
+function BackpackIcon({
+  className = "",
+  strokeWidth = 2,
+}: {
+  className?: string;
+  strokeWidth?: number;
+}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={className}
+      aria-hidden="true"
     >
-      <path d="M11 1h2a0.5 0.5 0 0 1 0 1h-2a0.5 0.5 0 0 1 0-1z" opacity="0.55" />
-      <path d="M8.5 3C8.5 2.2 9.2 1.5 10 1.5h4c0.8 0 1.5 0.7 1.5 1.5V4h-7V3z" />
-      <path d="M7 6.5C7 5.7 7.7 5 8.5 5h7c0.8 0 1.5 0.7 1.5 1.5V22c0 0.8-0.7 1.5-1.5 1.5h-7c-0.8 0-1.5-0.7-1.5-1.5V6.5z" />
-      <ellipse cx="6.3" cy="14" rx="0.9" ry="3.5" />
-      <ellipse cx="17.7" cy="14" rx="0.9" ry="3.5" />
-      <rect x="11.05" y="6.5" width="0.55" height="15.5" rx="0.27" fill="#fff" opacity="0.9" />
-      <rect x="12.4" y="6.5" width="0.55" height="15.5" rx="0.27" fill="#fff" opacity="0.9" />
-      <rect x="11.5" y="1.7" width="1" height="3.3" rx="0.25" fill="#fff" opacity="0.55" />
+      {/* دسته */}
+      <path d="M9.5 5V4a2.5 2.5 0 015 0v1" />
+      {/* بدنه */}
+      <path d="M7 21h10a2 2 0 002-2v-9a5 5 0 00-5-5h-4a5 5 0 00-5 5v9a2 2 0 002 2z" />
+      {/* جیب جلو */}
+      <path d="M8.5 21v-5a1 1 0 011-1h5a1 1 0 011 1v5" />
+      {/* خط بالای جیب */}
+      <path d="M9 10h6" />
     </svg>
   );
 }
 
 export default function CartDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const [bump, setBump] = useState(false);
   const { items, removeItem, totalItems, totalPrice } = useCart();
+  const prevTotal = useRef(totalItems);
+
+  // وقتی تعداد محصولات زیاد شد، عدد کوله یک بار بالا می‌پرد
+  useEffect(() => {
+    if (totalItems > prevTotal.current) {
+      setBump(true);
+      prevTotal.current = totalItems;
+      const t = setTimeout(() => setBump(false), 350);
+      return () => clearTimeout(t);
+    }
+    prevTotal.current = totalItems;
+  }, [totalItems]);
 
   return (
     <>
@@ -55,18 +80,21 @@ export default function CartDropdown() {
         type="button"
         onClick={() => setIsOpen(true)}
         data-cart-icon
-        className="relative flex items-center gap-2 text-theme-muted transition hover:text-accent"
+        aria-label="کوله خرید"
+        className="relative flex h-11 w-11 items-center justify-center text-theme transition hover:opacity-60"
       >
-        <span className="relative">
-          <BackpackIcon className="h-10 w-9" />
+        <span className="relative flex items-center justify-center">
+          <BackpackIcon className="h-6 w-6" />
           {totalItems > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
+            <span
+              className={
+                "absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-blue-900 px-1 text-[10px] font-bold text-white transition-transform duration-200 ease-out dark:bg-blue-600 " +
+                (bump ? "-translate-y-2 scale-125" : "translate-y-0 scale-100")
+              }
+            >
               {totalItems}
             </span>
           )}
-        </span>
-        <span className="hidden text-lg font-bold md:inline">
-          {formatPrice(totalPrice)}
         </span>
       </button>
 
@@ -104,7 +132,10 @@ export default function CartDropdown() {
         {items.length === 0 ? (
           /* کوله خالی */
           <div className="flex h-[calc(100vh-140px)] flex-col items-center justify-center p-8 text-center">
-            <BackpackIcon className="h-24 w-20 text-theme-muted/40" />
+            <BackpackIcon
+              strokeWidth={1.2}
+              className="h-20 w-20 text-theme-muted/40"
+            />
             <p className="mt-4 text-base font-bold text-theme">
               کوله شما خالی است
             </p>
@@ -183,7 +214,7 @@ export default function CartDropdown() {
                   href="/cart"
                   className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-theme bg-theme-surface py-3 text-sm font-bold text-theme transition hover:border-accent hover:text-accent"
                 >
-                  <BackpackIcon className="h-4 w-3.5" />
+                  <BackpackIcon className="h-4 w-4" />
                   <span>مشاهده کوله</span>
                 </a>
                 <a

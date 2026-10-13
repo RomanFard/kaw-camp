@@ -199,9 +199,9 @@ export default function MobileMenuDrawer({
           </button>
         </div>
 
-        {/* ═══ بدنه با اسلاید نرم (جهت معکوس) ═══ */}
+        {/* ═══ بدنه با اسلاید نرم ═══ */}
         <div className="relative flex-1 overflow-hidden">
-          {/* ─── نمای اصلی: وقتی دسته باز می‌شه، می‌ره راست ─── */}
+          {/* ─── نمای اصلی ─── */}
           <div
             className={
               "absolute inset-0 overflow-y-auto transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform " +
@@ -215,7 +215,7 @@ export default function MobileMenuDrawer({
             />
           </div>
 
-          {/* ─── نمای دسته: از چپ میاد ─── */}
+          {/* ─── نمای دسته ─── */}
           <div
             className={
               "absolute inset-0 overflow-y-auto transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform " +
@@ -277,14 +277,15 @@ function MainView({
           </li>
         ))}
 
+        {/* 🆕 «همه محصولات» → «سایر» */}
         <li>
           <Link
-            href="/products"
+            href="/products?cat=other"
             onClick={onClose}
             className="group flex items-center justify-between px-5 py-[16px] text-[15px] font-semibold text-theme"
           >
             <span className="relative inline-block pb-1">
-              همه محصولات
+              سایر
               <span
                 aria-hidden="true"
                 className="absolute inset-x-0 bottom-0 h-0.5 origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100"
@@ -387,7 +388,7 @@ function MainView({
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Category View — با خط accent زیر تیتر گروه‌ها
+   Category View
    ═══════════════════════════════════════════════════════════════ */
 function CategoryView({
   category,
@@ -413,7 +414,6 @@ function CategoryView({
         <div className="grid grid-cols-2 gap-x-6 gap-y-8">
           {getVisibleGroups(category).map((group) => (
             <div key={group.title}>
-              {/* ─── تیتر گروه با خط accent زیرش ─── */}
               <h4 className="mb-4 inline-block pb-1 text-[14px] font-extrabold text-theme">
                 <span className="relative inline-block">
                   {group.title}

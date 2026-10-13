@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import FloatingButtons from "@/components/FloatingButtons";
+
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { CartProvider } from "@/components/context/CartContext";
@@ -77,7 +77,7 @@ export default function RootLayout({
                     <WishlistProvider>
                       {children}
                     
-                      <FloatingButtons />
+  
                       <ToastContainer />
                     </WishlistProvider>
                   </CartProvider>
