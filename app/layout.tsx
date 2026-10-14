@@ -14,7 +14,9 @@ import ToastContainer from "@/components/ToastContainer";
 
 export const metadata: Metadata = {
   title: "58391172",
+
   description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
+
   other: {
     enamad: "58391172",
   },
@@ -36,7 +38,7 @@ export default function RootLayout({
                 try {
                   // حذف هر تم ذخیره‌شده‌ای
                   localStorage.removeItem('theme');
-                  
+
                   // اجبار به light
                   var html = document.documentElement;
                   html.classList.remove('dark');
@@ -61,7 +63,7 @@ export default function RootLayout({
         />
         <link
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/AmirAbbasVafei/persian-fonts-cdn@main/css/iran-yekan.css"
+          href="https://cdn.jsdelivr.net/gh/AmirAbbasVafaee/persian-fonts-cdn@main/css/iran-yekan.css"
         />
       </head>
       <body className="font-[IranYekan] bg-theme">
@@ -73,6 +75,7 @@ export default function RootLayout({
                 <CartProvider>
                   <WishlistProvider>
                     {children}
+
                     <ToastContainer />
                   </WishlistProvider>
                 </CartProvider>
