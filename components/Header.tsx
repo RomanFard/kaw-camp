@@ -126,7 +126,7 @@ export default function Header() {
       ? announcements[announcementIndex % announcements.length]
       : null;
 
-  // 🆕 اندازه‌گیری ارتفاع هدر موبایل
+  // اندازه‌گیری ارتفاع هدر موبایل
   useEffect(() => {
     const el = mobileHeaderRef.current;
     if (!el) return;
@@ -672,7 +672,10 @@ function LogoName({
   priority?: boolean;
 }) {
   return (
-    <span className={"relative block overflow-hidden " + className}>
+    <span
+      data-header-logo
+      className={"relative block overflow-hidden " + className}
+    >
       <Image
         src="/images/logo.png"
         alt="کاو کمپ"

@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fa" dir="rtl" className="light">
+   <html lang="fa" dir="rtl" className="light" suppressHydrationWarning>
       <head>
         {/* 🔴 Anti-Flash — همیشه روشن */}
         <script

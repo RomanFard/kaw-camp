@@ -1,14 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
+const MIN_DURATION = 2000;
+
+// مقصد پیش‌فرض اگر لوگوی هدر پیدا نشد
+const TARGET_Y = 90;
+const TARGET_WIDTH = 110;
+
+type Dock = { x: number; y: number; scale: number };
+
 export default function LoadingScreen() {
   const pathname = usePathname();
+  const logoRef = useRef<HTMLDivElement>(null);
   const [hidden, setHidden] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [dock, setDock] = useState<Dock | null>(null);
 
   useEffect(() => {
     if (pathname !== "/") {
@@ -18,6 +28,11 @@ export default function LoadingScreen() {
     setHidden(false);
     setFadeOut(false);
     setProgress(0);
+    setDock(null);
+
+    const startTime = Date.now();
+    let finished = false;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
 
     let currentProgress = 0;
     const progressInterval = setInterval(() => {
@@ -29,188 +44,179 @@ export default function LoadingScreen() {
       setProgress(currentProgress);
     }, 200);
 
-    function handleLoad() {
+    function startDock() {
+      const el = logoRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+
+      // لوگوی نمایان هدر (موبایل یا دسکتاپ)
+      const target = Array.from(
+        document.querySelectorAll("[data-header-logo]")
+      )
+        .map((n) => n.getBoundingClientRect())
+        .find((r) => r.width > 0 && r.height > 0);
+
+      const targetX = target
+        ? target.left + target.width / 2
+        : window.innerWidth / 2;
+      const targetY = target ? target.top + target.height / 2 : TARGET_Y;
+      const targetWidth = target ? target.width : TARGET_WIDTH;
+
+      setDock({
+        x: targetX - (rect.left + rect.width / 2),
+        y: targetY - (rect.top + rect.height / 2),
+        scale: targetWidth / rect.width,
+      });
+    }
+
+    function finish() {
+      if (finished) return;
+      finished = true;
       clearInterval(progressInterval);
       setProgress(100);
-      setTimeout(() => {
-        setFadeOut(true);
-        setTimeout(() => setHidden(true), 600);
-      }, 300);
+      timeouts.push(
+        setTimeout(() => {
+          startDock();
+          timeouts.push(
+            setTimeout(() => {
+              setFadeOut(true);
+              timeouts.push(setTimeout(() => setHidden(true), 600));
+            }, 1000)
+          );
+        }, 400)
+      );
+    }
+
+    function handleLoad() {
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, MIN_DURATION - elapsed);
+      timeouts.push(setTimeout(finish, remaining));
     }
 
     if (document.readyState === "complete") {
       handleLoad();
-      return;
+    } else {
+      window.addEventListener("load", handleLoad);
+      timeouts.push(setTimeout(handleLoad, 3000));
     }
-
-    window.addEventListener("load", handleLoad);
-    const fallback = setTimeout(handleLoad, 3000);
 
     return () => {
       window.removeEventListener("load", handleLoad);
       clearInterval(progressInterval);
-      clearTimeout(fallback);
+      timeouts.forEach(clearTimeout);
     };
   }, [pathname]);
 
   if (hidden) return null;
 
-  const progressText = `${Math.round(progress).toLocaleString("fa-IR")}٪`;
+  // تاری: از ۳۰ پیکسل (شروع) تا ۰ (پایان)
+  const blurPx = 30 * (1 - progress / 100);
+  // سفیدی پس‌زمینه: از ۰.۸ تا ۰.۱
+  const whiteAlpha = 0.8 - 0.7 * (progress / 100);
 
   return (
     <div
       dir="rtl"
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-theme transition-all duration-600 ${
-        fadeOut ? "opacity-0 scale-105" : "opacity-100 scale-100"
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center ${
+        dock ? "pointer-events-none" : ""
       }`}
-      style={{
-        transitionProperty: "opacity, transform",
-        transitionDuration: "600ms",
-      }}
     >
-      {/* گرادیان accent گوشه */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute -right-40 top-20 h-80 w-80 rounded-full blur-[120px]"
-          style={{ backgroundColor: "var(--accent)", opacity: 0.1 }}
-        />
-        <div
-          className="absolute -left-40 bottom-20 h-80 w-80 rounded-full blur-[120px]"
-          style={{ backgroundColor: "var(--accent)", opacity: 0.05 }}
-        />
-      </div>
+      {/* لایه پس‌زمینه: بعد از رسیدن به ۱۰۰٪ کامل محو می‌شود */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundColor: `rgba(255, 255, 255, ${whiteAlpha})`,
+          backdropFilter: `blur(${blurPx}px)`,
+          WebkitBackdropFilter: `blur(${blurPx}px)`,
+          opacity: dock ? 0 : 1,
+          transition:
+            "background-color 400ms ease-out, backdrop-filter 400ms ease-out, -webkit-backdrop-filter 400ms ease-out, opacity 800ms ease",
+        }}
+      />
 
-      {/* دایره + لوگو */}
-      <div className="relative h-44 w-44 md:h-56 md:w-56">
-        {/* هاله درخشان */}
+      {/* لوگوی تصویری: بعد از ۱۰۰٪ کوچک می‌شود و روی لوگوی هدر می‌نشیند */}
+      <div
+        ref={logoRef}
+        className="kaw-enter relative w-[260px] md:w-[420px]"
+        style={{
+          transform: dock
+            ? `translate(${dock.x}px, ${dock.y}px) scale(${dock.scale})`
+            : "none",
+          opacity: fadeOut ? 0 : 1,
+          transition:
+            "transform 900ms cubic-bezier(0.65, 0, 0.35, 1), opacity 600ms ease",
+        }}
+      >
+        {/* همان برش و نسبت لوگوی هدر (۱۱۰ در ۴۶) */}
         <div
-          className="absolute inset-0 animate-pulse-slow rounded-full"
-          style={{
-            boxShadow: `0 0 80px 20px color-mix(in srgb, var(--accent) 20%, transparent), 0 0 140px 40px color-mix(in srgb, var(--accent) 8%, transparent)`,
-          }}
-        />
-
-        {/* دایره زمینه */}
-        <svg
-          viewBox="0 0 100 100"
-          className="absolute inset-0 h-full w-full -rotate-90"
+          className="relative w-full overflow-hidden"
+          style={{ aspectRatio: "110 / 46" }}
         >
-          <circle
-            cx="50"
-            cy="50"
-            r="46"
-            fill="none"
-            stroke="var(--card-border)"
-            strokeWidth="1.5"
-          />
-        </svg>
+          {/* لایه کم‌رنگ زیرین */}
+          <div className="absolute inset-0">
+            <Image
+              src="/images/logo.png"
+              alt=""
+              width={300}
+              height={300}
+              priority
+              className="absolute inset-x-0 bottom-0 h-auto w-full opacity-15 grayscale mix-blend-multiply"
+            />
+          </div>
 
-        {/* دایره progress */}
-        <svg
-          viewBox="0 0 100 100"
-          className="absolute inset-0 h-full w-full -rotate-90"
-        >
-          <defs>
-            <linearGradient
-              id="progressGradient"
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%"
-            >
-              <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="var(--accent)" stopOpacity="1" />
-            </linearGradient>
-          </defs>
-          <circle
-            cx="50"
-            cy="50"
-            r="46"
-            fill="none"
-            stroke="url(#progressGradient)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
+          {/* لایه کامل که از چپ به راست پر می‌شود */}
+          <div
+            className="absolute inset-0"
             style={{
-              strokeDasharray: 289,
-              strokeDashoffset: 289 - (progress / 100) * 289,
-              transition: "stroke-dashoffset 300ms ease-out",
-              filter: "drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 60%, transparent))",
+              clipPath: `inset(0 ${100 - progress}% 0 0)`,
+              transition: "clip-path 300ms ease-out",
             }}
-          />
-        </svg>
-
-        {/* نقطه درخشان */}
-        <div
-          className="absolute left-1/2 top-1/2 h-3 w-3 rounded-full"
-          style={{
-            backgroundColor: "var(--accent)",
-            boxShadow: "0 0 16px 6px color-mix(in srgb, var(--accent) 80%, transparent)",
-            transform: `rotate(${(progress / 100) * 360 - 90}deg) translateX(${progress * 0.46}px)`,
-            transformOrigin: "0 0",
-            transition: "transform 300ms ease-out",
-          }}
-        />
-
-        {/* لوگو */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="animate-pulse-slow">
-<Image
-  src="/images/loading.png"        // ← مسیر عکس جدیدت
-  alt="KAW CAMP"
-  width={200}
-  height={200}
-  priority
-  className="h-24 w-auto md:h-28"
-/>
+          >
+            <Image
+              src="/images/logo.png"
+              alt="KAW CAMP"
+              width={300}
+              height={300}
+              priority
+              className="absolute inset-x-0 bottom-0 h-auto w-full grayscale contrast-125 mix-blend-multiply"
+            />
           </div>
         </div>
       </div>
 
-      {/* درصد */}
-      <div className="relative mt-8 flex flex-col items-center">
-        <p className="text-3xl font-black text-accent md:text-4xl">
-          {progressText}
-        </p>
-        <p
-          className="mt-2 text-[10px] font-black uppercase tracking-[0.5em] text-theme-muted md:text-xs"
-          dir="ltr"
-        >
-          LOADING
-        </p>
-      </div>
-
-      {/* نوار پیشرفت */}
-      <div className="mt-8 w-56 overflow-hidden rounded-full bg-theme-surface md:w-72">
+      {/* خط باریک پیشرفت زیر لوگو */}
+      <div
+        className="relative mt-6 h-px w-[260px] bg-black/15 md:w-[420px]"
+        style={{
+          opacity: dock ? 0 : 1,
+          transition: "opacity 300ms ease",
+        }}
+      >
         <div
-          className="h-[3px] rounded-full bg-accent"
+          className="mx-auto h-full bg-black"
           style={{
             width: `${progress}%`,
             transition: "width 300ms ease-out",
-            boxShadow: "0 0 10px color-mix(in srgb, var(--accent) 60%, transparent)",
           }}
         />
       </div>
 
-      {/* برند پایین */}
-      <p className="absolute bottom-8 text-[10px] font-black uppercase tracking-[0.3em] text-theme-muted">
-        KAW CAMP © ۱۴۰۴
-      </p>
-
       <style jsx global>{`
-        @keyframes pulseSlow {
-          0%,
-          100% {
-            opacity: 1;
-            transform: scale(1);
+        @keyframes kawEnter {
+          from {
+            opacity: 0;
+            filter: blur(10px);
+            margin-top: 24px;
           }
-          50% {
-            opacity: 0.9;
-            transform: scale(1.04);
+          to {
+            opacity: 1;
+            filter: blur(0);
+            margin-top: 0;
           }
         }
 
-        .animate-pulse-slow {
-          animation: pulseSlow 2s ease-in-out infinite;
+        .kaw-enter {
+          animation: kawEnter 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
         }
       `}</style>
     </div>
