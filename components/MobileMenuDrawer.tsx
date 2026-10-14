@@ -290,23 +290,7 @@ function MainView({
           </li>
         ))}
 
-        {/* 🆕 «همه محصولات» → «سایر» */}
-        <li>
-          <Link
-            href="/products?cat=other"
-            onClick={onClose}
-            className="group flex items-center justify-between px-5 py-[16px] text-[15px] font-semibold text-theme"
-          >
-            <span className="relative inline-block pb-1">
-              سایر
-              <span
-                aria-hidden="true"
-                className="absolute inset-x-0 bottom-0 h-0.5 origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100"
-              />
-            </span>
-            <Icon d={CHEVRON_PATH} strokeWidth={2.2} className="h-4 w-4" />
-          </Link>
-        </li>
+
       </ul>
 
       <div className="mt-6 flex flex-col gap-3 px-5">

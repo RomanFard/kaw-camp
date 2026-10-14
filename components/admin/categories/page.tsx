@@ -2,30 +2,24 @@
 
 import { useState } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
-import PopularTab from "@/components/admin/categories/PopularTab";
-import SpecialTab from "@/components/admin/categories/SpecialTab";
-import MobileTab from "@/components/admin/categories/MobileTab";
-import PhotosTab from "@/components/admin/categories/PhotosTab";
 import UnifiedTab from "@/components/admin/categories/UnifiedTab";
+import GridTab from "@/components/admin/categories/GridTab";
+import LinksTab from "@/components/admin/categories/LinksTab";
 
-type Tab = "unified" | "products" | "photos" | "special" | "popular" | "mobile";
+type Tab = "unified" | "grid" | "links";
 
 export default function AdminCategoriesPage() {
   const [tab, setTab] = useState<Tab>("unified");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: "unified", label: "🎯 یکپارچه (جدید)" },
-    { key: "popular", label: "🔥 محبوب" },
-    { key: "special", label: "✨ ویژه" },
-    { key: "mobile", label: "📱 موبایل" },
-    { key: "photos", label: "🖼 عکس‌ها" },
-    { key: "products", label: "📦 محصولات" },
+  const tabs: { key: Tab; label: string; hint?: string }[] = [
+    { key: "unified", label: "🎯 یکپارچه", hint: "منبع اصلی محصولات" },
+    { key: "grid", label: "🖼 گرید عکس", hint: "دسته‌بندی‌های محبوب" },
+    { key: "links", label: "🔗 لینک‌ها", hint: "پایین صفحه اصلی" },
   ];
 
   return (
     <div dir="rtl" className="flex min-h-screen bg-theme text-theme">
-      {/* Backdrop موبایل */}
       {isMobileMenuOpen && (
         <div
           onClick={() => setIsMobileMenuOpen(false)}
@@ -33,13 +27,11 @@ export default function AdminCategoriesPage() {
         />
       )}
 
-      {/* سایدبار */}
       <AdminSidebar
         isMobileMenuOpen={isMobileMenuOpen}
         onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
       />
 
-      {/* محتوای اصلی */}
       <main className="flex-1 overflow-x-hidden p-4 pb-12 sm:p-8">
         <div className="mx-auto max-w-7xl">
           {/* هدر */}
@@ -72,7 +64,7 @@ export default function AdminCategoriesPage() {
                   🗂 مدیریت دسته‌بندی‌ها
                 </h1>
                 <p className="mt-1 text-xs text-theme-muted">
-                  مدیریت کامل دسته‌بندی‌های محبوب، ویژه، منوی موبایل و عکس‌ها
+                  منبع واحد همه‌ی بخش‌های سایت
                 </p>
               </div>
             </div>
@@ -91,32 +83,18 @@ export default function AdminCategoriesPage() {
                     ? "bg-accent text-white shadow-sm"
                     : "border border-theme bg-theme-card text-theme-muted hover:border-accent/50 hover:text-theme")
                 }
+                title={t.hint}
               >
                 {t.label}
               </button>
             ))}
           </div>
 
-          {/* محتوای تب */}
+          {/* محتوا */}
           <div className="rounded-2xl border border-theme bg-theme-card p-5 shadow-sm">
             {tab === "unified" && <UnifiedTab />}
-            {tab === "popular" && <PopularTab />}
-            {tab === "special" && <SpecialTab />}
-            {tab === "mobile" && <MobileTab />}
-            {tab === "photos" && <PhotosTab />}
-            {tab === "products" && (
-              <div className="p-8 text-center">
-                <p className="mb-4 text-xs text-theme-muted">
-                  برای مدیریت محصولات به صفحه محصولات برو
-                </p>
-                <a
-                  href="/admin/products"
-                  className="inline-block rounded-xl bg-accent px-6 py-3 text-xs font-bold text-white shadow-sm transition hover:opacity-90"
-                >
-                  📦 رفتن به مدیریت محصولات
-                </a>
-              </div>
-            )}
+            {tab === "grid" && <GridTab />}
+            {tab === "links" && <LinksTab />}
           </div>
         </div>
       </main>

@@ -3,13 +3,33 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getAppContent } from "@/lib/supabase/appContent";
-import type { CategoryGridFilter } from "@/lib/contentTypes";
+import {
+  type CategoryGridFilter,
+  type CategoryGridPhoto,
+  normalizeGridPhoto,
+} from "@/lib/contentTypes";
 
 const DEFAULT_FILTERS: CategoryGridFilter[] = [
-  { key: "tent", label: "چادر", photos: ["tent", "bottle", "cooking", "lighting"] },
-  { key: "sleep", label: "کیسه خواب", photos: ["sleep", "mattress", "tent", "bottle"] },
-  { key: "mattress", label: "زیرانداز", photos: ["mattress", "sleep", "tent", "backpack"] },
-  { key: "backpack", label: "کوله پشتی", photos: ["backpack", "accessories", "bottle", "clothing"] },
+  {
+    key: "tent",
+    label: "چادر",
+    photos: ["tent", "bottle", "cooking", "lighting"],
+  },
+  {
+    key: "sleep",
+    label: "کیسه خواب",
+    photos: ["sleep", "mattress", "tent", "bottle"],
+  },
+  {
+    key: "mattress",
+    label: "زیرانداز",
+    photos: ["mattress", "sleep", "tent", "backpack"],
+  },
+  {
+    key: "backpack",
+    label: "کوله پشتی",
+    photos: ["backpack", "accessories", "bottle", "clothing"],
+  },
 ];
 
 const LABELS: Record<string, string> = {
@@ -59,7 +79,7 @@ export default function CategoryGrid() {
 
   return (
     <section className="w-full px-3 py-10 sm:px-6 md:px-7 md:py-14">
-      {/* ─── تیتر ─── */}
+      {/* تیتر */}
       <div className="mb-5 flex items-end justify-between md:mb-8">
         <h2 className="text-lg font-black tracking-tight text-theme md:text-xl lg:text-2xl">
           دسته‌بندی‌های محبوب
@@ -73,8 +93,8 @@ export default function CategoryGrid() {
         </Link>
       </div>
 
-      {/* ─── تب‌ها — موبایل: یک ردیف، فشرده ─── */}
-      <div className="mb-5 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:mb-8 md:flex-wrap md:gap-2 md:pb-0 scrollbar-hide">
+      {/* تب‌ها */}
+      <div className="scrollbar-hide mb-5 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:mb-8 md:flex-wrap md:gap-2 md:pb-0">
         {filters.map((f) => {
           const isActive = activeKey === f.key;
           return (
@@ -95,14 +115,18 @@ export default function CategoryGrid() {
         })}
       </div>
 
-      {/* ─── گرید کارت‌ها ─── */}
+      {/* گرید کارت‌ها */}
       <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-2.5">
-        {activeFilter.photos.map((photoName, idx) => {
-          const imageSrc = `/images/categories/photos/${photoName}.jpg`;
-          const label = LABELS[photoName] || photoName;
+        {activeFilter.photos.map((rawPhoto: string | CategoryGridPhoto, idx) => {
+          const photo = normalizeGridPhoto(rawPhoto);
+          const imageSrc = `/images/categories/photos/${photo.name}.jpg`;
+          const label = photo.label || LABELS[photo.name] || photo.name;
           const description =
-            DESCRIPTIONS[photoName] || "محصولات باکیفیت و حرفه‌ای کوهنوردی";
-          const href = `/products?cat=${activeFilter.key}`;
+            photo.description ||
+            DESCRIPTIONS[photo.name] ||
+            "محصولات باکیفیت و حرفه‌ای کوهنوردی";
+          // 🆕 اگه لینک اختصاصی داشت، از اون استفاده کن
+          const href = photo.href || `/products?cat=${activeFilter.key}`;
 
           return (
             <Link

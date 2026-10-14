@@ -30,11 +30,28 @@ export const SPECIAL_ICON_KEYS = [
   "cooking",
   "tools",
 ] as const;
+// 🖼 هر عکس توی گرید می‌تونه لینک و متن اختصاصی داشته باشه
+export type CategoryGridPhoto = {
+  name: string;         // نام فایل عکس (مثلاً tent)
+  href?: string;        // لینک اختصاصی (اگه نباشه: /products?cat={filter.key})
+  label?: string;       // عنوان اختصاصی (اگه نباشه: از LABELS خونده می‌شه)
+  description?: string; // توضیح اختصاصی
+};
+
 export type CategoryGridFilter = {
   key: string;
   label: string;
-  photos: string[];
+  // 🆕 می‌تونه string باشه (سازگاری با قدیمی) یا object
+  photos: (string | CategoryGridPhoto)[];
 };
+
+// helper — تبدیل string به object
+export function normalizeGridPhoto(
+  p: string | CategoryGridPhoto
+): CategoryGridPhoto {
+  if (typeof p === "string") return { name: p };
+  return p;
+}
 // ─────────────────────────────────────────────
 // 📢 نوار اعلان (Announcement Bar)
 // ─────────────────────────────────────────────
@@ -149,3 +166,59 @@ export function toCategoryPhoto(cat: UnifiedCategory): { name: string; url: stri
     url: cat.photo,
   };
 }
+// ─────────────────────────────────────────────
+// 🔗 لینک‌های دسته‌بندی (CategoryLinks)
+// ─────────────────────────────────────────────
+
+export type CategoryLink = {
+  label: string;
+  href: string;
+};
+
+export type CategoryLinkGroup = {
+  title: string;
+  links: CategoryLink[];
+};
+
+export const CATEGORY_LINKS_KEY = "category_links";
+
+export const DEFAULT_CATEGORY_LINKS: CategoryLinkGroup[] = [
+  {
+    title: "چادر و خواب",
+    links: [
+      { label: "چادر و سایبان", href: "/products?cat=tent" },
+      { label: "کیسه خواب", href: "/products?cat=sleep" },
+      { label: "زیرانداز کمپینگ", href: "/products?cat=mattress" },
+    ],
+  },
+  {
+    title: "حمل و پوشاک",
+    links: [
+      { label: "کیف و کوله‌پشتی", href: "/products?cat=backpack" },
+      { label: "پوشاک کوهنوردی", href: "/products?cat=clothing" },
+      { label: "کفش کوهنوردی", href: "/products?cat=shoes" },
+      { label: "جوراب", href: "/products?cat=socks" },
+      { label: "گتر", href: "/products?cat=gaiters" },
+    ],
+  },
+  {
+    title: "پخت و تجهیزات",
+    links: [
+      { label: "پخت و پز", href: "/products?cat=cooking" },
+      { label: "چراغ و روشنایی", href: "/products?cat=lighting" },
+      { label: "تجهیزات و ابزار", href: "/products?cat=tools" },
+      { label: "میز و صندلی", href: "/products?cat=table" },
+    ],
+  },
+  {
+    title: "اکسسوری و سایر",
+    links: [
+      { label: "لیوان و قمقمه", href: "/products?cat=bottle" },
+      { label: "عینک", href: "/products?cat=sunglasses" },
+      { label: "ساعت ورزشی", href: "/products?cat=watch" },
+      { label: "دوچرخه", href: "/products?cat=bicycle" },
+      { label: "اکسسوری", href: "/products?cat=accessories" },
+      { label: "سایر", href: "/products?cat=other" },
+    ],
+  },
+];

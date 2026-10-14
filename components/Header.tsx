@@ -372,24 +372,17 @@ export default function Header() {
               <ul className="flex items-center gap-8">
                 {menuItems.map((item) => {
                   const isMega = !!item.mega;
-                  const rows: Row[] = isMega
-                    ? [
-                        ...megaCats.map((c) => ({
-                          label: c.label,
-                          href: `/products?cat=${c.key}`,
-                          catKey: c.key,
-                        })),
-                        {
-                          label: "سایر",
-                          href: "/products?cat=other",
-                          catKey: null,
-                        },
-                      ]
-                    : (item.children ?? []).map((c) => ({
-                        label: c.label,
-                        href: c.href,
-                        catKey: null,
-                      }));
+const rows: Row[] = isMega
+  ? megaCats.map((c) => ({
+      label: c.label,
+      href: `/products?cat=${c.key}`,
+      catKey: c.key,
+    }))
+  : (item.children ?? []).map((c) => ({
+      label: c.label,
+      href: c.href,
+      catKey: null,
+    }));
                   const hasChildren = rows.length > 0;
                   const isOpen = openDropdown === item.label;
                   const activeCategory =

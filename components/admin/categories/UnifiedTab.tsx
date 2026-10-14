@@ -69,10 +69,6 @@ async function migrateFromOldSources(): Promise<UnifiedCategory[]> {
 const SHOW_IN_LABELS: { key: keyof CategoryShowIn; label: string }[] = [
   { key: "megaMenu", label: "🎛️ مگا منو (دسکتاپ)" },
   { key: "mobileMenu", label: "📱 منوی موبایل" },
-  { key: "popular", label: "🔥 محبوب‌ها" },
-  { key: "special", label: "✨ ویژه‌ها" },
-  { key: "grid", label: "🖼️ گرید عکس" },
-  { key: "showcase", label: "🐕 ویترین بلک داگ" },
 ];
 
 export default function UnifiedTab() {
