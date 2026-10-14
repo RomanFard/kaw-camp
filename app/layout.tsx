@@ -21,9 +21,9 @@ export const metadata: Metadata = {
 
   description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
 
-  // 🆕 متاتگ اینماد — دائمی
+  // 🆕 متاتگ اینماد (4817186 دائمی) + Vercel (FAYIYIA7 موقت)
   other: {
-    enamad: "4817186",
+    enamad: ["4817186", "FAYIYIA7"],
   },
 };
 
