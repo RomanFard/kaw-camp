@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { CartProvider } from "@/components/context/CartContext";
-import { ThemeProvider } from "@/components/context/ThemeProvider";
 import { WishlistProvider } from "@/components/context/WishlistContext";
 import { ToastProvider } from "@/components/context/ToastContext";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -14,14 +13,8 @@ import { HeroSlideProvider } from "@/components/context/HeroSlideContext";
 import ToastContainer from "@/components/ToastContainer";
 
 export const metadata: Metadata = {
-  // 🆕 موقت — برای تأیید عنوان اینماد
-  // ⚠️ بعد از تأیید اینماد، این خط رو به مقدار اصلی برگردون:
-  // title: "KAW CAMP | فروشگاه تخصصی کمپینگ و کوهنوردی",
   title: "58391172",
-
   description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
-
-  // 🆕 متاتگ اینماد (کد جدید: 58391172)
   other: {
     enamad: "58391172",
   },
@@ -33,27 +26,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning>
+    <html lang="fa" dir="rtl" className="light">
       <head>
-        {/* ═══════════════════════════════════════════════
-            🔴 Anti-Flash Script
-            - تم (dark/light) رو از localStorage می‌خونه
-            - اگه ذخیره نشده → پیش‌فرض light
-            ═══════════════════════════════════════════════ */}
+        {/* 🔴 Anti-Flash — همیشه روشن */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  // ─── تم — پیش‌فرض روشن ───
-                  var stored = localStorage.getItem('theme');
-                  var theme = stored === 'dark' ? 'dark' : 'light';
+                  // حذف هر تم ذخیره‌شده‌ای
+                  localStorage.removeItem('theme');
+                  
+                  // اجبار به light
                   var html = document.documentElement;
-                  html.classList.remove('dark', 'light');
-                  html.classList.add(theme);
-                  html.style.colorScheme = theme;
+                  html.classList.remove('dark');
+                  html.classList.add('light');
+                  html.style.colorScheme = 'light';
 
-                  // ─── رنگ accent ───
+                  // رنگ accent
                   var settings = localStorage.getItem('kaw-site-settings');
                   if (settings) {
                     var s = JSON.parse(settings);
@@ -71,28 +61,25 @@ export default function RootLayout({
         />
         <link
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/AmirAbbasVafaee/persian-fonts-cdn@main/css/iran-yekan.css"
+          href="https://cdn.jsdelivr.net/gh/AmirAbbasVafei/persian-fonts-cdn@main/css/iran-yekan.css"
         />
       </head>
       <body className="font-[IranYekan] bg-theme">
-        <ThemeProvider>
-          <SiteSettingsProvider>
-            <HeroSlideProvider>
-              <LoadingScreen />
-              <ToastProvider>
-                <ProductsProvider>
-                  <CartProvider>
-                    <WishlistProvider>
-                      {children}
-
-                      <ToastContainer />
-                    </WishlistProvider>
-                  </CartProvider>
-                </ProductsProvider>
-              </ToastProvider>
-            </HeroSlideProvider>
-          </SiteSettingsProvider>
-        </ThemeProvider>
+        <SiteSettingsProvider>
+          <HeroSlideProvider>
+            <LoadingScreen />
+            <ToastProvider>
+              <ProductsProvider>
+                <CartProvider>
+                  <WishlistProvider>
+                    {children}
+                    <ToastContainer />
+                  </WishlistProvider>
+                </CartProvider>
+              </ProductsProvider>
+            </ToastProvider>
+          </HeroSlideProvider>
+        </SiteSettingsProvider>
       </body>
     </html>
   );
