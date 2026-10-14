@@ -8,7 +8,12 @@ import MobileMenuDrawer from "./MobileMenuDrawer";
 import { useWishlist } from "@/components/context/WishlistContext";
 import { getAppContent } from "@/lib/supabase/appContent";
 import { megaMenu as defaultMenu } from "@/lib/megaMenu";
-import type { MobileMenuCategory } from "@/lib/contentTypes";
+import type {
+  MobileMenuCategory,
+  AnnouncementBar,
+  AnnouncementMessage,
+} from "@/lib/contentTypes";
+import { DEFAULT_ANNOUNCEMENT_BAR } from "@/lib/contentTypes";
 
 type MegaMenuCategory = {
   key: string;
@@ -70,13 +75,6 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-const ANNOUNCEMENTS = [
-  {
-    text: "۱۵٪ تخفیف برای عضویت در خبرنامه — همین حالا عضو شو",
-    href: "/#newsletter",
-  },
-];
-
 const HEART_PATH =
   "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z";
 const USER_PATH =
@@ -133,6 +131,11 @@ export default function Header() {
     defaultMenu as unknown as MegaMenuCategory[]
   );
 
+  // 📢 نوار اعلان از Supabase
+  const [announcementData, setAnnouncementData] = useState<AnnouncementBar>(
+    DEFAULT_ANNOUNCEMENT_BAR
+  );
+
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const desktopRef = useRef<HTMLDivElement | null>(null);
   const mobileHeaderRef = useRef<HTMLDivElement>(null);
@@ -140,7 +143,15 @@ export default function Header() {
   const { totalItems: wishlistCount } = useWishlist();
 
   const menuOpen = openDropdown !== null;
-  const announcement = ANNOUNCEMENTS[announcementIndex];
+
+  // پیام فعال (اگه نوار غیرفعال باشه یا پیامی نباشه، null)
+  const announcements = announcementData.enabled
+    ? announcementData.messages
+    : [];
+  const currentAnnouncement: AnnouncementMessage | null =
+    announcements.length > 0
+      ? announcements[announcementIndex % announcements.length]
+      : null;
 
   // 🆕 اندازه‌گیری خودکار ارتفاع هدر موبایل
   useEffect(() => {
@@ -168,12 +179,19 @@ export default function Header() {
 
   // چرخش پیام‌های نوار اعلان
   useEffect(() => {
-    if (announcementPaused || ANNOUNCEMENTS.length < 2) return;
+    if (
+      announcementPaused ||
+      !announcementData.enabled ||
+      announcementData.messages.length < 2
+    )
+      return;
     const id = setInterval(() => {
-      setAnnouncementIndex((i) => (i + 1) % ANNOUNCEMENTS.length);
-    }, 5000);
+      setAnnouncementIndex(
+        (i) => (i + 1) % announcementData.messages.length
+      );
+    }, announcementData.rotateInterval || 5000);
     return () => clearInterval(id);
-  }, [announcementPaused]);
+  }, [announcementPaused, announcementData]);
 
   // دسته‌های محصولات از همان منبع منوی موبایل خوانده می‌شوند
   useEffect(() => {
@@ -182,6 +200,20 @@ export default function Header() {
       const data = await getAppContent<MobileMenuCategory[]>("mobile_menu");
       if (!cancelled && data && data.length > 0) {
         setMegaCats(data as unknown as MegaMenuCategory[]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 📢 خوندن نوار اعلان از Supabase
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const stored = await getAppContent<AnnouncementBar>("announcement_bar");
+      if (!cancelled && stored) {
+        setAnnouncementData({ ...DEFAULT_ANNOUNCEMENT_BAR, ...stored });
       }
     })();
     return () => {
@@ -235,52 +267,69 @@ export default function Header() {
     };
   }, [menuOpen, closeNow]);
 
-  const renderAnnouncement = (heightClass: string) => (
-    <div className="bg-theme-surface text-theme">
-      <div
-        className={
-          "relative mx-auto flex items-center justify-center px-10 md:px-24 " +
-          heightClass
-        }
-      >
-        <a
-          href={announcement.href}
-          className="text-center text-[12px] font-medium underline underline-offset-2"
-        >
-          {announcement.text}
-        </a>
-        <button
-          type="button"
-          onClick={() => setAnnouncementPaused((p) => !p)}
-          aria-label={
-            announcementPaused ? "پخش پیام‌های اعلان" : "توقف پیام‌های اعلان"
+  const renderAnnouncement = (heightClass: string) => {
+    // اگه نوار غیرفعاله یا پیامی نیست، هیچی نشون نده
+    if (!announcementData.enabled || !currentAnnouncement) return null;
+
+    const hasMultiple = announcements.length > 1;
+
+    return (
+      <div className="bg-theme-surface text-theme">
+        <div
+          className={
+            "relative mx-auto flex items-center justify-center px-10 md:px-24 " +
+            heightClass
           }
-          className="absolute end-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-theme transition hover:opacity-60 md:end-14"
         >
-          {announcementPaused ? (
-            <svg
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-3 w-3"
-              aria-hidden="true"
+          {currentAnnouncement.href ? (
+            <a
+              href={currentAnnouncement.href}
+              className="text-center text-[12px] font-medium underline underline-offset-2"
             >
-              <path d="M7 4.5v15a1 1 0 001.5.86l12.5-7.5a1 1 0 000-1.72L8.5 3.64A1 1 0 007 4.5z" />
-            </svg>
+              {currentAnnouncement.text}
+            </a>
           ) : (
-            <svg
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-3 w-3"
-              aria-hidden="true"
-            >
-              <rect x="4" y="3" width="6" height="18" rx="1" />
-              <rect x="14" y="3" width="6" height="18" rx="1" />
-            </svg>
+            <span className="text-center text-[12px] font-medium">
+              {currentAnnouncement.text}
+            </span>
           )}
-        </button>
+          {hasMultiple && (
+            <button
+              type="button"
+              onClick={() => setAnnouncementPaused((p) => !p)}
+              aria-label={
+                announcementPaused
+                  ? "پخش پیام‌های اعلان"
+                  : "توقف پیام‌های اعلان"
+              }
+              className="absolute end-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-theme transition hover:opacity-60 md:end-14"
+            >
+              {announcementPaused ? (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="h-3 w-3"
+                  aria-hidden="true"
+                >
+                  <path d="M7 4.5v15a1 1 0 001.5.86l12.5-7.5a1 1 0 000-1.72L8.5 3.64A1 1 0 007 4.5z" />
+                </svg>
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="h-3 w-3"
+                  aria-hidden="true"
+                >
+                  <rect x="4" y="3" width="6" height="18" rx="1" />
+                  <rect x="14" y="3" width="6" height="18" rx="1" />
+                </svg>
+              )}
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <>

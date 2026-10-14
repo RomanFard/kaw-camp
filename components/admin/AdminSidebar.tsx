@@ -20,8 +20,9 @@ const NAV_ITEMS: NavItem[] = [
   { id: "accounting", label: "حسابداری", icon: "💰", href: "/admin/accounting" },
   { id: "categories", label: "دسته‌بندی‌ها", icon: "🖼️", href: "/admin/categories" },
   { id: "brands", label: "برندها", icon: "🏷️", href: "/admin/brands" },
-  { id: "attributes", label: "ویژگی‌ها", icon: "🎛️", href: "/admin/attributes" }, // 🆕
+  { id: "attributes", label: "ویژگی‌ها", icon: "🎛️", href: "/admin/attributes" },
   { id: "hero-slides", label: "بنر اصلی", icon: "🎬", href: "/admin/hero-slides" },
+  { id: "announcement", label: "نوار اعلان", icon: "📢", href: "/admin/announcement" }, // 🆕
   { id: "category-showcase", label: "ویترین بلک داگ", icon: "🐕", href: "/admin/category-showcase" },
   { id: "black-dog-steps", label: "مراحل برپا کردن", icon: "🏕️", href: "/admin/black-dog-steps" },
   { id: "about", label: "درباره ما", icon: "📄", href: "/admin/about" },

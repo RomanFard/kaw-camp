@@ -35,3 +35,28 @@ export type CategoryGridFilter = {
   label: string;
   photos: string[];
 };
+// ─────────────────────────────────────────────
+// 📢 نوار اعلان (Announcement Bar)
+// ─────────────────────────────────────────────
+
+export type AnnouncementMessage = {
+  text: string;
+  href?: string;
+};
+
+export type AnnouncementBar = {
+  enabled: boolean;
+  messages: AnnouncementMessage[];
+  rotateInterval: number; // ms — زمان چرخش بین پیام‌ها
+};
+
+export const DEFAULT_ANNOUNCEMENT_BAR: AnnouncementBar = {
+  enabled: true,
+  messages: [
+    {
+      text: "۱۵٪ تخفیف برای عضویت در خبرنامه — همین حالا عضو شو",
+      href: "/#newsletter",
+    },
+  ],
+  rotateInterval: 5000,
+};
