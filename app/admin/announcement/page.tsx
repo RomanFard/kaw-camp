@@ -14,6 +14,7 @@ const CONTENT_KEY = "announcement_bar";
 
 export default function AnnouncementAdminPage() {
   const supabase = createClient();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [data, setData] = useState<AnnouncementBar>(DEFAULT_ANNOUNCEMENT_BAR);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -33,12 +34,12 @@ export default function AnnouncementAdminPage() {
     setSaving(true);
     setMessage(null);
     try {
-const { error } = await supabase
-  .from("app_content")
-  .upsert(
-    { key: CONTENT_KEY, data: data },
-    { onConflict: "key" }
-  );
+      const { error } = await supabase
+        .from("app_content")
+        .upsert(
+          { key: CONTENT_KEY, data: data },
+          { onConflict: "key" }
+        );
       if (error) throw error;
       setMessage({ type: "ok", text: "✅ با موفقیت ذخیره شد" });
       setTimeout(() => setMessage(null), 3000);
@@ -94,7 +95,16 @@ const { error } = await supabase
   if (loading) {
     return (
       <div className="flex min-h-screen bg-theme" dir="rtl">
-        <AdminSidebar />
+        {isMobileMenuOpen && (
+          <div
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+          />
+        )}
+        <AdminSidebar
+          isMobileMenuOpen={isMobileMenuOpen}
+          onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
+        />
         <main className="flex-1 p-6 md:p-10">
           <p className="text-theme-muted">در حال بارگذاری...</p>
         </main>
@@ -106,17 +116,52 @@ const { error } = await supabase
 
   return (
     <div className="flex min-h-screen bg-theme" dir="rtl">
-      <AdminSidebar />
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+        />
+      )}
+
+      <AdminSidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
+      />
+
       <main className="flex-1 p-6 md:p-10">
         <div className="mx-auto max-w-4xl">
           {/* ═══ هدر ═══ */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-extrabold text-theme md:text-3xl">
-              📢 نوار اعلان
-            </h1>
-            <p className="mt-1 text-sm text-theme-muted">
-              متن نوار بالای سایت رو مدیریت کن
-            </p>
+          <div className="mb-8 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-theme bg-theme-card text-theme transition hover:bg-theme-surface md:hidden"
+              aria-label="باز کردن منو"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.2}
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+                />
+              </svg>
+            </button>
+
+            <div>
+              <h1 className="text-2xl font-extrabold text-theme md:text-3xl">
+                📢 نوار اعلان
+              </h1>
+              <p className="mt-1 text-sm text-theme-muted">
+                متن نوار بالای سایت رو مدیریت کن
+              </p>
+            </div>
           </div>
 
           {/* ═══ پیش‌نمایش زنده ═══ */}

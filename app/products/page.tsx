@@ -426,7 +426,7 @@ function ProductsContent() {
       <div className="w-full px-4 pb-6 pt-6 sm:px-6 md:px-10 md:pb-14 md:pt-8">
         <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-8">
           {/* ─── سایدبار فیلتر (دسکتاپ) ─── */}
-          <aside className="hidden self-start lg:sticky lg:top-6 lg:block lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pe-2 [scrollbar-width:thin]">
+          <aside className="hidden self-start lg:sticky lg:top-[140px] lg:block lg:max-h-[calc(100vh-160px)] lg:overflow-y-auto lg:pe-2 [scrollbar-width:thin]">
             <div className="mb-6 flex items-end justify-between">
               <h2 className="text-xl font-black uppercase tracking-tight text-theme">
                 فیلتر و مرتب‌سازی

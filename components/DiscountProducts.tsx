@@ -4,11 +4,13 @@ import { useMemo, useRef } from "react";
 import Link from "next/link";
 import { useProducts } from "@/components/context/ProductsContext";
 import { useWishlist } from "@/components/context/WishlistContext";
+import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
+import { flyToCart } from "@/lib/flyToCart";
 import type { Product } from "@/data/products";
 
 const PRODUCTS_TO_SHOW = 10;
-const VIRTUAL_DISCOUNT = 20; // درصد تخفیف مجازی برای fallback
+const VIRTUAL_DISCOUNT = 20;
 
 const HEART_PATH =
   "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z";
@@ -18,6 +20,8 @@ const HEART_FILLED_PATH =
 
 const BAG_PATH =
   "M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z";
+
+const CHECK_PATH = "M4.5 12.75l6 6 9-13.5";
 
 const CHEVRON_LEFT = "M15.75 19.5L8.25 12l7.5-7.5";
 const CHEVRON_RIGHT = "M8.25 4.5l7.5 7.5-7.5 7.5";
@@ -54,11 +58,31 @@ type DisplayProduct = Product & {
 
 function ProductCard({ product }: { product: DisplayProduct }) {
   const { isInWishlist, toggleItem } = useWishlist();
+  const { addItem, items } = useCart();
   const inWishlist = isInWishlist(product.id);
+
+  // 🆕 آیا این محصول توی سبد هست؟
+  const inCart = items.some((i) => i.id === product.id);
 
   const hasDiscount =
     !!product.__displayOldPrice && product.__displayDiscount > 0;
   const secondImage = product.images?.[1];
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  function handleAddToCart(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!product.inStock) return;
+
+    // 🎯 انیمیشن پرتاب (فقط بار اول که اضافه می‌شه)
+    if (!inCart && buttonRef.current) {
+      flyToCart(buttonRef.current, product.image);
+    }
+
+    addItem(product, 1);
+  }
 
   return (
     <div className="group relative">
@@ -92,7 +116,6 @@ function ProductCard({ product }: { product: DisplayProduct }) {
           </span>
         )}
 
-        {/* ─── بج تخفیف — پایین چپ، مشکی ─── */}
         {hasDiscount && (
           <span className="absolute bottom-2 left-2 z-10 rounded-sm bg-black px-2.5 py-1.5 text-[12px] font-black leading-none text-white shadow-lg md:bottom-3 md:left-3 md:px-3 md:py-2 md:text-[14px]">
             {product.__displayDiscount}٪
@@ -102,22 +125,37 @@ function ProductCard({ product }: { product: DisplayProduct }) {
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between p-2 md:p-3">
         <button
+          ref={buttonRef}
           type="button"
-          aria-label="افزودن به سبد"
-          className="pointer-events-auto flex h-7 w-7 items-center justify-center text-black transition hover:opacity-60 md:h-8 md:w-8"
-          onClick={(e) => {
-            e.preventDefault();
-          }}
+          aria-label={inCart ? "در سبد خرید" : "افزودن به سبد"}
+          disabled={!product.inStock}
+          className={
+            "pointer-events-auto flex h-7 w-7 items-center justify-center transition md:h-8 md:w-8 " +
+            (!product.inStock
+              ? "cursor-not-allowed text-black/30 dark:text-white/30"
+              : inCart
+              ? "text-green-600 dark:text-green-400"
+              : "text-black hover:opacity-60 dark:text-white")
+          }
+          onClick={handleAddToCart}
         >
-          <Icon d={BAG_PATH} className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.6} />
+          {inCart ? (
+            <Icon d={CHECK_PATH} className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2.4} />
+          ) : (
+            <Icon d={BAG_PATH} className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.6} />
+          )}
         </button>
 
         <button
           type="button"
           aria-label="افزودن به علاقه‌مندی"
-          className="pointer-events-auto flex h-7 w-7 items-center justify-center text-black transition hover:opacity-60 md:h-8 md:w-8"
+          className={
+            "pointer-events-auto flex h-7 w-7 items-center justify-center transition hover:opacity-60 md:h-8 md:w-8 " +
+            (inWishlist ? "text-red-500" : "text-black dark:text-white")
+          }
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             toggleItem(product, "product");
           }}
         >
@@ -140,22 +178,21 @@ function ProductCard({ product }: { product: DisplayProduct }) {
       </div>
 
       <Link href={`/product/${product.id}`} className="mt-2.5 block md:mt-3">
-        <h3 className="line-clamp-1 text-[13px] font-semibold text-black md:text-[14px] dark:text-white">
+        <h3 className="line-clamp-1 text-[13px] font-semibold text-theme md:text-[14px]">
           {product.name}
         </h3>
 
-        <p className="mt-0.5 line-clamp-1 text-[12px] text-black/60 md:text-[13px] dark:text-white/60">
+        <p className="mt-0.5 line-clamp-1 text-[12px] text-theme-muted md:text-[13px]">
           {product.inStock ? "موجود در انبار" : "ناموجود"}
         </p>
 
-        {/* ─── قیمت‌ها — همه مشکی ─── */}
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
-          <span className="text-[15px] font-black text-black md:text-[16px] dark:text-white">
+          <span className="text-[15px] font-black text-theme md:text-[16px]">
             {formatPrice(product.__displayPrice)}
           </span>
 
           {product.__displayOldPrice && (
-            <span className="text-[12px] text-black/50 line-through md:text-[13px] dark:text-white/50">
+            <span className="text-[12px] text-theme-muted line-through md:text-[13px]">
               {formatPrice(product.__displayOldPrice)}
             </span>
           )}
@@ -189,14 +226,11 @@ export default function DiscountProducts() {
 
     if (discounted.length > 0) return discounted;
 
-    // ─── fallback: جدیدترین‌ها با تخفیف مجازی ───
     return [...products]
       .sort((a, b) => Number(b.id) - Number(a.id))
       .slice(0, PRODUCTS_TO_SHOW)
       .map((p) => {
-        const virtualPrice = Math.round(
-          p.price * (1 - VIRTUAL_DISCOUNT / 100)
-        );
+        const virtualPrice = Math.round(p.price * (1 - VIRTUAL_DISCOUNT / 100));
         return {
           ...p,
           __displayPrice: virtualPrice,

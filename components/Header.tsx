@@ -55,6 +55,7 @@ const menuItems: MenuItem[] = [
     ],
   },
 ];
+
 const HEART_PATH =
   "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z";
 const USER_PATH =
@@ -90,13 +91,7 @@ function Icon({
 }
 
 function getVisibleGroups(category: MegaMenuCategory) {
-  return category.groups
-    .filter((g) => !g.title.includes("برند") && !g.title.includes("ظرفیت"))
-    .sort((a, b) => {
-      const aUse = a.title.includes("استفاده") ? 0 : 1;
-      const bUse = b.title.includes("استفاده") ? 0 : 1;
-      return aUse - bUse;
-    });
+  return category.groups;
 }
 
 export default function Header() {
@@ -111,7 +106,6 @@ export default function Header() {
     defaultMenu as unknown as MegaMenuCategory[]
   );
 
-  // 📢 نوار اعلان از Supabase
   const [announcementData, setAnnouncementData] = useState<AnnouncementBar>(
     DEFAULT_ANNOUNCEMENT_BAR
   );
@@ -124,7 +118,6 @@ export default function Header() {
 
   const menuOpen = openDropdown !== null;
 
-  // پیام فعال (اگه نوار غیرفعال باشه یا پیامی نباشه، null)
   const announcements = announcementData.enabled
     ? announcementData.messages
     : [];
@@ -133,7 +126,7 @@ export default function Header() {
       ? announcements[announcementIndex % announcements.length]
       : null;
 
-  // 🆕 اندازه‌گیری خودکار ارتفاع هدر موبایل
+  // 🆕 اندازه‌گیری ارتفاع هدر موبایل
   useEffect(() => {
     const el = mobileHeaderRef.current;
     if (!el) return;
@@ -157,7 +150,7 @@ export default function Header() {
     };
   }, []);
 
-  // چرخش پیام‌های نوار اعلان
+  // چرخش پیام‌ها
   useEffect(() => {
     if (
       announcementPaused ||
@@ -173,7 +166,7 @@ export default function Header() {
     return () => clearInterval(id);
   }, [announcementPaused, announcementData]);
 
-  // 🎯 دسته‌های محصولات از منبع واحد categories
+  // دسته‌ها از categories
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -197,7 +190,7 @@ export default function Header() {
     };
   }, []);
 
-  // 📢 خوندن نوار اعلان از Supabase
+  // نوار اعلان
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -258,7 +251,6 @@ export default function Header() {
   }, [menuOpen, closeNow]);
 
   const renderAnnouncement = (heightClass: string) => {
-    // اگه نوار غیرفعاله یا پیامی نیست، هیچی نشون نده
     if (!announcementData.enabled || !currentAnnouncement) return null;
 
     const hasMultiple = announcements.length > 1;
@@ -323,16 +315,19 @@ export default function Header() {
 
   return (
     <>
-      <header dir="rtl" className="w-full">
-        {/* ═══ نوار اعلان (دسکتاپ) ═══ */}
-        <div className="hidden md:block">{renderAnnouncement("h-[50px]")}</div>
+      {/* ═══ نوار اعلان — موبایل (نرمال، با اسکرول می‌ره) ═══ */}
+      <div className="md:hidden">{renderAnnouncement("h-10")}</div>
 
-        {/* ═══ موبایل ═══ */}
-        <div
-          ref={mobileHeaderRef}
-          className="fixed left-0 right-0 top-0 z-[100] bg-theme md:hidden"
-        >
-          {renderAnnouncement("h-10")}
+      {/* ═══ نوار اعلان — دسکتاپ (نرمال، با اسکرول می‌ره) ═══ */}
+      <div className="hidden md:block">{renderAnnouncement("h-[50px]")}</div>
+
+      {/* ═══ هدر چسبان — هم موبایل هم دسکتاپ ═══ */}
+      <header
+        dir="rtl"
+        className="sticky top-0 z-[100] w-full bg-theme"
+      >
+        {/* ─── موبایل ─── */}
+        <div ref={mobileHeaderRef} className="md:hidden">
           <div className="grid h-[56px] grid-cols-[1fr_auto_1fr] items-center px-3">
             <div className="flex items-center justify-start">
               <button
@@ -365,298 +360,297 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ═══ دسکتاپ ═══ */}
-        <div ref={desktopRef} className="relative hidden bg-theme md:block">
-          <div className="grid h-[76px] grid-cols-[1fr_auto_1fr] items-center gap-6 px-[34px]">
-            <nav className="flex items-center">
-              <ul className="flex items-center gap-8">
-                {menuItems.map((item) => {
-                  const isMega = !!item.mega;
-const rows: Row[] = isMega
-  ? megaCats.map((c) => ({
-      label: c.label,
-      href: `/products?cat=${c.key}`,
-      catKey: c.key,
-    }))
-  : (item.children ?? []).map((c) => ({
-      label: c.label,
-      href: c.href,
-      catKey: null,
-    }));
-                  const hasChildren = rows.length > 0;
-                  const isOpen = openDropdown === item.label;
-                  const activeCategory =
-                    isMega && activeCat
-                      ? megaCats.find((c) => c.key === activeCat) ?? null
-                      : null;
+        {/* ─── دسکتاپ ─── */}
+        <div className="hidden md:block">
+          <div ref={desktopRef} className="relative bg-theme">
+            <div className="grid h-[76px] grid-cols-[1fr_auto_1fr] items-center gap-6 px-[34px]">
+              <nav className="flex items-center">
+                <ul className="flex items-center gap-8">
+                  {menuItems.map((item) => {
+                    const isMega = !!item.mega;
+                    const rows: Row[] = isMega
+                      ? megaCats.map((c) => ({
+                          label: c.label,
+                          href: `/products?cat=${c.key}`,
+                          catKey: c.key,
+                        }))
+                      : (item.children ?? []).map((c) => ({
+                          label: c.label,
+                          href: c.href,
+                          catKey: null,
+                        }));
+                    const hasChildren = rows.length > 0;
+                    const isOpen = openDropdown === item.label;
+                    const activeCategory =
+                      isMega && activeCat
+                        ? megaCats.find((c) => c.key === activeCat) ?? null
+                        : null;
 
-                  return (
-                    <li
-                      key={item.label}
-                      className="group flex h-[76px] items-center"
-                      onMouseEnter={() =>
-                        handleMouseEnter(item.label, hasChildren)
-                      }
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      <a
-                        href={item.href}
-                        className="block text-[14px] font-medium text-theme"
+                    return (
+                      <li
+                        key={item.label}
+                        className="group flex h-[76px] items-center"
+                        onMouseEnter={() =>
+                          handleMouseEnter(item.label, hasChildren)
+                        }
+                        onMouseLeave={handleMouseLeave}
                       >
-                        <span className="relative inline-block pb-1">
-                          {item.label}
-                          <span
-                            aria-hidden="true"
-                            className={
-                              "absolute inset-x-0 bottom-0 h-0.5 origin-right bg-current transition-transform duration-300 ease-out " +
-                              (isOpen
-                                ? "scale-x-100"
-                                : "scale-x-0 group-hover:scale-x-100")
-                            }
-                          />
-                        </span>
-                      </a>
+                        <a
+                          href={item.href}
+                          className="block text-[14px] font-medium text-theme"
+                        >
+                          <span className="relative inline-block pb-1">
+                            {item.label}
+                            <span
+                              aria-hidden="true"
+                              className={
+                                "absolute inset-x-0 bottom-0 h-0.5 origin-right bg-current transition-transform duration-300 ease-out " +
+                                (isOpen
+                                  ? "scale-x-100"
+                                  : "scale-x-0 group-hover:scale-x-100")
+                              }
+                            />
+                          </span>
+                        </a>
 
-                      {hasChildren && (
-                        <>
-                          {/* ═══ پنل اول ═══ */}
-                          <div
-                            style={{
-                              top: panelTop,
-                              height: `calc(100vh - ${panelTop}px)`,
-                              width: FIRST_PANEL_WIDTH,
-                            }}
-                            className={
-                              "fixed start-0 z-50 flex flex-col overflow-y-auto border-t border-theme bg-theme transition-opacity duration-200 " +
-                              (isOpen
-                                ? "visible opacity-100"
-                                : "invisible opacity-0")
-                            }
-                          >
-                            <ul className="pb-4 pt-5">
-                              {rows.map((row) => {
-                                const isActiveRow =
-                                  row.catKey !== null &&
-                                  row.catKey === activeCat;
-                                return (
-                               <li key={row.catKey ?? `other-${row.label}`}>
-                                    <a
-                                      href={row.href}
-                                      onClick={closeNow}
-                                      onMouseEnter={() =>
-                                        isMega && setActiveCat(row.catKey)
-                                      }
-                                      className={
-                                        "group/row flex items-center justify-between px-7 py-[12px] text-[14px] font-semibold text-theme transition " +
-                                        (isActiveRow ? "bg-theme-surface" : "")
-                                      }
-                                    >
-                                      <span className="relative inline-block pb-1">
-                                        {row.label}
-                                        <span
-                                          aria-hidden="true"
-                                          className={
-                                            "absolute inset-x-0 bottom-0 h-0.5 origin-right bg-current transition-transform duration-300 ease-out " +
-                                            (isActiveRow
-                                              ? "scale-x-100"
-                                              : "scale-x-0 group-hover/row:scale-x-100")
-                                          }
-                                        />
-                                      </span>
-                                      <Icon
-                                        d={CHEVRON_PATH}
-                                        strokeWidth={2.2}
-                                        className="h-4 w-4"
-                                      />
-                                    </a>
-                                  </li>
-                                );
-                              })}
-                            </ul>
-
-                            {/* 🆕 دکمه‌های میانبر (مثل موبایل) */}
-                            <div className="mt-2 flex flex-col gap-2 border-t border-theme/40 px-4 py-4">
-                              <a
-                                href="/products"
-                                onClick={closeNow}
-                                className="flex items-center justify-center rounded border-2 border-accent bg-accent/10 px-4 py-2.5 text-[13px] font-extrabold text-accent transition hover:bg-accent hover:text-white"
-                              >
-                                مشاهده همه محصولات
-                              </a>
-                              <a
-                                href="/brands"
-                                onClick={closeNow}
-                                className="flex items-center justify-center rounded border-2 border-theme px-4 py-2.5 text-[13px] font-extrabold text-theme transition hover:border-accent hover:text-accent"
-                              >
-                                برندها
-                              </a>
-                            </div>
-
-                            {item.promos && (
-                              <div className="mt-auto flex flex-col gap-2 pe-2">
-                                {item.promos.map((promo) => (
-                                  <a
-                                    key={promo.label}
-                                    href={promo.href}
-                                    onClick={closeNow}
-                                    style={{
-                                      backgroundImage: `url(${promo.image})`,
-                                    }}
-                                    className="relative flex h-[190px] flex-shrink-0 items-end bg-neutral-900 bg-cover bg-center p-4"
-                                  >
-                                    <span className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
-                                    <span className="relative text-[18px] font-extrabold text-white">
-                                      {promo.label}
-                                    </span>
-                                  </a>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* ═══ پنل دوم ═══ */}
-                          {activeCategory && (
+                        {hasChildren && (
+                          <>
                             <div
                               style={{
                                 top: panelTop,
                                 height: `calc(100vh - ${panelTop}px)`,
-                                insetInlineStart: FIRST_PANEL_WIDTH,
+                                width: FIRST_PANEL_WIDTH,
                               }}
                               className={
-                                "fixed z-50 w-[520px] overflow-y-auto border-s border-t border-theme bg-theme transition-opacity duration-200 " +
+                                "fixed start-0 z-50 flex flex-col overflow-y-auto border-t border-theme bg-theme transition-opacity duration-200 " +
                                 (isOpen
                                   ? "visible opacity-100"
                                   : "invisible opacity-0")
                               }
                             >
-                              <div className="px-8 pb-10 pt-6">
+                              <ul className="pb-4 pt-5">
+                                {rows.map((row) => {
+                                  const isActiveRow =
+                                    row.catKey !== null &&
+                                    row.catKey === activeCat;
+                                  return (
+                                    <li key={row.catKey ?? `other-${row.label}`}>
+                                      <a
+                                        href={row.href}
+                                        onClick={closeNow}
+                                        onMouseEnter={() =>
+                                          isMega && setActiveCat(row.catKey)
+                                        }
+                                        className={
+                                          "group/row flex items-center justify-between px-7 py-[12px] text-[14px] font-semibold text-theme transition " +
+                                          (isActiveRow ? "bg-theme-surface" : "")
+                                        }
+                                      >
+                                        <span className="relative inline-block pb-1">
+                                          {row.label}
+                                          <span
+                                            aria-hidden="true"
+                                            className={
+                                              "absolute inset-x-0 bottom-0 h-0.5 origin-right bg-current transition-transform duration-300 ease-out " +
+                                              (isActiveRow
+                                                ? "scale-x-100"
+                                                : "scale-x-0 group-hover/row:scale-x-100")
+                                            }
+                                          />
+                                        </span>
+                                        <Icon
+                                          d={CHEVRON_PATH}
+                                          strokeWidth={2.2}
+                                          className="h-4 w-4"
+                                        />
+                                      </a>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+
+                              <div className="mt-2 flex flex-col gap-2 border-t border-theme/40 px-4 py-4">
                                 <a
-                                  href={`/products?cat=${activeCategory.key}`}
+                                  href="/products"
                                   onClick={closeNow}
-                                  className="mb-7 flex items-center justify-between rounded border-2 border-accent bg-accent/10 px-4 py-2.5 text-[14px] font-extrabold text-accent transition hover:bg-accent hover:text-white"
+                                  className="flex items-center justify-center rounded border-2 border-accent bg-accent/10 px-4 py-2.5 text-[13px] font-extrabold text-accent transition hover:bg-accent hover:text-white"
                                 >
-                                  <span>مشاهده همه {activeCategory.label}</span>
-                                  <Icon
-                                    d={CHEVRON_PATH}
-                                    strokeWidth={2.2}
-                                    className="h-4 w-4"
-                                  />
+                                  مشاهده همه محصولات
                                 </a>
+                                <a
+                                  href="/brands"
+                                  onClick={closeNow}
+                                  className="flex items-center justify-center rounded border-2 border-theme px-4 py-2.5 text-[13px] font-extrabold text-theme transition hover:border-accent hover:text-accent"
+                                >
+                                  برندها
+                                </a>
+                              </div>
 
-                                <div className="grid grid-cols-2 gap-x-8 gap-y-8">
-                                  {getVisibleGroups(activeCategory).map(
-                                    (group) => (
-                                      <div key={group.title}>
-                                        <h4 className="mb-3 text-[14px] font-extrabold text-theme">
-                                          {group.title}
-                                        </h4>
-                                        <ul className="space-y-2.5">
-                                          {group.items.map((it) => (
-                                            <li key={it.label}>
-                                              <a
-                                                href={it.href}
-                                                onClick={closeNow}
-                                                className="group/item text-[13px] text-theme-muted transition hover:text-theme"
-                                              >
-                                                <span className="relative inline-block pb-0.5">
-                                                  {it.label}
-                                                  <span
-                                                    aria-hidden="true"
-                                                    className="absolute inset-x-0 bottom-0 h-px origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover/item:scale-x-100"
-                                                  />
-                                                </span>
-                                              </a>
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                    )
-                                  )}
+                              {item.promos && (
+                                <div className="mt-auto flex flex-col gap-2 pe-2">
+                                  {item.promos.map((promo) => (
+                                    <a
+                                      key={promo.label}
+                                      href={promo.href}
+                                      onClick={closeNow}
+                                      style={{
+                                        backgroundImage: `url(${promo.image})`,
+                                      }}
+                                      className="relative flex h-[190px] flex-shrink-0 items-end bg-neutral-900 bg-cover bg-center p-4"
+                                    >
+                                      <span className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
+                                      <span className="relative text-[18px] font-extrabold text-white">
+                                        {promo.label}
+                                      </span>
+                                    </a>
+                                  ))}
                                 </div>
+                              )}
+                            </div>
 
-                                {activeCategory.photo && (
+                            {activeCategory && (
+                              <div
+                                style={{
+                                  top: panelTop,
+                                  height: `calc(100vh - ${panelTop}px)`,
+                                  insetInlineStart: FIRST_PANEL_WIDTH,
+                                }}
+                                className={
+                                  "fixed z-50 w-[520px] overflow-y-auto border-s border-t border-theme bg-theme transition-opacity duration-200 " +
+                                  (isOpen
+                                    ? "visible opacity-100"
+                                    : "invisible opacity-0")
+                                }
+                              >
+                                <div className="px-8 pb-10 pt-6">
                                   <a
                                     href={`/products?cat=${activeCategory.key}`}
                                     onClick={closeNow}
-                                    aria-label={activeCategory.label}
-                                    style={{
-                                      backgroundImage: `url(${activeCategory.photo})`,
-                                    }}
-                                    className="mt-9 block h-[190px] bg-neutral-900 bg-cover bg-center"
-                                  />
-                                )}
+                                    className="mb-7 flex items-center justify-between rounded border-2 border-accent bg-accent/10 px-4 py-2.5 text-[14px] font-extrabold text-accent transition hover:bg-accent hover:text-white"
+                                  >
+                                    <span>مشاهده همه {activeCategory.label}</span>
+                                    <Icon
+                                      d={CHEVRON_PATH}
+                                      strokeWidth={2.2}
+                                      className="h-4 w-4"
+                                    />
+                                  </a>
+
+                                  <div className="grid grid-cols-2 gap-x-8 gap-y-8">
+                                    {getVisibleGroups(activeCategory).map(
+                                      (group) => (
+                                        <div key={group.title}>
+                                          <h4 className="mb-3 text-[14px] font-extrabold text-theme">
+                                            {group.title}
+                                          </h4>
+                                          <ul className="space-y-2.5">
+                                            {group.items.map((it) => (
+                                              <li key={it.label}>
+                                                <a
+                                                  href={it.href}
+                                                  onClick={closeNow}
+                                                  className="group/item text-[13px] text-theme-muted transition hover:text-theme"
+                                                >
+                                                  <span className="relative inline-block pb-0.5">
+                                                    {it.label}
+                                                    <span
+                                                      aria-hidden="true"
+                                                      className="absolute inset-x-0 bottom-0 h-px origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover/item:scale-x-100"
+                                                    />
+                                                  </span>
+                                                </a>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+
+                                  {activeCategory.photo && (
+                                    <a
+                                      href={`/products?cat=${activeCategory.key}`}
+                                      onClick={closeNow}
+                                      aria-label={activeCategory.label}
+                                      style={{
+                                        backgroundImage: `url(${activeCategory.photo})`,
+                                      }}
+                                      className="mt-9 block h-[190px] bg-neutral-900 bg-cover bg-center"
+                                    />
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
+                            )}
+                          </>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
 
-            <a href="/" className="flex items-center justify-center">
-              <LogoName
-                className="h-[46px] w-[110px] translate-y-[9px]"
-                priority
-              />
-            </a>
-
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setSearchOpen(true)}
-                className="me-4 flex h-11 w-[250px] items-center gap-3 border border-transparent bg-theme-surface px-4 text-[14px] text-theme-muted transition-colors hover:border-neutral-900 dark:hover:border-neutral-300"
-              >
-                <Icon
-                  d={SEARCH_PATH}
-                  className="h-[18px] w-[18px] flex-shrink-0 text-theme"
+              <a href="/" className="flex items-center justify-center">
+                <LogoName
+                  className="h-[46px] w-[110px] translate-y-[9px]"
+                  priority
                 />
-                <span className="flex-1 truncate text-start">
-                  دنبال چی می‌گردی؟
-                </span>
-              </button>
+              </a>
 
-              <a
-                href="/wishlist"
-                aria-label="علاقه‌مندی"
-                data-wishlist-icon
-                className="relative flex h-11 w-11 items-center justify-center text-theme transition hover:opacity-60"
-              >
-                <Icon d={HEART_PATH} className="h-6 w-6" />
-                {wishlistCount > 0 && (
-                  <span className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
-                    {wishlistCount}
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(true)}
+                  className="me-4 flex h-11 w-[250px] items-center gap-3 border border-transparent bg-theme-surface px-4 text-[14px] text-theme-muted transition-colors hover:border-neutral-900 dark:hover:border-neutral-300"
+                >
+                  <Icon
+                    d={SEARCH_PATH}
+                    className="h-[18px] w-[18px] flex-shrink-0 text-theme"
+                  />
+                  <span className="flex-1 truncate text-start">
+                    دنبال چی می‌گردی؟
                   </span>
-                )}
-              </a>
+                </button>
 
-              <a
-                href="/login"
-                aria-label="حساب کاربری"
-                className="flex h-11 w-11 items-center justify-center text-theme transition hover:opacity-60"
-              >
-                <Icon d={USER_PATH} className="h-6 w-6" />
-              </a>
+                <a
+                  href="/wishlist"
+                  aria-label="علاقه‌مندی"
+                  data-wishlist-icon
+                  className="relative flex h-11 w-11 items-center justify-center text-theme transition hover:opacity-60"
+                >
+                  <Icon d={HEART_PATH} className="h-6 w-6" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </a>
 
-              <CartDropdown />
+                <a
+                  href="/login"
+                  aria-label="حساب کاربری"
+                  className="flex h-11 w-11 items-center justify-center text-theme transition hover:opacity-60"
+                >
+                  <Icon d={USER_PATH} className="h-6 w-6" />
+                </a>
+
+                <CartDropdown />
+              </div>
             </div>
           </div>
         </div>
-
-        {/* ═══ لایه تیره و مات پشت منو ═══ */}
-        <div
-          aria-hidden="true"
-          style={{ top: panelTop }}
-          onMouseEnter={handleMouseLeave}
-          onClick={closeNow}
-          className={
-            "fixed inset-x-0 bottom-0 z-40 hidden bg-black/50 backdrop-blur-[6px] transition-opacity duration-200 md:block " +
-            (menuOpen ? "opacity-100" : "pointer-events-none opacity-0")
-          }
-        />
       </header>
+
+      {/* ═══ لایه تیره پشت منو ═══ */}
+      <div
+        aria-hidden="true"
+        style={{ top: panelTop }}
+        onMouseEnter={handleMouseLeave}
+        onClick={closeNow}
+        className={
+          "fixed inset-x-0 bottom-0 z-40 hidden bg-black/50 backdrop-blur-[6px] transition-opacity duration-200 md:block " +
+          (menuOpen ? "opacity-100" : "pointer-events-none opacity-0")
+        }
+      />
 
       <MobileMenuDrawer
         isOpen={mobileOpen}

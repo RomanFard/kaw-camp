@@ -4,7 +4,9 @@ import { useMemo, useRef } from "react";
 import Link from "next/link";
 import { useProducts } from "@/components/context/ProductsContext";
 import { useWishlist } from "@/components/context/WishlistContext";
+import { useCart } from "@/components/context/CartContext";
 import { formatPrice } from "@/lib/utils";
+import { flyToCart } from "@/lib/flyToCart";
 import type { Product } from "@/data/products";
 
 const PRODUCTS_TO_SHOW = 10;
@@ -17,6 +19,8 @@ const HEART_FILLED_PATH =
 
 const BAG_PATH =
   "M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z";
+
+const CHECK_PATH = "M4.5 12.75l6 6 9-13.5";
 
 const CHEVRON_LEFT = "M15.75 19.5L8.25 12l7.5-7.5";
 const CHEVRON_RIGHT = "M8.25 4.5l7.5 7.5-7.5 7.5";
@@ -46,15 +50,34 @@ function Icon({
 }
 
 function ProductCard({ product }: { product: Product }) {
- const { isInWishlist, toggleItem } = useWishlist();
+  const { isInWishlist, toggleItem } = useWishlist();
+  const { addItem, items } = useCart();
   const inWishlist = isInWishlist(product.id);
+
+  // 🆕 آیا این محصول توی سبد هست؟
+  const inCart = items.some((i) => i.id === product.id);
+
   const hasDiscount = !!product.oldPrice;
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
 
-  // 🆕 عکس دوم (اگه موجود باشه)
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const secondImage = product.images?.[1];
+
+  function handleAddToCart(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!product.inStock) return;
+
+    // 🎯 انیمیشن پرتاب (فقط بار اول که اضافه می‌شه)
+    if (!inCart && buttonRef.current) {
+      flyToCart(buttonRef.current, product.image);
+    }
+
+    addItem(product, 1);
+  }
 
   return (
     <div className="group relative">
@@ -62,7 +85,6 @@ function ProductCard({ product }: { product: Product }) {
         href={`/product/${product.id}`}
         className="relative block aspect-[3/4] w-full overflow-hidden bg-theme-surface"
       >
-        {/* ─── عکس اول (پیش‌فرض) ─── */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={product.image}
@@ -72,7 +94,6 @@ function ProductCard({ product }: { product: Product }) {
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
 
-        {/* ─── عکس دوم (فقط اگه موجود باشه) — fade-in روی hover ─── */}
         {secondImage && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -84,38 +105,45 @@ function ProductCard({ product }: { product: Product }) {
           />
         )}
 
-        {/* ناموجود */}
         {!product.inStock && (
           <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-xs font-bold text-white">
             ناموجود
           </span>
         )}
 
-        {/* تخفیف — بالا چپ */}
         {hasDiscount && discount > 0 && (
           <span className="absolute left-2 top-2 z-10 rounded-sm bg-accent px-1.5 py-0.5 text-[10px] font-black text-white md:left-3 md:top-3">
             {discount}٪
           </span>
         )}
 
-        {/* بج «جدید» — پایین چپ */}
         <span className="absolute bottom-2 left-2 z-10 bg-white px-2.5 py-1 text-[10px] font-bold text-black md:bottom-3 md:left-3 md:text-[11px]">
           جدید
         </span>
       </Link>
 
-      {/* ─── آیکون‌های شناور بالا ─── */}
+      {/* آیکون‌های شناور */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between p-2 md:p-3">
         <button
+          ref={buttonRef}
           type="button"
-          aria-label="افزودن به سبد"
-          className="pointer-events-auto flex h-7 w-7 items-center justify-center text-black transition hover:opacity-60 md:h-8 md:w-8"
-          onClick={(e) => {
-            e.preventDefault();
-            // TODO: add to cart
-          }}
+          aria-label={inCart ? "در سبد خرید" : "افزودن به سبد"}
+          disabled={!product.inStock}
+          className={
+            "pointer-events-auto flex h-7 w-7 items-center justify-center transition md:h-8 md:w-8 " +
+            (!product.inStock
+              ? "cursor-not-allowed text-black/30 dark:text-white/30"
+              : inCart
+              ? "text-green-600 dark:text-green-400"
+              : "text-black hover:opacity-60 dark:text-white")
+          }
+          onClick={handleAddToCart}
         >
-          <Icon d={BAG_PATH} className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.6} />
+          {inCart ? (
+            <Icon d={CHECK_PATH} className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2.4} />
+          ) : (
+            <Icon d={BAG_PATH} className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.6} />
+          )}
         </button>
 
         <button
@@ -123,12 +151,13 @@ function ProductCard({ product }: { product: Product }) {
           aria-label="افزودن به علاقه‌مندی"
           className={
             "pointer-events-auto flex h-7 w-7 items-center justify-center transition hover:opacity-60 md:h-8 md:w-8 " +
-            (inWishlist ? "text-red-500" : "text-black")
+            (inWishlist ? "text-red-500" : "text-black dark:text-white")
           }
-onClick={(e) => {
-  e.preventDefault();
-  toggleItem(product, "product");
-}}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleItem(product, "product");
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +177,6 @@ onClick={(e) => {
         </button>
       </div>
 
-      {/* ─── اطلاعات ─── */}
       <Link href={`/product/${product.id}`} className="mt-2.5 block md:mt-3">
         <h3 className="line-clamp-1 text-[13px] font-semibold text-theme md:text-[14px]">
           {product.name}
@@ -173,7 +201,7 @@ onClick={(e) => {
   );
 }
 
-export default function CategoryGrid() {
+export default function LatestProducts() {
   const { products, loading } = useProducts();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -225,9 +253,7 @@ export default function CategoryGrid() {
   return (
     <div className="w-full px-3 sm:px-6 md:px-7">
       <section className="py-10 md:py-14">
-        {/* ─── هدر سکشن ─── */}
         <div className="mb-6 flex items-end justify-between md:mb-8">
-          {/* راست: تیتر + «مشاهده همه» (فقط دسکتاپ، کنار تیتر) */}
           <div className="flex items-baseline gap-4">
             <h2 className="text-lg font-black tracking-tight text-theme md:text-xl lg:text-2xl">
               جدیدترین‌ها
@@ -241,9 +267,7 @@ export default function CategoryGrid() {
             </Link>
           </div>
 
-          {/* چپ: «مشاهده همه» (موبایل) + فلش‌ها (دسکتاپ) */}
           <div className="flex items-center gap-3 md:gap-1">
-            {/* مشاهده همه — فقط موبایل */}
             <Link
               href="/products?sort=newest"
               className="text-[12px] font-semibold text-theme-muted underline underline-offset-4 transition hover:text-theme md:hidden"
@@ -251,7 +275,6 @@ export default function CategoryGrid() {
               مشاهده همه
             </Link>
 
-            {/* فلش‌ها — فقط دسکتاپ */}
             <div className="hidden items-center gap-1 md:flex">
               <button
                 type="button"
@@ -274,7 +297,6 @@ export default function CategoryGrid() {
           </div>
         </div>
 
-        {/* ─── اسکرول افقی ─── */}
         <div
           ref={scrollRef}
           className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 scrollbar-hide md:gap-2.5"
