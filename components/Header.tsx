@@ -9,11 +9,14 @@ import { useWishlist } from "@/components/context/WishlistContext";
 import { getAppContent } from "@/lib/supabase/appContent";
 import { megaMenu as defaultMenu } from "@/lib/megaMenu";
 import type {
-  MobileMenuCategory,
+  UnifiedCategory,
   AnnouncementBar,
   AnnouncementMessage,
 } from "@/lib/contentTypes";
-import { DEFAULT_ANNOUNCEMENT_BAR } from "@/lib/contentTypes";
+import {
+  DEFAULT_ANNOUNCEMENT_BAR,
+  CATEGORIES_KEY,
+} from "@/lib/contentTypes";
 
 type MegaMenuCategory = {
   key: string;
@@ -36,29 +39,7 @@ type Row = { label: string; href: string; catKey: string | null };
 const menuItems: MenuItem[] = [
   { label: "صفحه اصلی", href: "/" },
   { label: "محصولات", href: "/products", mega: true },
-  {
-    label: "آفرود و تور",
-    href: "/explore",
-    children: [
-      { label: "همه تورها", href: "/explore" },
-      { label: "تورهای آفرود", href: "/explore?type=off-road" },
-      { label: "کوهنوردی", href: "/explore?type=hiking" },
-      { label: "کمپینگ", href: "/explore?type=camping" },
-      { label: "نقشه و آب‌وهوا", href: "/explore#map" },
-    ],
-    promos: [
-      {
-        label: "تورهای آفرود",
-        href: "/explore?type=off-road",
-        image: "/images/menu/tour-1.jpg",
-      },
-      {
-        label: "کوهنوردی",
-        href: "/explore?type=hiking",
-        image: "/images/menu/tour-2.jpg",
-      },
-    ],
-  },
+  { label: "آفرود و تور (به زودی)", href: "#" },
   {
     label: "صفحات",
     href: "#",
@@ -74,7 +55,6 @@ const menuItems: MenuItem[] = [
     ],
   },
 ];
-
 const HEART_PATH =
   "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z";
 const USER_PATH =
@@ -193,13 +173,23 @@ export default function Header() {
     return () => clearInterval(id);
   }, [announcementPaused, announcementData]);
 
-  // دسته‌های محصولات از همان منبع منوی موبایل خوانده می‌شوند
+  // 🎯 دسته‌های محصولات از منبع واحد categories
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const data = await getAppContent<MobileMenuCategory[]>("mobile_menu");
+      const data = await getAppContent<UnifiedCategory[]>(CATEGORIES_KEY);
       if (!cancelled && data && data.length > 0) {
-        setMegaCats(data as unknown as MegaMenuCategory[]);
+        const filtered = data
+          .filter((c) => c.isActive && c.showIn?.megaMenu)
+          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+          .map((c) => ({
+            key: c.key,
+            label: c.label,
+            icon: c.icon,
+            photo: c.photo,
+            groups: c.groups ?? [],
+          }));
+        setMegaCats(filtered);
       }
     })();
     return () => {
@@ -456,7 +446,7 @@ export default function Header() {
                                   row.catKey !== null &&
                                   row.catKey === activeCat;
                                 return (
-                                  <li key={row.label}>
+                               <li key={row.catKey ?? `other-${row.label}`}>
                                     <a
                                       href={row.href}
                                       onClick={closeNow}

@@ -6,7 +6,8 @@ import { useCart } from "@/components/context/CartContext";
 import { useWishlist } from "@/components/context/WishlistContext";
 import { getAppContent } from "@/lib/supabase/appContent";
 import { megaMenu as defaultMenu } from "@/lib/megaMenu";
-import type { MobileMenuCategory } from "@/lib/contentTypes";
+import type { UnifiedCategory } from "@/lib/contentTypes";
+import { CATEGORIES_KEY } from "@/lib/contentTypes";
 import SearchPanel from "./SearchPanel";
 
 type View = { type: "main" } | { type: "category"; key: string };
@@ -67,8 +68,8 @@ export default function MobileMenuDrawer({
   onClose: () => void;
 }) {
   const [view, setView] = useState<View>({ type: "main" });
-  const [menuItems, setMenuItems] = useState<MobileMenuCategory[]>(
-    defaultMenu as MobileMenuCategory[]
+  const [menuItems, setMenuItems] = useState<MegaMenuCategory[]>(
+    defaultMenu as unknown as MegaMenuCategory[]
   );
   const [searchOpen, setSearchOpen] = useState(false);
   const { totalItems } = useCart();
@@ -97,12 +98,24 @@ export default function MobileMenuDrawer({
     }
   }, [isOpen]);
 
-  // load menu
+  // 🎯 load menu از منبع واحد categories
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const data = await getAppContent<MobileMenuCategory[]>("mobile_menu");
-      if (!cancelled && data && data.length > 0) setMenuItems(data);
+      const data = await getAppContent<UnifiedCategory[]>(CATEGORIES_KEY);
+      if (!cancelled && data && data.length > 0) {
+        const filtered = data
+          .filter((c) => c.isActive && c.showIn?.mobileMenu)
+          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+          .map((c) => ({
+            key: c.key,
+            label: c.label,
+            icon: c.icon,
+            photo: c.photo,
+            groups: c.groups ?? [],
+          }));
+        setMenuItems(filtered as any);
+      }
     })();
     return () => {
       cancelled = true;
@@ -251,7 +264,7 @@ function MainView({
   onCategory,
   onClose,
 }: {
-  menuItems: MobileMenuCategory[];
+  menuItems: MegaMenuCategory[];
   onCategory: (key: string) => void;
   onClose: () => void;
 }) {

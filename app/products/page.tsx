@@ -6,7 +6,9 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductGridCard from "@/components/products/ProductGridCard";
-import { categories } from "@/data/products";
+import { getAppContent } from "@/lib/supabase/appContent";
+import type { UnifiedCategory } from "@/lib/contentTypes";
+import { CATEGORIES_KEY } from "@/lib/contentTypes";
 import { useProducts } from "@/components/context/ProductsContext";
 import ScrollToHash from "@/components/ScrollToHash";
 
@@ -61,11 +63,15 @@ function matchesSpecValue(productValue: string, targetValue: string): boolean {
   return productNums.some((n) => n >= min && n <= max);
 }
 
-function getPageMeta(params: {
-  sort: string;
-  cat: string | null;
-  brand: string | null;
-}) {
+// 🎯 getPageMeta با پارامتر دوم categories
+function getPageMeta(
+  params: {
+    sort: string;
+    cat: string | null;
+    brand: string | null;
+  },
+  categories: { key: string; label: string; emoji: string }[]
+) {
   const { sort, cat, brand } = params;
 
   if (brand) {
@@ -181,6 +187,28 @@ function ProductsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { products, loading } = useProducts();
+
+  // 🎯 دسته‌ها از منبع واحد categories
+  const [categories, setCategories] = useState<
+    { key: string; label: string; emoji: string }[]
+  >([]);
+
+  useEffect(() => {
+    (async () => {
+      const data = await getAppContent<UnifiedCategory[]>(CATEGORIES_KEY);
+      if (data && data.length > 0) {
+        const mapped = data
+          .filter((c) => c.isActive)
+          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+          .map((c) => ({
+            key: c.key,
+            label: c.label,
+            emoji: c.emoji || "📦",
+          }));
+        setCategories(mapped);
+      }
+    })();
+  }, []);
 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -307,7 +335,9 @@ function ProductsContent() {
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
   const paginated = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  const meta = getPageMeta({ sort, cat, brand: brandParam });
+
+  // 🎯 getPageMeta با categories
+  const meta = getPageMeta({ sort, cat, brand: brandParam }, categories);
 
   const collectionCards = useMemo(() => {
     return categories.slice(0, 5).map((c) => {
@@ -315,7 +345,7 @@ function ProductsContent() {
       const img: string | undefined = sample?.image ?? sample?.images?.[0];
       return { key: c.key, label: c.label, img };
     });
-  }, [products]);
+  }, [categories, products]);
 
   const topInCategory = useMemo(() => {
     return filtered.slice(0, 3);
@@ -357,7 +387,7 @@ function ProductsContent() {
 
   return (
     <main className="relative min-h-screen bg-theme">
-      
+      <ScrollToHash />
       <Header />
 
       {/* ───── هدر صفحه ───── */}

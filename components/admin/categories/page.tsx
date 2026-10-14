@@ -6,14 +6,16 @@ import PopularTab from "@/components/admin/categories/PopularTab";
 import SpecialTab from "@/components/admin/categories/SpecialTab";
 import MobileTab from "@/components/admin/categories/MobileTab";
 import PhotosTab from "@/components/admin/categories/PhotosTab";
+import UnifiedTab from "@/components/admin/categories/UnifiedTab";
 
-type Tab = "products" | "photos" | "special" | "popular" | "mobile";
+type Tab = "unified" | "products" | "photos" | "special" | "popular" | "mobile";
 
 export default function AdminCategoriesPage() {
-  const [tab, setTab] = useState<Tab>("popular");
+  const [tab, setTab] = useState<Tab>("unified");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const tabs: { key: Tab; label: string }[] = [
+    { key: "unified", label: "🎯 یکپارچه (جدید)" },
     { key: "popular", label: "🔥 محبوب" },
     { key: "special", label: "✨ ویژه" },
     { key: "mobile", label: "📱 موبایل" },
@@ -97,10 +99,11 @@ export default function AdminCategoriesPage() {
 
           {/* محتوای تب */}
           <div className="rounded-2xl border border-theme bg-theme-card p-5 shadow-sm">
+            {tab === "unified" && <UnifiedTab />}
             {tab === "popular" && <PopularTab />}
             {tab === "special" && <SpecialTab />}
             {tab === "mobile" && <MobileTab />}
-               {tab === "photos" && <PhotosTab />}
+            {tab === "photos" && <PhotosTab />}
             {tab === "products" && (
               <div className="p-8 text-center">
                 <p className="mb-4 text-xs text-theme-muted">
