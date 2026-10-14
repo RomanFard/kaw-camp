@@ -38,17 +38,16 @@ export default function RootLayout({
         {/* ═══════════════════════════════════════════════
             🔴 Anti-Flash Script
             - تم (dark/light) رو از localStorage می‌خونه
-            - رنگ accent رو از localStorage می‌خونه
-            - قبل از هر paint روی <html> اعمال می‌کنه
+            - اگه ذخیره نشده → پیش‌فرض light
             ═══════════════════════════════════════════════ */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  // ─── تم ───
+                  // ─── تم — پیش‌فرض روشن ───
                   var stored = localStorage.getItem('theme');
-                  var theme = stored === 'light' ? 'light' : 'dark';
+                  var theme = stored === 'dark' ? 'dark' : 'light';
                   var html = document.documentElement;
                   html.classList.remove('dark', 'light');
                   html.classList.add(theme);
