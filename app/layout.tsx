@@ -18,13 +18,36 @@ export const metadata: Metadata = {
   description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
 
   icons: {
-    icon: [{ url: "/images/logo2.png", type: "image/png" }],
+    icon: [
+      { url: "/images/logo2.png", type: "image/png", sizes: "192x192" },
+      { url: "/images/logo2.png", type: "image/png", sizes: "512x512" },
+    ],
     shortcut: "/images/logo2.png",
     apple: "/images/logo2.png",
   },
 
-  other: {
-    enamad: "74148659",
+  openGraph: {
+    title: "کاو کمپ | فروشگاه تخصصی لوازم کمپینگ و کوهنوردی",
+    description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
+    url: "https://kawcamp.com",
+    siteName: "KAW CAMP",
+    images: [
+      {
+        url: "https://kawcamp.com/images/logo2.png",
+        width: 512,
+        height: 512,
+        alt: "KAW CAMP",
+      },
+    ],
+    locale: "fa_IR",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "کاو کمپ | فروشگاه تخصصی لوازم کمپینگ و کوهنوردی",
+    description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
+    images: ["https://kawcamp.com/images/logo2.png"],
   },
 };
 
@@ -36,6 +59,42 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className="light" suppressHydrationWarning>
       <head>
+        {/* 🆕 Structured Data — لوگو و اطلاعات برند برای گوگل */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "کاو کمپ | KAW CAMP",
+              alternateName: "KAW CAMP",
+              url: "https://kawcamp.com",
+              logo: "https://kawcamp.com/images/logo2.png",
+              image: "https://kawcamp.com/images/logo2.png",
+              description:
+                "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "IR",
+                addressLocality: "بانه",
+                addressRegion: "کردستان",
+                streetAddress: "کوچه پاساژ نور، پلاک ۲",
+              },
+              contactPoint: {
+                "@type": "ContactPoint",
+                telephone: "+98-918-054-0019",
+                contactType: "customer service",
+                areaServed: "IR",
+                availableLanguage: ["Persian"],
+              },
+              sameAs: [
+                "https://www.instagram.com/kawcamp",
+                "https://t.me/kawcamp",
+              ],
+            }),
+          }}
+        />
+
         {/* 🔴 Anti-Flash — همیشه روشن */}
         <script
           dangerouslySetInnerHTML={{
