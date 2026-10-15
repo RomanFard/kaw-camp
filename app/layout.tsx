@@ -73,13 +73,14 @@ export default function RootLayout({
               image: "https://kawcamp.com/images/logo2.png",
               description:
                 "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
-              address: {
-                "@type": "PostalAddress",
-                addressCountry: "IR",
-                addressLocality: "بانه",
-                addressRegion: "کردستان",
-                streetAddress: "کوچه پاساژ نور، پلاک ۲",
-              },
+address: {
+  "@type": "PostalAddress",
+  addressCountry: "IR",
+  addressLocality: "بانه",
+  addressRegion: "کردستان",
+  streetAddress: "کوچه پاساژ نور، پلاک ۲",
+  postalCode: "6651714396",
+},
               contactPoint: {
                 "@type": "ContactPoint",
                 telephone: "+98-918-054-0019",
