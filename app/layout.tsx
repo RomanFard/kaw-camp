@@ -13,9 +13,15 @@ import { HeroSlideProvider } from "@/components/context/HeroSlideContext";
 import ToastContainer from "@/components/ToastContainer";
 
 export const metadata: Metadata = {
-  title: "74148659",
+  title: "کاو کمپ | فروشگاه تخصصی لوازم کمپینگ و کوهنوردی",
 
   description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
+
+  icons: {
+    icon: [{ url: "/images/logo2.png", type: "image/png" }],
+    shortcut: "/images/logo2.png",
+    apple: "/images/logo2.png",
+  },
 
   other: {
     enamad: "74148659",
@@ -28,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-   <html lang="fa" dir="rtl" className="light" suppressHydrationWarning>
+    <html lang="fa" dir="rtl" className="light" suppressHydrationWarning>
       <head>
         {/* 🔴 Anti-Flash — همیشه روشن */}
         <script
