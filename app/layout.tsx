@@ -13,12 +13,12 @@ import { HeroSlideProvider } from "@/components/context/HeroSlideContext";
 import ToastContainer from "@/components/ToastContainer";
 
 export const metadata: Metadata = {
-  title: "58391172",
+  title: "74148659",
 
   description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
 
   other: {
-    enamad: "58391172",
+    enamad: "74148659",
   },
 };
 
