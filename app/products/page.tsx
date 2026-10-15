@@ -10,7 +10,7 @@ import { getAppContent } from "@/lib/supabase/appContent";
 import type { UnifiedCategory } from "@/lib/contentTypes";
 import { CATEGORIES_KEY } from "@/lib/contentTypes";
 import { useProducts } from "@/components/context/ProductsContext";
-import ScrollToHash from "@/components/ScrollToHash";
+
 
 const ITEMS_PER_PAGE = 24;
 const FALLBACK_MAX_PRICE = 2_000_000_000;
@@ -387,7 +387,7 @@ function ProductsContent() {
 
   return (
     <main className="relative min-h-screen bg-theme">
-      <ScrollToHash />
+      
       <Header />
 
       {/* ───── هدر صفحه ───── */}

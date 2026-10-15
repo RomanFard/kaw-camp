@@ -84,7 +84,7 @@ export default function Home() {
         <HeroBannerImage />
         <DiscountProducts />
 
-        {/* ─── برندها — دو اسلاید ─── */}
+        {/* ─── برندها — اسلاید ۱: نیچرهایک + بلک داگ ─── */}
         <BrandShowcase
           brands={[
             {
@@ -92,29 +92,6 @@ export default function Home() {
               nameFa: "نیچرهایک",
               nameEn: "NatureHike",
               matchNames: ["naturehike", "نیچرهایک", "نیچر هایک"],
-            },
-            {
-              key: "shinetrip",
-              nameFa: "شاین تریپ",
-              nameEn: "Shine Trip",
-              matchNames: ["shinetrip", "shine trip", "شاین تریپ"],
-            },
-          ]}
-          productsPerBrand={4}
-        />
-
-        <BrandShowcase
-          brands={[
-            {
-              key: "mountainhiker",
-              nameFa: "ماونتین هایکر",
-              nameEn: "Mountainhiker",
-              matchNames: [
-                "mountainhiker",
-                "mountain hiker",
-                "ماونتین هایکر",
-                "ماونتین‌هایکر",
-              ],
             },
             {
               key: "blackdog",
@@ -132,12 +109,35 @@ export default function Home() {
           productsPerBrand={4}
         />
 
+        {/* ─── برندها — اسلاید ۲: ماونتین هایکر + شاین تریپ ─── */}
+        <BrandShowcase
+          brands={[
+            {
+              key: "mountainhiker",
+              nameFa: "ماونتین هایکر",
+              nameEn: "Mountainhiker",
+              matchNames: [
+                "mountainhiker",
+                "mountain hiker",
+                "ماونتین هایکر",
+                "ماونتین‌هایکر",
+              ],
+            },
+            {
+              key: "shinetrip",
+              nameFa: "شاین تریپ",
+              nameEn: "Shine Trip",
+              matchNames: ["shinetrip", "shine trip", "شاین تریپ"],
+            },
+          ]}
+          productsPerBrand={4}
+        />
+
         <CategoryGrid />
         {/* 🆕 لینک همهٔ دسته‌بندی‌ها (سبک Gymshark) */}
         <CategoryLinks />
 
         <NewsletterSection />
-
 
         <Footer />
       </div>

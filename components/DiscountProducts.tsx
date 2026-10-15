@@ -186,16 +186,15 @@ function ProductCard({ product }: { product: DisplayProduct }) {
           {product.inStock ? "موجود در انبار" : "ناموجود"}
         </p>
 
-        <div className="mt-1.5 flex flex-wrap items-center gap-2">
-          <span className="text-[15px] font-black text-theme md:text-[16px]">
-            {formatPrice(product.__displayPrice)}
-          </span>
-
+        <div className="mt-1.5 flex flex-col gap-0.5">
           {product.__displayOldPrice && (
             <span className="text-[12px] text-theme-muted line-through md:text-[13px]">
               {formatPrice(product.__displayOldPrice)}
             </span>
           )}
+          <span className="text-[15px] font-black text-theme md:text-[16px]">
+            {formatPrice(product.__displayPrice)}
+          </span>
         </div>
       </Link>
     </div>

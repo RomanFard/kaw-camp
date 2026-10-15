@@ -142,9 +142,6 @@ function ProductCard({ product }: { product: any }) {
         <h3 className="line-clamp-1 text-[14px] font-bold text-theme md:text-[15px]">
           {product.name}
         </h3>
-        <p className="mt-1 line-clamp-2 text-[12px] leading-5 text-theme-muted md:text-[13px]">
-          {product.shortDesc}
-        </p>
         <p className="mt-2 text-[14px] font-black text-theme md:text-[15px]">
           {formatPrice(product.price)}
         </p>

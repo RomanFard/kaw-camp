@@ -255,17 +255,15 @@ export default function Footer() {
             <span className="font-bold text-theme">KAW CAMP</span> محفوظ است
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12px] text-theme-muted">
-            <Link href="/rules" className="transition hover:text-theme">
-              قوانین و مقررات
+          <p className="text-[12px] text-theme-muted">
+            طراحی شده توسط{" "}
+            <Link
+              href="/designer"
+              className="font-bold text-accent underline decoration-dotted underline-offset-4 transition hover:decoration-solid"
+            >
+              Roman Fard
             </Link>
-            <Link href="/returns" className="transition hover:text-theme">
-              بازگشت کالا
-            </Link>
-            <Link href="/warranty" className="transition hover:text-theme">
-              گارانتی
-            </Link>
-          </div>
+          </p>
         </div>
       </div>
     </footer>
