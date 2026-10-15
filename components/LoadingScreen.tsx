@@ -21,7 +21,8 @@ export default function LoadingScreen() {
   const [dock, setDock] = useState<Dock | null>(null);
 
   useEffect(() => {
-    if (pathname !== "/") {
+    // 🆕 فقط توی صفحه اصلی و صفحه طراح نمایش بده
+    if (pathname !== "/" && pathname !== "/designer") {
       setHidden(true);
       return;
     }
