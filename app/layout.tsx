@@ -17,15 +17,32 @@ export const metadata: Metadata = {
 
   description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
 
+  // 🆕 PWA Manifest (آیکون هوم اسکرین)
+  manifest: "/manifest.webmanifest",
+
+  // 🆕 رنگ نوار بالای مرورگر موبایل
+  themeColor: "#E84C4C",
+
+  // 🆕 Apple PWA (iPhone/iPad)
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "KAW CAMP",
+  },
+
+  // 🆕 آیکون‌ها — همه logo2.png
   icons: {
     icon: [
       { url: "/images/logo2.png", type: "image/png", sizes: "192x192" },
       { url: "/images/logo2.png", type: "image/png", sizes: "512x512" },
     ],
     shortcut: "/images/logo2.png",
-    apple: "/images/logo2.png",
+    apple: [
+      { url: "/images/logo2.png", sizes: "180x180", type: "image/png" },
+    ],
   },
 
+  // 🆕 Open Graph (اشتراک‌گذاری در شبکه‌های اجتماعی)
   openGraph: {
     title: "کاو کمپ | فروشگاه تخصصی لوازم کمپینگ و کوهنوردی",
     description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
@@ -43,6 +60,7 @@ export const metadata: Metadata = {
     type: "website",
   },
 
+  // 🆕 Twitter Card
   twitter: {
     card: "summary_large_image",
     title: "کاو کمپ | فروشگاه تخصصی لوازم کمپینگ و کوهنوردی",
@@ -73,14 +91,13 @@ export default function RootLayout({
               image: "https://kawcamp.com/images/logo2.png",
               description:
                 "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
-address: {
-  "@type": "PostalAddress",
-  addressCountry: "IR",
-  addressLocality: "بانه",
-  addressRegion: "کردستان",
-  streetAddress: "کوچه پاساژ نور، پلاک ۲",
-  postalCode: "6651714396",
-},
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "IR",
+                addressLocality: "بانه",
+                addressRegion: "کردستان",
+                streetAddress: "کوچه پاساژ نور، پلاک ۲",
+              },
               contactPoint: {
                 "@type": "ContactPoint",
                 telephone: "+98-918-054-0019",
