@@ -166,7 +166,7 @@ export default function LoginPage() {
               {/* دکمه اصلی */}
               <button
                 type="submit"
-                className="w-full rounded-lg bg-accent py-3 text-base font-bold text-white transition hover:bg-accent-hover"
+                className="w-full rounded-lg bg-zinc-900 py-3.5 text-base font-bold text-white shadow-md shadow-black/10 transition hover:bg-zinc-800"
               >
                 {otpMode
                   ? "دریافت کد یکبار مصرف"
