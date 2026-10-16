@@ -4,7 +4,7 @@ import { Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ProductCard from "@/components/ProductCard";
+import ProductGridCard from "@/components/products/ProductGridCard";
 import { categories } from "@/data/products";
 import { searchProducts, popularSearches } from "@/lib/search";
 import { useProducts } from "@/components/context/ProductsContext";
@@ -254,7 +254,7 @@ function SearchContent() {
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
               {resultProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductGridCard key={p.id} product={p} />
               ))}
             </div>
 

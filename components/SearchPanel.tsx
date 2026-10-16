@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { products } from "@/data/products";
+import { useProducts } from "@/components/context/ProductsContext";
 import { formatPrice } from "@/lib/utils";
 import { searchProducts, popularSearches } from "@/lib/search";
-import { getProductPlaceholder } from "@/lib/placeholder";
+import { getProductImage } from "@/lib/productImages";
 
 const SEARCH_PATH = "M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z";
 const CLOSE_PATH = "M6 18L18 6M6 6l12 12";
@@ -36,28 +36,6 @@ function Svg({
   );
 }
 
-function getCategoryEmoji(cat: string) {
-  const map: Record<string, string> = {
-    tent: "⛺",
-    sleep: "🛏️",
-    mattress: "🟦",
-    backpack: "🎒",
-    clothing: "🧥",
-    shoes: "🥾",
-    socks: "🧦",
-    gaiters: "🦵",
-    tools: "🧰",
-    lighting: "🔦",
-    bottle: "🥤",
-    cooking: "🍳",
-    sunglasses: "🕶️",
-    watch: "⌚",
-    bicycle: "🚲",
-    accessories: "🎁",
-  };
-  return map[cat] || "📦";
-}
-
 export default function SearchPanel({
   onClose,
   forceOpen = false,
@@ -69,6 +47,9 @@ export default function SearchPanel({
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // 🎯 محصولات از منبع واقعی (Supabase) — نه sample
+  const { products } = useProducts();
 
   useEffect(() => {
     if ((isOpen || forceOpen) && inputRef.current) {
@@ -102,10 +83,16 @@ export default function SearchPanel({
   const results = useMemo(() => {
     if (!query.trim()) return [];
     return searchProducts(query, products);
-  }, [query]);
+  }, [query, products]);
 
-  // بخش «پرفروش‌ترین‌ها» در حالت بدون جستجو
-  const bestSellers = useMemo(() => products.slice(0, 4), []);
+  // 🆕 بخش «جدیدترین‌ها» — مرتب بر اساس id نزولی
+  const newestProducts = useMemo(
+    () =>
+      [...products]
+        .sort((a, b) => Number(b.id) - Number(a.id))
+        .slice(0, 4),
+    [products]
+  );
 
   const topResults = results.slice(0, 6);
   const totalResults = results.length;
@@ -134,6 +121,11 @@ export default function SearchPanel({
   function searchFor(term: string) {
     setQuery(term);
     if (inputRef.current) inputRef.current.focus();
+  }
+
+  // 🎯 گرفتن عکس واقعی محصول (با fallback به عکس دسته)
+  function getImage(product: any): string {
+    return product.image || getProductImage(product.category, product.id);
   }
 
   const trendingList = (
@@ -177,7 +169,7 @@ export default function SearchPanel({
         />
       )}
 
-      {/* لایه تیره پشت پنل در دسکتاپ (مثل Gymshark) */}
+      {/* لایه تیره پشت پنل در دسکتاپ */}
       {forceOpen && (
         <div
           aria-hidden="true"
@@ -197,7 +189,7 @@ export default function SearchPanel({
         }
         dir="rtl"
       >
-        {/* ═══ نوار بالا: بازگشت (موبایل) / جستجوی وسط‌چین + بستن (دسکتاپ) ═══ */}
+        {/* ═══ نوار بالا ═══ */}
         <form
           onSubmit={handleSubmit}
           className="relative flex h-16 items-center gap-2 border-b border-theme px-3 md:h-20 md:justify-center md:px-8"
@@ -248,7 +240,7 @@ export default function SearchPanel({
 
         {/* ═══ محتوای پنل ═══ */}
         <div className="mx-auto max-w-[1100px] px-4 pb-8 pt-6 md:px-8 md:pb-10 md:pt-8">
-          {/* حالت ۱: query خالیه → جستجوهای پرطرفدار + پرفروش‌ترین‌ها */}
+          {/* حالت ۱: query خالیه */}
           {!query.trim() && (
             <div className="grid gap-8 md:grid-cols-[220px_1fr] md:gap-12">
               <div>
@@ -261,7 +253,7 @@ export default function SearchPanel({
               <div>
                 <div className="flex items-center justify-between">
                   <h3 className="text-[15px] font-extrabold text-theme">
-                    پرفروش‌ترین‌ها
+                    جدیدترین‌ها
                   </h3>
                   <a
                     href="/products"
@@ -273,7 +265,7 @@ export default function SearchPanel({
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
-                  {bestSellers.map((product) => (
+                            {newestProducts.map((product) => (
                     <a
                       key={product.id}
                       href={"/product/" + product.id}
@@ -281,13 +273,11 @@ export default function SearchPanel({
                       className="block"
                     >
                       <div className="aspect-[4/5] w-full overflow-hidden bg-theme-surface">
+                        {/* 🆕 عکس واقعی محصول */}
                         <img
-                          src={getProductPlaceholder(
-                            product.name,
-                            getCategoryEmoji(product.category)
-                          )}
+                          src={getImage(product)}
                           alt={product.name}
-                          className="h-full w-full object-cover"
+                          className="h-full w-full object-contain p-2"
                         />
                       </div>
                       <div className="mt-2 line-clamp-1 text-[13px] font-semibold text-theme md:text-[14px]">
@@ -319,10 +309,10 @@ export default function SearchPanel({
                 </p>
               </div>
 
-              <div className="rounded-lg border border-accent/30 bg-accent/10 p-4">
+              <div className="rounded-lg border border-theme bg-theme-surface p-4">
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">💡</span>
-                  <div className="text-sm text-accent md:text-base">
+                  <div className="text-sm text-theme md:text-base">
                     <p className="font-bold">راهنمای جستجو:</p>
                     <ul className="mt-2 space-y-1 leading-7">
                       <li>• با <b>کد محصول</b> (مثل <b>19</b>) جستجو کن</li>
@@ -363,13 +353,11 @@ export default function SearchPanel({
                     className="flex w-full items-center gap-3 border-b border-theme p-3 text-right transition last:border-0 hover:bg-theme-surface"
                   >
                     <div className="h-14 w-14 flex-shrink-0 overflow-hidden bg-theme-surface md:h-16 md:w-16">
+                      {/* 🆕 عکس واقعی محصول */}
                       <img
-                        src={getProductPlaceholder(
-                          product.name,
-                          getCategoryEmoji(product.category)
-                        )}
+                        src={getImage(product)}
                         alt={product.name}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-contain p-1"
                       />
                     </div>
 
@@ -405,11 +393,10 @@ export default function SearchPanel({
                 )}
               </div>
 
-              {/* دکمه موبایل */}
               <button
                 type="button"
                 onClick={() => handleSubmit()}
-                className="mt-4 w-full bg-accent py-3 text-sm font-bold text-white transition hover:bg-accent-hover md:hidden"
+                className="mt-4 w-full bg-zinc-900 py-3 text-sm font-bold text-white transition hover:bg-zinc-800 md:hidden"
               >
                 جستجوی کامل برای «{query}»
               </button>
