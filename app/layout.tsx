@@ -12,6 +12,14 @@ import { HeroSlideProvider } from "@/components/context/HeroSlideContext";
 
 import ToastContainer from "@/components/ToastContainer";
 
+// 🆕 Viewport — جدا از metadata
+export const viewport: Viewport = {
+  themeColor: "#FFFFFF",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   title: "کاو کمپ | فروشگاه تخصصی لوازم کمپینگ و کوهنوردی",
 
@@ -19,14 +27,6 @@ export const metadata: Metadata = {
 
   // 🆕 PWA Manifest (آیکون هوم اسکرین)
   manifest: "/manifest.webmanifest",
-
-// 🆕 رنگ نوار وضعیت موبایل (باید در viewport باشه)
-export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
-};
 
   // 🆕 Apple PWA (iPhone/iPad)
   appleWebApp: {
@@ -47,7 +47,7 @@ export const viewport: Viewport = {
     ],
   },
 
-  // 🆕 Open Graph (اشتراک‌گذاری در شبکه‌های اجتماعی)
+  // 🆕 Open Graph
   openGraph: {
     title: "کاو کمپ | فروشگاه تخصصی لوازم کمپینگ و کوهنوردی",
     description: "فروشگاه تخصصی لوازم کمپینگ و کوهنوردی — KAW CAMP",
@@ -82,7 +82,7 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className="light" suppressHydrationWarning>
       <head>
-        {/* 🆕 Structured Data — لوگو و اطلاعات برند برای گوگل */}
+        {/* 🆕 Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -118,22 +118,17 @@ export default function RootLayout({
           }}
         />
 
-        {/* 🔴 Anti-Flash — همیشه روشن */}
+        {/* 🔴 Anti-Flash */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  // حذف هر تم ذخیره‌شده‌ای
                   localStorage.removeItem('theme');
-
-                  // اجبار به light
                   var html = document.documentElement;
                   html.classList.remove('dark');
                   html.classList.add('light');
                   html.style.colorScheme = 'light';
-
-                  // رنگ accent
                   var settings = localStorage.getItem('kaw-site-settings');
                   if (settings) {
                     var s = JSON.parse(settings);
@@ -163,7 +158,6 @@ export default function RootLayout({
                 <CartProvider>
                   <WishlistProvider>
                     {children}
-
                     <ToastContainer />
                   </WishlistProvider>
                 </CartProvider>
