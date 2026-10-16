@@ -30,8 +30,8 @@ const SECTION_SIZE =
   "aspect-[3/4] sm:aspect-[2/3] md:aspect-auto md:h-[600px] lg:h-[700px] xl:h-[760px]";
 
 export default function HeroBannerImage() {
-  const [slide, setSlide] = useState<HeroSlide>(FALLBACK_SLIDE);
-  const [loading, setLoading] = useState(true);
+const [slide, setSlide] = useState<HeroSlide | null>(null);
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -40,6 +40,8 @@ export default function HeroBannerImage() {
         setSlide({ ...data[SLIDE_INDEX], video: "" });
       } else if (data.length > 0) {
         setSlide({ ...data[0], video: "" });
+      } else {
+        setSlide(FALLBACK_SLIDE);
       }
       setLoading(false);
     }
@@ -47,6 +49,18 @@ export default function HeroBannerImage() {
   }, []);
 
   if (loading) {
+    return (
+      <div className="w-full px-3 sm:px-6 md:px-7">
+        <section
+          className={`relative w-full overflow-hidden bg-black ${SECTION_SIZE}`}
+        >
+          <div className="h-full w-full animate-pulse bg-zinc-900" />
+        </section>
+      </div>
+    );
+  }
+
+  if (!slide) {
     return (
       <div className="w-full px-3 sm:px-6 md:px-7">
         <section
@@ -72,7 +86,6 @@ export default function HeroBannerImage() {
             alt={slide.title_line1}
             className="h-full w-full object-cover object-center"
           />
-
           {/* ─── Overlay ─── */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent md:bg-gradient-to-tr md:from-black/90 md:via-black/40 md:to-transparent" />
         </div>
