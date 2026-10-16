@@ -6,6 +6,7 @@ import { useCart } from "@/components/context/CartContext";
 import { useWishlist } from "@/components/context/WishlistContext";
 import { formatPrice } from "@/lib/utils";
 import ImageLightbox from "@/components/ImageLightbox";
+import RelatedProducts from "@/components/products/RelatedProducts";
 
 type FlyingItem = {
   x: number;
@@ -248,6 +249,45 @@ export default function ProductPageClient({ product }: { product: Product }) {
                   -{discount}%
                 </span>
               )}
+
+              {/* 🆕 دکمه علاقه‌مندی — گوشه چپ بالا */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleItem(product, "product");
+                }}
+                aria-label={
+                  inWishlist ? "حذف از علاقه‌مندی" : "افزودن به علاقه‌مندی"
+                }
+                className={
+                  "absolute left-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border shadow-md backdrop-blur-sm transition " +
+                  (inWishlist
+                    ? "border-red-500 bg-white text-red-500"
+                    : "border-theme bg-white/90 text-theme hover:border-red-500 hover:text-red-500")
+                }
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill={inWishlist ? "currentColor" : "none"}
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d={
+                      inWishlist
+                        ? "M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"
+                        : "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                    }
+                  />
+                </svg>
+              </button>
 
               {!product.inStock && (
                 <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-lg font-bold text-white">
@@ -606,20 +646,20 @@ export default function ProductPageClient({ product }: { product: Product }) {
             گزینه‌های پرداخت دیگر
           </button>
 
-          <div className="mt-5 grid grid-cols-2 gap-3 border-t border-theme pt-5 md:mt-7 md:gap-5 md:pt-7">
+           <div className="mt-5 grid grid-cols-2 gap-3 border-t border-theme pt-5 md:mt-7 md:gap-5 md:pt-7">
             {[
               {
-                title: "ارسال رایگان",
-                desc: "سفارش بالای ۲ میلیون",
+                title: "ضمانت اصالت کالا",
+                desc: "تضمین کیفیت و اصل بودن",
                 icon: (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4 md:h-6 md:w-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
                   </svg>
                 ),
               },
               {
                 title: "بازگشت رایگان",
-                desc: "تا ۳۰ روز",
+                desc: "تا ۷ روز",
                 icon: (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4 md:h-6 md:w-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
@@ -627,11 +667,11 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 ),
               },
               {
-                title: "ارسال ۱-۲ روزه",
-                desc: "سریع و مطمئن",
+                title: "ارسال زیر ۱۰ روز",
+                desc: "ارسال مطمئن و به موقع",
                 icon: (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4 md:h-6 md:w-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                   </svg>
                 ),
               },
@@ -868,9 +908,14 @@ export default function ProductPageClient({ product }: { product: Product }) {
                   <button
                     type="button"
                     onClick={() => setShowReviewForm((s) => !s)}
-                    className="mt-3 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition hover:bg-accent-hover md:px-5 md:py-2.5 md:text-sm"
+                    className={
+                      "mt-3 rounded-lg px-5 py-2.5 text-xs font-bold shadow-md transition md:px-6 md:py-3 md:text-sm " +
+                      (showReviewForm
+                        ? "border-2 border-theme bg-theme-surface text-theme hover:bg-theme-card"
+                        : "bg-zinc-900 text-white shadow-black/10 hover:bg-zinc-800")
+                    }
                   >
-                    {showReviewForm ? "بستن فرم" : "✍️ ثبت نظر"}
+                    {showReviewForm ? "✕ بستن فرم" : "✍️ ثبت نظر"}
                   </button>
                 </div>
               </div>
@@ -922,19 +967,19 @@ export default function ProductPageClient({ product }: { product: Product }) {
                     required
                   />
 
-                  <div className="mt-2 flex gap-2 md:mt-3">
+                  <div className="mt-3 flex flex-wrap gap-3 md:mt-4">
                     <button
                       type="submit"
-                      className="rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition hover:bg-accent-hover md:px-5 md:py-2.5 md:text-sm"
+                      className="flex-1 rounded-lg bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-600/30 transition hover:bg-emerald-700 md:flex-none md:px-8 md:py-3.5 md:text-base"
                     >
-                      ثبت نظر
+                      ✓ ثبت نظر
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowReviewForm(false)}
-                      className="rounded-lg border border-theme px-4 py-2 text-xs font-bold text-theme-muted transition hover:text-theme md:px-5 md:py-2.5 md:text-sm"
+                      className="flex-1 rounded-lg border-2 border-theme bg-theme-card px-6 py-3 text-sm font-bold text-theme transition hover:border-red-500 hover:text-red-500 md:flex-none md:px-8 md:py-3.5 md:text-base"
                     >
-                      انصراف
+                      ✕ انصراف
                     </button>
                   </div>
                 </form>
@@ -999,8 +1044,10 @@ export default function ProductPageClient({ product }: { product: Product }) {
           )}
         </div>
       </div>
+      {/* ═══════ پیشنهادها ═══════ */}
+      <RelatedProducts currentProduct={product} />
 
-      {/* انیمیشن — آیکون کوله مشکی */}
+      {/* انیمیشن */}
       {flyingItems.map((item, index) => (
         <div
           key={index}
