@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
@@ -20,8 +20,13 @@ export const metadata: Metadata = {
   // 🆕 PWA Manifest (آیکون هوم اسکرین)
   manifest: "/manifest.webmanifest",
 
-  // رنگ نوار بالای مرورگر موبایل — سفید
+// 🆕 رنگ نوار وضعیت موبایل (باید در viewport باشه)
+export const viewport: Viewport = {
   themeColor: "#FFFFFF",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
   // 🆕 Apple PWA (iPhone/iPad)
   appleWebApp: {
