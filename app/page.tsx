@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
 import Header from "@/components/Header";
 import HeroVideo from "@/components/HeroVideo";
 import HeroBannerImage from "@/components/HeroBannerImage";
@@ -19,7 +18,6 @@ import CategoryLinks from "@/components/CategoryLinks";
 
 export default function Home() {
   const { mounted, level } = useDevicePerformance();
-  const { resolvedTheme } = useTheme();
   const { settings } = useSiteSettings();
   const [isClient, setIsClient] = useState(false);
 
@@ -31,8 +29,7 @@ export default function Home() {
     isClient &&
     mounted &&
     level !== "low" &&
-    settings.bg_variant !== "none" &&
-    (!settings.bg_only_dark || resolvedTheme === "dark");
+    settings.bg_variant !== "none";
 
   const quality =
     settings.bg_quality === "auto" ? level : settings.bg_quality;
@@ -62,7 +59,7 @@ export default function Home() {
               variant="night"
               particleCount={particleCount}
               quality={quality}
-              sky={resolvedTheme === "dark"}
+              sky={false}
             />
           )}
 
@@ -134,7 +131,6 @@ export default function Home() {
         />
 
         <CategoryGrid />
-        {/* 🆕 لینک همهٔ دسته‌بندی‌ها (سبک Gymshark) */}
         <CategoryLinks />
 
         <NewsletterSection />

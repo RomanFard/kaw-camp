@@ -118,15 +118,13 @@ export default function RootLayout({
           }}
         />
 
-        {/* 🔴 Anti-Flash */}
+        {/* 🔴 Anti-Flash — فقط light */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  localStorage.removeItem('theme');
                   var html = document.documentElement;
-                  html.classList.remove('dark');
                   html.classList.add('light');
                   html.style.colorScheme = 'light';
                   var settings = localStorage.getItem('kaw-site-settings');

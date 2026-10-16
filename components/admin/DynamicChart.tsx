@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useTheme } from "next-themes";
+
 import {
   LineChart,
   Line,
@@ -31,8 +31,7 @@ type Props = {
 };
 
 export default function DynamicChart({ orders, groupBy, metric, loading }: Props) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const isDark = false;
 
   const grouped = useMemo(() => groupOrders(orders, groupBy), [orders, groupBy]);
   const chartType = GROUP_META[groupBy].chart;
