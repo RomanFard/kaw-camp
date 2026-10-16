@@ -74,17 +74,17 @@ export default function ProductGridCard({ product }: { product: Product }) {
         className="group relative block overflow-hidden rounded-xl border border-theme bg-theme-card transition duration-300 hover:border-accent/60 hover:shadow-lg hover:shadow-accent/10"
       >
         {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden bg-theme-surface">
+        <div className="relative aspect-square overflow-hidden bg-theme-surface p-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image}
             alt={product.name}
             loading="lazy"
-            className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
+            className="h-full w-full object-contain object-center transition duration-700 group-hover:scale-105"
           />
 
           {discount > 0 && (
-            <span className="absolute right-2 top-2 rounded bg-accent px-2 py-0.5 text-[10px] font-black text-white shadow-lg">
+            <span className="absolute right-2 top-2 z-10 rounded bg-accent px-2 py-0.5 text-[10px] font-black text-white shadow-lg">
               {discount}٪
             </span>
           )}

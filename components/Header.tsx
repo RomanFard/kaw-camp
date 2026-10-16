@@ -259,19 +259,19 @@ export default function Header() {
       <div className="bg-theme-surface text-theme">
         <div
           className={
-            "relative mx-auto flex items-center justify-center px-10 md:px-24 " +
+            "relative mx-auto flex items-center justify-center px-12 md:px-24 " +
             heightClass
           }
         >
           {currentAnnouncement.href ? (
             <a
               href={currentAnnouncement.href}
-              className="text-center text-[12px] font-medium underline underline-offset-2"
+              className="line-clamp-2 text-center text-[11px] font-medium leading-4 underline underline-offset-2 md:text-[12px] md:line-clamp-1"
             >
               {currentAnnouncement.text}
             </a>
           ) : (
-            <span className="text-center text-[12px] font-medium">
+            <span className="line-clamp-2 text-center text-[11px] font-medium leading-4 md:text-[12px] md:line-clamp-1">
               {currentAnnouncement.text}
             </span>
           )}
@@ -284,7 +284,7 @@ export default function Header() {
                   ? "پخش پیام‌های اعلان"
                   : "توقف پیام‌های اعلان"
               }
-              className="absolute end-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-theme transition hover:opacity-60 md:end-14"
+              className="absolute end-2 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center text-theme transition hover:opacity-60 md:end-14 md:h-6 md:w-6"
             >
               {announcementPaused ? (
                 <svg
@@ -315,8 +315,8 @@ export default function Header() {
 
   return (
     <>
-      {/* ═══ نوار اعلان — موبایل (نرمال، با اسکرول می‌ره) ═══ */}
-      <div className="md:hidden">{renderAnnouncement("h-10")}</div>
+      {/* ═══ نوار اعلان — موبایل ═══ */}
+      <div className="md:hidden">{renderAnnouncement("h-12")}</div>
 
       {/* ═══ نوار اعلان — دسکتاپ (نرمال، با اسکرول می‌ره) ═══ */}
       <div className="hidden md:block">{renderAnnouncement("h-[50px]")}</div>

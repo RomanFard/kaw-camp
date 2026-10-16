@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   // 🆕 PWA Manifest (آیکون هوم اسکرین)
   manifest: "/manifest.webmanifest",
 
-  // 🆕 رنگ نوار بالای مرورگر موبایل
-  themeColor: "#E84C4C",
+  // رنگ نوار بالای مرورگر موبایل — سفید
+  themeColor: "#FFFFFF",
 
   // 🆕 Apple PWA (iPhone/iPad)
   appleWebApp: {
