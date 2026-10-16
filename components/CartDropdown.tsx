@@ -141,7 +141,7 @@ export default function CartDropdown() {
             </p>
             <a
               href="/products"
-              className="mt-5 inline-block rounded-lg bg-accent px-6 py-2.5 text-sm font-bold text-white transition hover:bg-accent-hover"
+              className="mt-5 inline-block rounded-lg bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700"
             >
               مشاهده محصولات
             </a>
@@ -161,9 +161,15 @@ export default function CartDropdown() {
                     className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-theme bg-theme-surface"
                   >
                     <img
-                      src={getProductPlaceholder(item.name, getCategoryEmojiFromName(item.name))}
+                      src={
+                        item.image ||
+                        getProductPlaceholder(
+                          item.name,
+                          getCategoryEmojiFromName(item.name)
+                        )
+                      }
                       alt={item.name}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain p-1"
                     />
                   </a>
 
@@ -219,7 +225,7 @@ export default function CartDropdown() {
                 </a>
                 <a
                   href="/checkout"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-bold text-white transition hover:bg-accent-hover"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 py-3 text-sm font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700"
                 >
                   <span>✓</span>
                   <span>تسویه حساب</span>

@@ -325,8 +325,8 @@ export default function ProductPageClient({ product }: { product: Product }) {
                   onClick={() => goToImage(i)}
                   className={`relative aspect-square w-14 flex-shrink-0 overflow-hidden rounded border-2 transition md:w-16 ${
                     i === activeImageIndex
-                      ? "border-accent"
-                      : "border-theme/40 hover:border-theme"
+                      ? "border-black"
+                      : "border-transparent hover:border-theme/40"
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -538,16 +538,33 @@ export default function ProductPageClient({ product }: { product: Product }) {
 
           {/* دکمه‌ها */}
           <div className="mt-5 grid grid-cols-2 gap-2 md:mt-7 md:gap-3">
+            {/* 🆕 افزودن به کوله — آبی + آیکون کوله */}
             <button
               ref={cartButtonRef}
               type="button"
               onClick={handleAddToCart}
               disabled={!product.inStock}
-              className="rounded bg-accent px-3 py-3 text-xs font-bold text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-theme-surface disabled:text-theme-muted md:px-4 md:py-4 md:text-lg"
+              className="flex items-center justify-center gap-1.5 rounded bg-blue-800 px-3 py-3 text-xs font-bold text-white shadow-md shadow-blue-800/20 transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:bg-theme-surface disabled:text-theme-muted disabled:shadow-none md:gap-2 md:px-4 md:py-4 md:text-lg"
             >
-              {product.inStock ? "افزودن به کوله" : "ناموجود"}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4 md:h-5 md:w-5"
+              >
+                <path d="M9.5 5V4a2.5 2.5 0 015 0v1" />
+                <path d="M7 21h10a2 2 0 002-2v-9a5 5 0 00-5-5h-4a5 5 0 00-5 5v9a2 2 0 002 2z" />
+                <path d="M8.5 21v-5a1 1 0 011-1h5a1 1 0 011 1v5" />
+                <path d="M9 10h6" />
+              </svg>
+              <span>{product.inStock ? "افزودن به کوله" : "ناموجود"}</span>
             </button>
 
+            {/* 🆕 خرید سریع — نارنجی کم‌رنگ */}
             <button
               type="button"
               onClick={() => {
@@ -562,9 +579,23 @@ export default function ProductPageClient({ product }: { product: Product }) {
                 }
               }}
               disabled={!product.inStock}
-              className="rounded bg-zinc-900 px-3 py-3 text-xs font-bold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 md:px-4 md:py-4 md:text-lg dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+              className="flex items-center justify-center gap-1.5 rounded bg-orange-100 px-3 py-3 text-xs font-bold text-orange-700 shadow-sm transition hover:bg-orange-200 disabled:cursor-not-allowed disabled:opacity-50 md:gap-2 md:px-4 md:py-4 md:text-lg"
             >
-              خرید سریع
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="h-4 w-4 md:h-5 md:w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
+                />
+              </svg>
+              <span>خرید سریع</span>
             </button>
           </div>
 
@@ -641,8 +672,8 @@ export default function ProductPageClient({ product }: { product: Product }) {
             className={
               "whitespace-nowrap rounded-md px-3 py-2 text-xs font-bold transition md:rounded-lg md:px-6 md:py-3 md:text-lg " +
               (activeTab === "specs"
-                ? "bg-accent text-white shadow-lg shadow-accent/20"
-                : "bg-theme-surface text-theme-muted hover:text-accent")
+                ? "bg-zinc-900 text-white shadow-lg shadow-black/20"
+                : "bg-theme-surface text-theme-muted hover:bg-theme-surface/80 hover:text-theme")
             }
           >
             مشخصات فنی
@@ -654,8 +685,8 @@ export default function ProductPageClient({ product }: { product: Product }) {
             className={
               "whitespace-nowrap rounded-md px-3 py-2 text-xs font-bold transition md:rounded-lg md:px-6 md:py-3 md:text-lg " +
               (activeTab === "desc"
-                ? "bg-accent text-white shadow-lg shadow-accent/20"
-                : "bg-theme-surface text-theme-muted hover:text-accent")
+                ? "bg-zinc-900 text-white shadow-lg shadow-black/20"
+                : "bg-theme-surface text-theme-muted hover:bg-theme-surface/80 hover:text-theme")
             }
           >
             توضیحات
@@ -667,42 +698,18 @@ export default function ProductPageClient({ product }: { product: Product }) {
             className={
               "whitespace-nowrap rounded-md px-3 py-2 text-xs font-bold transition md:rounded-lg md:px-6 md:py-3 md:text-lg " +
               (activeTab === "reviews"
-                ? "bg-accent text-white shadow-lg shadow-accent/20"
-                : "bg-theme-surface text-theme-muted hover:text-accent")
+                ? "bg-zinc-900 text-white shadow-lg shadow-black/20"
+                : "bg-theme-surface text-theme-muted hover:bg-theme-surface/80 hover:text-theme")
             }
           >
             نظرات ({reviews.length.toLocaleString("fa-IR")})
           </button>
         </div>
-
         <div className="kaw-scrollbar max-h-[360px] overflow-y-auto pl-1 pr-2 md:max-h-[420px]">
-          {/* مشخصات فنی */}
+          {/* مشخصات فنی — مشخصات کلی بالا، مشخصات فنی پایین */}
           {activeTab === "specs" && (
             <div className="space-y-6 md:space-y-8">
-              {hasDynamicSpecs && (
-                <div>
-                  <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme md:mb-5 md:text-xl">
-                    <span>📐</span>
-                    <span>مشخصات فنی</span>
-                  </h3>
-                  <div className="grid gap-1.5 md:grid-cols-2 md:gap-x-10 md:gap-y-3">
-                    {dynamicSpecs.map((spec, i) => (
-                      <div
-                        key={i}
-                        className="flex flex-col gap-1 border-b border-theme py-2.5 text-xs md:flex-row md:items-start md:justify-between md:gap-4 md:py-3.5 md:text-base"
-                      >
-                        <span className="shrink-0 font-medium text-theme-muted md:min-w-[110px]">
-                          {spec.label}
-                        </span>
-                        <span className="break-words font-bold leading-6 text-theme md:flex-1 md:text-left">
-                          {spec.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
+              {/* 🆕 مشخصات کلی — اول */}
               <div>
                 <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme md:mb-5 md:text-xl">
                   <span>📋</span>
@@ -760,6 +767,31 @@ export default function ProductPageClient({ product }: { product: Product }) {
                   ))}
                 </div>
               </div>
+
+              {/* 🆕 مشخصات فنی — دوم */}
+              {hasDynamicSpecs && (
+                <div>
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-theme md:mb-5 md:text-xl">
+                    <span>📐</span>
+                    <span>مشخصات فنی</span>
+                  </h3>
+                  <div className="grid gap-1.5 md:grid-cols-2 md:gap-x-10 md:gap-y-3">
+                    {dynamicSpecs.map((spec, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col gap-1 border-b border-theme py-2.5 text-xs md:flex-row md:items-start md:justify-between md:gap-4 md:py-3.5 md:text-base"
+                      >
+                        <span className="shrink-0 font-medium text-theme-muted md:min-w-[110px]">
+                          {spec.label}
+                        </span>
+                        <span className="break-words font-bold leading-6 text-theme md:flex-1 md:text-left">
+                          {spec.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -968,7 +1000,7 @@ export default function ProductPageClient({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* انیمیشن */}
+      {/* انیمیشن — آیکون کوله مشکی */}
       {flyingItems.map((item, index) => (
         <div
           key={index}
@@ -981,20 +1013,21 @@ export default function ProductPageClient({ product }: { product: Product }) {
             animation: "flyToCartPage 0.8s cubic-bezier(0.5, -0.5, 1, 1) forwards",
           }}
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent shadow-2xl shadow-accent/50">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black shadow-2xl shadow-black/50">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="white"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="h-6 w-6"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-              />
+              <path d="M9.5 5V4a2.5 2.5 0 015 0v1" />
+              <path d="M7 21h10a2 2 0 002-2v-9a5 5 0 00-5-5h-4a5 5 0 00-5 5v9a2 2 0 002 2z" />
+              <path d="M8.5 21v-5a1 1 0 011-1h5a1 1 0 011 1v5" />
+              <path d="M9 10h6" />
             </svg>
           </div>
         </div>

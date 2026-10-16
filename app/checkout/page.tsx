@@ -678,7 +678,7 @@ export default function CheckoutPage() {
                   type="button"
                   onClick={handleSubmitOrder}
                   disabled={submitting}
-                  className="mt-5 w-full rounded-lg bg-accent py-3 text-base font-bold text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mt-5 w-full rounded-lg bg-emerald-600 py-3.5 text-base font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? "در حال ثبت سفارش..." : "ثبت نهایی سفارش"}
                 </button>

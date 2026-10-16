@@ -611,19 +611,19 @@ export default function Header() {
                   </span>
                 </button>
 
-                <a
-                  href="/wishlist"
-                  aria-label="علاقه‌مندی"
-                  data-wishlist-icon
-                  className="relative flex h-11 w-11 items-center justify-center text-theme transition hover:opacity-60"
-                >
-                  <Icon d={HEART_PATH} className="h-6 w-6" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </a>
+              <a
+                href="/wishlist"
+                aria-label="علاقه‌مندی"
+                data-wishlist-icon
+                className="relative flex h-11 w-11 items-center justify-center text-theme transition hover:opacity-60"
+              >
+                <Icon d={HEART_PATH} className="h-6 w-6" />
+                {wishlistCount > 0 && (
+<span className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-700 px-1 text-[10px] font-bold text-white">
+  {wishlistCount}
+</span>
+                )}
+              </a>
 
                 <a
                   href="/login"

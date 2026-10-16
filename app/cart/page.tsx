@@ -103,7 +103,7 @@ export default function CartPage() {
             </p>
             <a
               href="/products"
-              className="mt-6 inline-block rounded-lg bg-accent px-6 py-3 text-base font-bold text-white transition hover:bg-accent-hover"
+              className="mt-6 inline-block rounded-lg bg-emerald-600 px-6 py-3 text-base font-bold text-white transition hover:bg-emerald-700"
             >
               مشاهده محصولات
             </a>
@@ -124,7 +124,7 @@ export default function CartPage() {
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain p-1"
                     />
                   </a>
 
@@ -199,8 +199,22 @@ export default function CartPage() {
               <button
                 type="button"
                 onClick={handleClearCart}
-                className="mt-3 text-sm text-red-500 hover:underline"
+                className="mt-3 flex items-center gap-2 rounded-lg border border-red-500 px-4 py-2 text-sm font-bold text-red-500 transition hover:bg-red-500/10"
               >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                  />
+                </svg>
                 پاک کردن کل سبد
               </button>
             </div>
@@ -332,16 +346,18 @@ export default function CartPage() {
                 </span>
               </div>
 
+              {/* 🆕 ادامه فرآیند خرید — سبز */}
               <a
                 href="/checkout"
-                className="mt-5 block w-full rounded-lg bg-accent py-3 text-center text-base font-bold text-white transition hover:bg-accent-hover"
+                className="mt-5 block w-full rounded-lg bg-emerald-600 py-3.5 text-center text-base font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700"
               >
                 ادامه فرآیند خرید
               </a>
 
+              {/* 🆕 ادامه خرید — هم‌سبک «مشاهده کوله» */}
               <a
                 href="/products"
-                className="mt-3 block w-full rounded-lg border-2 border-accent bg-transparent py-3 text-center text-sm font-bold text-accent transition hover:bg-accent/10"
+                className="mt-3 block w-full rounded-lg border border-theme bg-theme-surface py-3 text-center text-sm font-bold text-theme transition hover:border-accent hover:text-accent"
               >
                 ← ادامه خرید
               </a>
