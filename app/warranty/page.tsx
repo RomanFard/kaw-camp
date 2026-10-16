@@ -127,7 +127,7 @@ export default function WarrantyPage() {
                   <div className="absolute right-0 top-7 hidden h-0.5 w-1/2 translate-x-1/2 bg-theme md:block"></div>
                 )}
 
-                <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent text-xl font-black text-white shadow-md">
+                <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-zinc-900 text-xl font-black text-white shadow-md">
                   {step.num}
                 </div>
 
@@ -171,14 +171,14 @@ export default function WarrantyPage() {
         </div>
 
         {/* نکته مهم */}
-        <div className="mb-8 rounded-2xl border border-accent/30 bg-accent/5 p-6 md:p-8">
+        <div className="mb-8 rounded-2xl border border-theme bg-theme-surface p-6 md:p-8">
           <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-accent text-2xl text-white">
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-zinc-900 text-2xl text-white">
               💡
             </span>
             <div>
-              <h3 className="text-base font-bold text-accent">نکته مهم</h3>
-              <p className="mt-2 text-sm leading-7 text-theme">
+              <h3 className="text-base font-bold text-theme">نکته مهم</h3>
+              <p className="mt-2 text-sm leading-7 text-theme-muted">
                 برای استفاده از ضمانت، حتماً فاکتور خرید و بسته‌بندی اصلی کالا
                 را نگه دارید. بدون این موارد، امکان بررسی ضمانت وجود ندارد.
                 هزینه‌های بازگشت کالا طبق توافق طرفین محاسبه خواهد شد.
@@ -188,22 +188,22 @@ export default function WarrantyPage() {
         </div>
 
         {/* CTA */}
-        <div className="rounded-2xl bg-accent p-8 text-center text-white">
+        <div className="rounded-2xl bg-zinc-900 p-8 text-center text-white">
           <h2 className="text-xl font-bold md:text-2xl">مشکل یا سوالی دارید؟</h2>
-          <p className="mt-3 text-base text-white/90">
+          <p className="mt-3 text-base text-zinc-300">
             کارشناسان پشتیبانی کاو کمپ آماده کمک به شماست
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a
               href="/contact"
-              className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-accent transition hover:bg-white/90"
+              className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-zinc-900 transition hover:bg-zinc-100"
             >
               تماس با ما
             </a>
             <a
               href="tel:09180540019"
               dir="ltr"
-              className="rounded-lg border-2 border-white/60 bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+              className="rounded-lg border-2 border-white/40 bg-transparent px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
             >
               ۰۹۱۸-۰۵۴-۰۰۱۹
             </a>
