@@ -9,7 +9,6 @@ import {
   createAttribute,
   updateAttribute,
   deleteAttribute,
-  generateAttributeKey,
   type Attribute,
   type AttributeType,
   type AttributeInput,
