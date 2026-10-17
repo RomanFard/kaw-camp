@@ -11,8 +11,8 @@ import CapacitiesManager, {
 import SpecsManager, { type ProductSpec } from "@/components/admin/SpecsManager";
 import AttributesPicker from "@/components/admin/AttributesPicker";
 import type { Category } from "@/data/products";
-import type { Brand } from "@/lib/supabase/brands";
-import type { Attribute } from "@/lib/supabase/attributes";
+import type { Brand } from "@/lib/actions/brands";
+import type { Attribute } from "@/lib/actions/attributes";
 
 export type ProductFormData = {
   id: string;

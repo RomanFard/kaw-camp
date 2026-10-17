@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
-import { getAppContent } from "@/lib/supabase/appContent";
+import { getAppContent } from "@/lib/actions/appContent";
 import { createClient } from "@/lib/supabase/client";
 import {
   type AnnouncementBar,

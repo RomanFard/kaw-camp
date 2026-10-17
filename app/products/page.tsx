@@ -6,7 +6,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductGridCard from "@/components/products/ProductGridCard";
-import { getAppContent } from "@/lib/supabase/appContent";
+import { getAppContent } from "@/lib/actions/appContent";
 import type { UnifiedCategory } from "@/lib/contentTypes";
 import { CATEGORIES_KEY } from "@/lib/contentTypes";
 import { useProducts } from "@/components/context/ProductsContext";

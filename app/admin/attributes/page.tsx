@@ -12,7 +12,7 @@ import {
   type Attribute,
   type AttributeType,
   type AttributeInput,
-} from "@/lib/supabase/attributes";
+} from "@/lib/actions/attributes";
 import { categories } from "@/data/products";
 
 type FormData = {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/context/CartContext";
 import { useWishlist } from "@/components/context/WishlistContext";
-import { getAppContent } from "@/lib/supabase/appContent";
+import { getAppContent } from "@/lib/actions/appContent";
 import { megaMenu as defaultMenu } from "@/lib/megaMenu";
 import type { UnifiedCategory } from "@/lib/contentTypes";
 import { CATEGORIES_KEY } from "@/lib/contentTypes";

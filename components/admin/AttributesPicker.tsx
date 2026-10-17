@@ -1,6 +1,6 @@
 "use client";
 
-import type { Attribute } from "@/lib/supabase/attributes";
+import type { Attribute } from "@/lib/actions/attributes";
 import type { ProductSpec } from "./SpecsManager";
 
 type Props = {

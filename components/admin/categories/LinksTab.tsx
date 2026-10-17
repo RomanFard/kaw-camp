@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAppContent, setAppContent } from "@/lib/supabase/appContent";
+import { getAppContent, setAppContent } from "@/lib/actions/appContent";
 import {
   type CategoryLinkGroup,
   type CategoryLink,

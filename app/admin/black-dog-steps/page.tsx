@@ -6,7 +6,7 @@ import BlackDogSteps, {
   DEFAULT_BLACK_DOG_STEPS,
 } from "@/components/BlackDogSteps";
 import AdminSidebar from "@/components/admin/AdminSidebar";
-import { getAppContent, setAppContent } from "@/lib/supabase/appContent";
+import { getAppContent, setAppContent } from "@/lib/actions/appContent";
 import { createClient } from "@/lib/supabase/client";
 
 const KEY = "black_dog_steps";

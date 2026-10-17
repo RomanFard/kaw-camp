@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getAppContent } from "@/lib/supabase/appContent";
+import { getAppContent } from "@/lib/actions/appContent";
 import {
   type CategoryGridFilter,
   type CategoryGridPhoto,

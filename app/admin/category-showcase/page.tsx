@@ -5,7 +5,7 @@ import CategoryShowcase, {
   CategoryShowcaseData,
   DEFAULT_CATEGORY_SHOWCASE,
 } from "@/components/CategoryShowcase";
-import { getAppContent, setAppContent } from "@/lib/supabase/appContent";
+import { getAppContent, setAppContent } from "@/lib/actions/appContent";
 import { createClient } from "@/lib/supabase/client";
 
 const KEY = "category_showcase";

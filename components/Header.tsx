@@ -6,7 +6,7 @@ import CartDropdown from "./CartDropdown";
 import SearchPanel from "./SearchPanel";
 import MobileMenuDrawer from "./MobileMenuDrawer";
 import { useWishlist } from "@/components/context/WishlistContext";
-import { getAppContent } from "@/lib/supabase/appContent";
+import { getAppContent } from "@/lib/actions/appContent";
 import { megaMenu as defaultMenu } from "@/lib/megaMenu";
 import type {
   UnifiedCategory,

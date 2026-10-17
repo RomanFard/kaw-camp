@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { useToast } from "@/components/context/ToastContext";
-import { getAllProducts } from "@/lib/supabase/products";
+import { getAllProducts } from "@/lib/actions/products";
 import type { Product } from "@/data/products";
 
 // ─── تایپ‌ها ───
