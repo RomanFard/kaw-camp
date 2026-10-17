@@ -14,7 +14,7 @@ import {
   updateProduct,
   deleteProduct,
   generateNextProductId,
-} from "@/lib/supabase/products";
+} from "@/lib/actions/products";
 import { getAllBrands, type Brand } from "@/lib/supabase/brands";
 import { getAllAttributes, type Attribute } from "@/lib/supabase/attributes";
 import {

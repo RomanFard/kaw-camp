@@ -1,24 +1,19 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════
-// پوشاندن لوگوی ریوان با لوگوی KAW
+// Overlay لوگو (مقاوم در برابر قطعی دیتابیس)
 // ═══════════════════════════════════════════
-// استفاده:
-//   node scripts/overlay-logo.mjs --logo=./public/images/logo.png --run
-//   node scripts/overlay-logo.mjs --logo=./public/images/logo.png --bg=auto --run
-//   node scripts/overlay-logo.mjs --logo=./public/images/logo.png --shape=circle --run
-//   node scripts/overlay-logo.mjs --logo=./public/images/logo.png --product=31716 --run
-
 import { createClient } from "@supabase/supabase-js";
+import pg from "pg";
 import sharp from "sharp";
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
-// ═══ CLI ═══
 const args = process.argv.slice(2);
 const hasFlag = (f) => args.includes(f);
 const getArg = (name, def) => {
@@ -26,27 +21,20 @@ const getArg = (name, def) => {
   return a ? a.split("=").slice(1).join("=") : def;
 };
 
-const LOGO_PATH = getArg("logo", "./public/images/logo.png");
-const LOGO_SIZE_PERCENT = parseInt(getArg("size", "30")); // اندازه لوگو
-const LOGO_PADDING = parseInt(getArg("padding", "14"));
-const BG_MODE = getArg("bg", "white"); // white | black | auto | none
-const SHAPE = getArg("shape", "circle"); // circle | rect | none
-const CIRCLE_SIZE_PERCENT = parseInt(getArg("circle-size", "45")); // اندازه دایره (درصد از عرض عکس)
+const LOGO_PATH = getArg("logo", "./public/images/logo2.png");
+const LOGO_SIZE_PERCENT = parseInt(getArg("size", "20"));
+const OFFSET_Y = parseInt(getArg("offset-y", "60"));
+const OFFSET_X = parseInt(getArg("offset-x", "20"));
+const LIMIT = parseInt(getArg("limit", "5"));
+const START_OFFSET = parseInt(getArg("start", "0"));
 const RUN = hasFlag("--run");
-const ONLY_PRODUCT = getArg("product", "");
 
-console.log("═══════════════════════════════════════════");
-console.log("🎨 KAW CAMP — Overlay لوگو");
-console.log("═══════════════════════════════════════════");
-console.log("حالت:", RUN ? "🔴 اجرای واقعی" : "🟢 Dry-run");
-console.log("لوگو:", LOGO_PATH);
-console.log("شکل پس‌زمینه:", SHAPE);
-if (SHAPE === "circle") console.log("اندازه دایره:", CIRCLE_SIZE_PERCENT, "% عرض عکس");
-console.log("اندازه لوگو:", LOGO_SIZE_PERCENT, "% عرض عکس");
-console.log("پدینگ:", LOGO_PADDING, "px");
-console.log("رنگ پس‌زمینه:", BG_MODE);
-if (ONLY_PRODUCT) console.log("فقط محصول:", ONLY_PRODUCT);
-console.log("");
+function progressBar(current, total, width = 20) {
+  const percent = Math.round((current / total) * 100);
+  const filled = Math.round((percent / 100) * width);
+  const empty = width - filled;
+  return { bar: "█".repeat(filled) + "░".repeat(empty), percent };
+}
 
 async function loadEnv() {
   const envPath = path.join(ROOT, ".env.local");
@@ -60,113 +48,41 @@ async function loadEnv() {
   return env;
 }
 
-function getBgColor(mode, sample) {
-  if (mode === "white") return { r: 255, g: 255, b: 255, alpha: 1 };
-  if (mode === "black") return { r: 0, g: 0, b: 0, alpha: 1 };
-  if (mode === "auto" && sample) return sample;
-  return null;
-}
-
-async function sampleCornerColor(imgBuf) {
-  try {
-    const { data, info } = await sharp(imgBuf)
-      .extract({ left: 5, top: 5, width: 30, height: 30 })
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-
-    let r = 0, g = 0, b = 0, count = 0;
-    for (let i = 0; i < data.length; i += info.channels) {
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
-      count++;
-    }
-    return {
-      r: Math.round(r / count),
-      g: Math.round(g / count),
-      b: Math.round(b / count),
-      alpha: 1,
-    };
-  } catch {
-    return { r: 255, g: 255, b: 255, alpha: 1 };
-  }
-}
-
-// 🆕 ساخت دایره
-async function createCircle(size, color) {
-  const r = Math.round(color.r);
-  const g = Math.round(color.g);
-  const b = Math.round(color.b);
-
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
-      <circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}" 
-              fill="rgb(${r},${g},${b})" />
-    </svg>
-  `;
-
-  return sharp(Buffer.from(svg)).png().toBuffer();
-}
-
-// 🆕 ساخت مستطیل
-async function createRect(width, height, color) {
-  return sharp({
-    create: {
-      width,
-      height,
-      channels: 4,
-      background: color,
-    },
-  })
-    .png()
-    .toBuffer();
-}
-
 async function main() {
-  const logoFullPath = path.resolve(ROOT, LOGO_PATH);
-  if (!existsSync(logoFullPath)) {
-    throw new Error(`لوگو پیدا نشد: ${logoFullPath}`);
-  }
-  const logoBuf = await readFile(logoFullPath);
-  const logoMeta = await sharp(logoBuf).metadata();
-  console.log(
-    `📷 لوگو اصلی: ${logoMeta.width}×${logoMeta.height} (${logoMeta.format})`
-  );
-
-  const trimmedLogoBuf = await sharp(logoBuf)
-    .trim({ threshold: 10 })
-    .toBuffer();
-  const trimmedMeta = await sharp(trimmedLogoBuf).metadata();
-  console.log(
-    `✂️  لوگو بعد از trim: ${trimmedMeta.width}×${trimmedMeta.height}`
-  );
-
   const env = await loadEnv();
-  const supabase = createClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  
+  // 🆕 مدیریت خطاهای Pool
+  const pool = new Pool({ 
+    connectionString: env.DATABASE_URL,
+    max: 1, // فقط یک اتصال برای کاهش فشار
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  });
+  
+  pool.on('error', (err) => {
+    console.error('⚠️ خطای اتصال دیتابیس:', err.message);
+  });
 
-  console.log("\n📥 لیست محصولات...");
-  const { data: folders, error: folderErr } = await supabase.storage
-    .from("products")
-    .list("rivancamp", { limit: 1000 });
+  const logoBuf = await readFile(path.resolve(ROOT, LOGO_PATH));
+  const trimmedLogoBuf = await sharp(logoBuf).trim({ threshold: 10 }).toBuffer();
+  const trimmedMeta = await sharp(trimmedLogoBuf).metadata();
 
-  if (folderErr) throw folderErr;
-  if (!folders || folders.length === 0) {
-    console.log("❌ هیچ محصولی پیدا نشد");
-    return;
-  }
+  console.log("═══════════════════════════════════════════");
+  console.log("🎨 KAW CAMP — Overlay لوگو");
+  console.log("═══════════════════════════════════════════");
+  console.log("حالت:", RUN ? "🔴 اجرای واقعی" : "🟢 Dry-run");
+  console.log("");
 
-  let targetFolders = folders;
-  if (ONLY_PRODUCT) {
-    targetFolders = folders.filter((f) => f.name === ONLY_PRODUCT);
-    if (targetFolders.length === 0) {
-      throw new Error(`محصول «${ONLY_PRODUCT}» پیدا نشد`);
-    }
-  }
+  const { data: folders } = await supabase.storage.from("products").list("rivancamp", { limit: 1000 });
+  if (!folders) { console.log("❌ هیچ پوشه‌ای پیدا نشد"); return; }
 
-  console.log(`   ${targetFolders.length} محصول برای پردازش`);
+  const sortedFolders = folders
+    .filter(f => !f.name.includes("."))
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const targetFolders = sortedFolders.slice(START_OFFSET, START_OFFSET + LIMIT);
+
+  console.log(`📁 پردازش ${targetFolders.length} پوشه...\n`);
 
   let totalImages = 0;
   let processedImages = 0;
@@ -175,159 +91,114 @@ async function main() {
   for (let i = 0; i < targetFolders.length; i++) {
     const folder = targetFolders[i];
     const folderPath = `rivancamp/${folder.name}`;
-    process.stdout.write(
-      `\n[${i + 1}/${targetFolders.length}] 📁 ${folder.name}`
-    );
+    const { data: files } = await supabase.storage.from("products").list(folderPath, { limit: 100 });
+    const imageFiles = (files || []).filter((f) => /\.(jpe?g|png|webp)$/i.test(f.name));
 
-    const { data: files, error: filesErr } = await supabase.storage
-      .from("products")
-      .list(folderPath, { limit: 100 });
+    if (imageFiles.length === 0) continue;
 
-    if (filesErr) {
-      console.log(` ❌ لیست نشد: ${filesErr.message}`);
+    // خواندن محصول از PostgreSQL
+    let product;
+    try {
+      const { rows } = await pool.query("SELECT id, image, images FROM products WHERE id = $1", [folder.name]);
+      if (rows.length === 0) {
+        console.log(`[${i + 1}/${targetFolders.length}] ⏭  ${folder.name} (در دیتابیس نیست)`);
+        continue;
+      }
+      product = rows[0];
+    } catch (dbErr) {
+      console.log(`[${i + 1}/${targetFolders.length}] ❌ خطای دیتابیس برای ${folder.name}: ${dbErr.message}`);
       continue;
     }
 
-    const imageFiles = (files || []).filter((f) =>
-      /\.(jpe?g|png|webp)$/i.test(f.name)
-    );
+    const currentImages = product.images || [];
+    const updatedImages = [...currentImages];
+    let mainImage = product.image;
 
-    if (imageFiles.length === 0) {
-      console.log(` ⏭  بدون عکس`);
-      continue;
-    }
+    console.log(`\n[${i + 1}/${targetFolders.length}] 📁 ${folder.name}`);
 
-    totalImages += imageFiles.length;
-    process.stdout.write(` → ${imageFiles.length} عکس`);
+    for (let imgIdx = 0; imgIdx < imageFiles.length; imgIdx++) {
+      const file = imageFiles[imgIdx];
+      const oldFilePath = `${folderPath}/${file.name}`;
+      const ext = file.name.split(".").pop() || "webp";
+      const newFileName = `${imgIdx}-${Date.now()}.${ext}`;
+      const newFilePath = `${folderPath}/${newFileName}`;
 
-    for (const file of imageFiles) {
-      const filePath = `${folderPath}/${file.name}`;
+      const { bar, percent } = progressBar(imgIdx + 1, imageFiles.length);
+      process.stdout.write(`\r   🎨 [${bar}] ${percent}% (${imgIdx + 1}/${imageFiles.length})`);
+
+      totalImages++;
+
       try {
-        const { data: urlData } = supabase.storage
-          .from("products")
-          .getPublicUrl(filePath);
-
+        const { data: urlData } = supabase.storage.from("products").getPublicUrl(oldFilePath);
         const res = await fetch(urlData.publicUrl);
-        if (!res.ok) throw new Error(`Download ${res.status}`);
         const imgBuf = Buffer.from(await res.arrayBuffer());
-
         const img = sharp(imgBuf);
         const meta = await img.metadata();
-        const imgWidth = meta.width || 0;
-        const imgHeight = meta.height || 0;
 
-        if (imgWidth === 0 || imgHeight === 0) {
-          throw new Error("ابعاد عکس نامعتبر");
+        const logoWidth = Math.round((meta.width * LOGO_SIZE_PERCENT) / 100);
+        const logoHeight = Math.round(logoWidth * (trimmedMeta.height / trimmedMeta.width));
+        const resizedLogo = await sharp(trimmedLogoBuf).resize(logoWidth, logoHeight).toBuffer();
+
+        const top = Math.max(0, meta.height - logoHeight - OFFSET_Y);
+        const left = Math.max(0, meta.width - logoWidth - OFFSET_X);
+
+        const bgTop = Math.max(0, top - 45);
+        const bgLeft = Math.max(0, left - 15);
+        const whiteBg = await sharp({
+          create: { width: logoWidth + 30, height: logoHeight + 55, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } },
+        }).png().toBuffer();
+
+        if (!RUN) { processedImages++; continue; }
+
+        const output = await img.composite([
+          { input: whiteBg, top: bgTop, left: bgLeft },
+          { input: resizedLogo, top, left },
+        ]).toBuffer();
+
+        await supabase.storage.from("products").upload(newFilePath, output, { upsert: false, contentType: `image/${meta.format || ext}` });
+        const { data: newUrlData } = supabase.storage.from("products").getPublicUrl(newFilePath);
+
+        const oldUrl = urlData.publicUrl;
+        const newUrl = newUrlData.publicUrl;
+        for (let k = 0; k < updatedImages.length; k++) {
+          if (updatedImages[k] === oldUrl) updatedImages[k] = newUrl;
         }
+        if (mainImage === oldUrl) mainImage = newUrl;
 
-        if (!RUN) {
-          process.stdout.write(".");
-          processedImages++;
-          continue;
-        }
-
-        const composites = [];
-
-        // ═══ ۱. پس‌زمینه (دایره یا مستطیل) ═══
-        if (SHAPE !== "none" && BG_MODE !== "none") {
-          let bgColor;
-          if (BG_MODE === "auto") {
-            bgColor = await sampleCornerColor(imgBuf);
-          } else {
-            bgColor = getBgColor(BG_MODE);
-          }
-
-          if (bgColor) {
-            if (SHAPE === "circle") {
-              // دایره
-              const circleSize = Math.round(
-                (imgWidth * CIRCLE_SIZE_PERCENT) / 100
-              );
-              const circleBuf = await createCircle(circleSize, bgColor);
-
-              // موقعیت دایره: گوشه پایین-راست
-              const circleLeft = imgWidth - circleSize;
-              const circleTop = imgHeight - circleSize;
-
-              composites.push({
-                input: circleBuf,
-                top: Math.max(0, circleTop),
-                left: Math.max(0, circleLeft),
-              });
-            } else {
-              // مستطیل (حالت قبلی)
-              const blockWidth = Math.round(imgWidth * 0.5);
-              const blockHeight = Math.round(imgHeight * 0.22);
-              const blockLeft = imgWidth - blockWidth;
-              const blockTop = imgHeight - blockHeight;
-
-              const rectBuf = await createRect(
-                blockWidth,
-                blockHeight,
-                bgColor
-              );
-
-              composites.push({
-                input: rectBuf,
-                top: Math.max(0, blockTop),
-                left: Math.max(0, blockLeft),
-              });
-            }
-          }
-        }
-
-        // ═══ ۲. KAW logo روی پس‌زمینه ═══
-        const logoWidth = Math.round((imgWidth * LOGO_SIZE_PERCENT) / 100);
-        const logoAspect = trimmedMeta.height / trimmedMeta.width;
-        const logoHeight = Math.round(logoWidth * logoAspect);
-
-        const resizedLogo = await sharp(trimmedLogoBuf)
-          .resize(logoWidth, logoHeight, { fit: "fill" })
-          .toBuffer();
-
-        const logoLeft = Math.max(0, imgWidth - logoWidth - LOGO_PADDING);
-        const logoTop = Math.max(0, imgHeight - logoHeight - LOGO_PADDING);
-
-        composites.push({
-          input: resizedLogo,
-          top: logoTop,
-          left: logoLeft,
-        });
-
-        // ═══ Composite نهایی ═══
-        const output = await img.composite(composites).toBuffer();
-
-        const { error: upErr } = await supabase.storage
-          .from("products")
-          .upload(filePath, output, {
-            upsert: true,
-            contentType: `image/${meta.format || "webp"}`,
-          });
-
-        if (upErr) throw upErr;
-        process.stdout.write(".");
+        await supabase.storage.from("products").remove([oldFilePath]);
         processedImages++;
-      } catch (e) {
-        console.log(`\n   ❌ ${file.name}: ${e.message}`);
+      } catch (err) {
         failedImages++;
       }
     }
-    console.log("");
+
+    // 🆕 آپدیت دیتابیس PostgreSQL با try/catch
+    if (RUN) {
+      try {
+        await pool.query(
+          "UPDATE products SET image = $1, images = $2, updated_at = NOW() WHERE id = $3",
+          [mainImage, JSON.stringify(updatedImages), folder.name]
+        );
+        process.stdout.write(`\r${" ".repeat(70)}\r`);
+        console.log(`   ✅ ${imageFiles.length} عکس (دیتابیس آپدیت شد)`);
+      } catch (dbErr) {
+        process.stdout.write(`\r${" ".repeat(70)}\r`);
+        console.log(`   ⚠️ عکس‌ها ذخیره شد ولی دیتابیس آپدیت نشد: ${dbErr.message}`);
+      }
+    }
   }
 
+  try {
+    await pool.end();
+  } catch (e) { /* ignore */ }
+
   console.log("\n═══════════════════════════════════════════");
-  console.log("📊 خلاصه");
+  console.log("📊 خلاصه نهایی");
   console.log("═══════════════════════════════════════════");
   console.log(`📷 کل عکس‌ها: ${totalImages}`);
   console.log(`✅ پردازش: ${processedImages}`);
   console.log(`❌ خطا: ${failedImages}`);
   console.log("");
-  if (!RUN) {
-    console.log("⚠️  dry-run بود. برای اجرای واقعی: --run اضافه کن");
-  }
 }
 
-main().catch((e) => {
-  console.error("\n❌ خطا:", e);
-  process.exit(1);
-});
+main().catch(console.error);

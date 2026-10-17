@@ -8,7 +8,8 @@ import {
   ReactNode,
 } from "react";
 import type { Product } from "@/data/products";
-import { getAllProducts } from "@/lib/supabase/products";
+// 🆕 تغییر مسیر ایمپورت
+import { getAllProducts } from "@/lib/actions/products";
 
 type ProductsContextType = {
   products: Product[];

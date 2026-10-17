@@ -269,44 +269,49 @@ function MainView({
   onClose: () => void;
 }) {
   return (
-    <div className="pb-8 pt-1">
-      <ul>
-        {menuItems.map((cat) => (
-          <li key={cat.key}>
-            <button
-              type="button"
-              onClick={() => onCategory(cat.key)}
-              className="group flex w-full items-center justify-between px-5 py-[16px] text-[15px] font-semibold text-theme"
-            >
-              <span className="relative inline-block pb-1">
-                {cat.label}
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-x-0 bottom-0 h-0.5 origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100"
-                />
-              </span>
-              <Icon d={CHEVRON_PATH} strokeWidth={2.2} className="h-4 w-4" />
-            </button>
-          </li>
-        ))}
-      </ul>
+    <div className="pb-8 pt-2">
+      {/* 🆕 کادر نازک خاکستری دور کل لیست */}
+      <div className="mx-5 overflow-hidden rounded-xl border border-gray-200 dark:border-zinc-800">
+        <ul className="divide-y divide-gray-200 dark:divide-zinc-800">
+          {menuItems.map((cat) => (
+            <li key={cat.key}>
+              <button
+                type="button"
+                onClick={() => onCategory(cat.key)}
+                className="group flex w-full items-center justify-between px-5 py-[16px] text-[15px] font-semibold text-theme transition hover:bg-theme-surface"
+              >
+                <span className="relative inline-block pb-1">
+                  {cat.label}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 bottom-0 h-0.5 origin-right scale-x-0 bg-current transition-transform duration-300 ease-out group-hover:scale-x-100"
+                  />
+                </span>
+                <Icon d={CHEVRON_PATH} strokeWidth={2.2} className="h-4 w-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div className="mt-6 flex flex-col gap-3 px-5">
         <Link
           href="/products"
           onClick={onClose}
-          className="flex items-center justify-center rounded border-2 border-theme bg-theme-surface px-4 py-3 text-[14px] font-extrabold text-theme transition hover:border-accent hover:text-accent"
+          className="flex items-center justify-center rounded border border-gray-200 bg-theme-surface px-4 py-3 text-[14px] font-extrabold text-theme transition hover:border-accent hover:text-accent dark:border-zinc-800"
         >
           مشاهده همه محصولات
         </Link>
         <Link
           href="/brands"
           onClick={onClose}
-          className="flex items-center justify-center rounded border-2 border-theme px-4 py-3 text-[14px] font-extrabold text-theme transition hover:border-accent hover:text-accent"
+          className="flex items-center justify-center rounded border border-gray-200 px-4 py-3 text-[14px] font-extrabold text-theme transition hover:border-accent hover:text-accent dark:border-zinc-800"
         >
           برندها
         </Link>
       </div>
+
+      {/* ... بخش پشتیبانی و شبکه‌های اجتماعی همون قبلی بمونه ... */}
 
       <div className="mt-8 border-t border-theme/40 px-5 pt-6">
         <h4 className="mb-3 text-[11px] font-black tracking-widest text-theme-muted">

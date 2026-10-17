@@ -1,20 +1,28 @@
-import { createClient } from "./client";
+"use server";
 
-export async function getAppContent<T>(key: string): Promise<T | null> {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("app_content")
-    .select("data")
-    .eq("key", key)
-    .maybeSingle();
-  if (error || !data) return null;
-  return data.data as T;
+import { query } from "@/lib/db";
+
+export async function getAppContent<T = any>(key: string): Promise<T | null> {
+  try {
+    const res = await query("SELECT value FROM app_content WHERE key = $1", [key]);
+    if (res.rows.length === 0) return null;
+    return res.rows[0].value as T;
+  } catch (error) {
+    console.error(`Error loading app_content for ${key}:`, error);
+    return null;
+  }
 }
 
-export async function setAppContent<T>(key: string, value: T) {
-  const supabase = createClient();
-  return supabase.from("app_content").upsert(
-    { key, data: value, updated_at: new Date().toISOString() },
-    { onConflict: "key" }
-  );
+export async function setAppContent(key: string, value: any) {
+  try {
+    const sql = `
+      INSERT INTO app_content (key, value, updated_at) 
+      VALUES ($1, $2, NOW()) 
+      ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW()
+    `;
+    await query(sql, [key, JSON.stringify(value)]);
+    return { error: null };
+  } catch (error: any) {
+    return { error };
+  }
 }

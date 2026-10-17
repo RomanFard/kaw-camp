@@ -154,7 +154,7 @@ export default function RulesPage() {
       <div className="mx-auto max-w-[1600px] px-6 py-8">
         {/* مسیر ناوبری */}
         <nav className="mb-6 text-sm text-theme-muted">
-          <a href="/" className="transition hover:text-accent">
+          <a href="/" className="transition hover:text-theme">
             خانه
           </a>
           <span className="mx-2">/</span>
@@ -163,7 +163,7 @@ export default function RulesPage() {
 
         {/* هدر صفحه */}
         <div className="mb-8 rounded-2xl border border-theme bg-theme-card p-8 text-center md:p-12">
-          <span className="inline-block rounded-full border border-accent/30 bg-accent/5 px-5 py-2 text-sm font-semibold text-accent">
+          <span className="inline-block rounded-full border border-theme bg-theme-surface px-5 py-2 text-sm font-semibold text-theme">
             قوانین و مقررات
           </span>
           <h1 className="mt-5 text-2xl font-bold text-theme md:text-3xl">
@@ -186,7 +186,8 @@ export default function RulesPage() {
               className="overflow-hidden rounded-2xl border border-theme bg-theme-card"
             >
               <div className="flex items-center gap-4 border-b border-theme bg-theme-surface px-6 py-4">
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-lg font-black text-white">
+                {/* 🆕 آیکون شماره با پس‌زمینه مشکی */}
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-zinc-900 text-lg font-black text-white">
                   {section.num}
                 </span>
                 <h2 className="text-base font-bold text-theme md:text-lg">
@@ -201,14 +202,14 @@ export default function RulesPage() {
           ))}
 
           {/* پیام پایانی */}
-          <div className="rounded-2xl border border-accent/30 bg-accent/5 p-6 md:p-8">
+          <div className="rounded-2xl border border-theme bg-theme-surface p-6 md:p-8">
             <p className="text-sm leading-8 text-theme md:text-base md:leading-9">
               با ثبت‌نام و استفاده از خدمات کاو کمپ، شما تأیید می‌کنید که
               قوانین و مقررات ذکرشده را مطالعه کرده و می‌پذیرید. هدف ما در
               کاو کمپ ارائه بهترین خدمات و محصولات با بالاترین کیفیت به
               مشتریان عزیز است. از همراهی شما سپاسگزاریم.
             </p>
-            <p className="mt-4 font-black text-accent">
+            <p className="mt-4 font-black text-theme">
               کاو کمپ — تجربه‌ای متفاوت در خرید تجهیزات طبیعت‌گردی و کمپینگ
             </p>
           </div>
@@ -220,41 +221,42 @@ export default function RulesPage() {
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
               <a
-                href="mailto:mohamadxanzadeh@gmail.com"
+                href="mailto:kawcamp@outlook.com"
                 className="flex items-center gap-3 rounded-lg border border-theme bg-theme-surface p-4 transition hover:border-accent"
               >
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-lg text-white">
+                {/* 🆕 آیکون با پس‌زمینه مشکی */}
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-zinc-900 text-lg text-white">
                   ✉️
                 </span>
-                <div>
+                <div className="min-w-0">
                   <div className="text-xs font-bold text-theme-muted">
                     ایمیل
                   </div>
-                  <div className="mt-0.5 text-sm font-bold text-theme">
-                    mohamadxanzadeh@gmail.com
+                  <div className="mt-0.5 truncate text-sm font-bold text-theme" dir="ltr">
+                    kawcamp@outlook.com
                   </div>
                 </div>
               </a>
 
               <a
-                href="tel:09180540019"
+                href="tel:09307582003"
                 className="flex items-center gap-3 rounded-lg border border-theme bg-theme-surface p-4 transition hover:border-accent"
               >
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-lg text-white">
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-zinc-900 text-lg text-white">
                   📞
                 </span>
                 <div>
                   <div className="text-xs font-bold text-theme-muted">
                     تلفن
                   </div>
-                  <div className="mt-0.5 text-sm font-bold text-theme">
-                    ۰۹۱۸-۰۵۴-۰۰۱۹
+                  <div className="mt-0.5 text-sm font-bold text-theme" dir="ltr">
+                    ۰۹۳۰-۷۵۸-۲۰۰۳
                   </div>
                 </div>
               </a>
 
               <div className="flex items-start gap-3 rounded-lg border border-theme bg-theme-surface p-4 md:col-span-2">
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-lg text-white">
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-zinc-900 text-lg text-white">
                   📍
                 </span>
                 <div>
@@ -262,7 +264,7 @@ export default function RulesPage() {
                     آدرس فروشگاه
                   </div>
                   <div className="mt-0.5 text-sm font-bold text-theme">
-                    کردستان - بانه - کوچه پاساژ نور - پاساژ ارغوانی - بلوک ۲
+                    کردستان، بانه، کوچه پاساژ نور، بلوک ۲
                   </div>
                 </div>
               </div>

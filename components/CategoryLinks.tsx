@@ -22,13 +22,32 @@ export default function CategoryLinks() {
     })();
   }, []);
 
+  // 🆕 فیلتر کردن لینک‌های ناخواسته
+  const filteredGroups = groups.map((group) => {
+    let filteredLinks = group.links;
+
+    // حذف گتر از «حمل و پوشاک»
+    if (group.title === "حمل و پوشاک") {
+      filteredLinks = filteredLinks.filter((l) => l.label !== "گتر");
+    }
+
+    // حذف دوچرخه و اکسسوری از «اکسسوری و سایر»
+    if (group.title === "اکسسوری و سایر") {
+      filteredLinks = filteredLinks.filter(
+        (l) => l.label !== "دوچرخه" && l.label !== "اکسسوری"
+      );
+    }
+
+    return { ...group, links: filteredLinks };
+  });
+
   return (
     <section
       dir="rtl"
       className="w-full border-t border-black/10 bg-theme px-3 py-10 dark:border-white/10 sm:px-6 md:px-7 md:py-14"
     >
       <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4 md:gap-x-12">
-        {groups.map((group) => (
+        {filteredGroups.map((group) => (
           <div key={group.title}>
             <h3 className="mb-4 text-[13px] font-black uppercase tracking-wider text-theme md:text-[14px]">
               {group.title}

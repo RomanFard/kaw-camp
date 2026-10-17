@@ -4,13 +4,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/components/context/ToastContext";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import ImageUploader from "@/components/admin/ImageUploader";
-import {
-  getAllBrands,
-  createBrand,
-  updateBrand,
-  deleteBrand,
-  type Brand,
-} from "@/lib/supabase/brands";
+import { getAllBrands, createBrand, updateBrand, deleteBrand, type Brand } from "@/lib/actions/brands";
 
 type FormData = {
   name: string;
