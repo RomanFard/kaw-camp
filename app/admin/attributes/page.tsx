@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { useToast } from "@/components/context/ToastContext";
+import { generateAttributeKey } from "@/lib/utils";
 import {
   getAllAttributes,
   createAttribute,
