@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 /* رنگ‌ها: ثابت و مستقل از تم سایت */
 const ACCENT = "#5b47d9"; // دکمه‌های اصلی
 const SOFT = "#b9afff"; // متن رنگی روی زمینه‌ی تیره
+const TAB_MS = 6000; // مدت نمایش هر نمونه، قبل از رفتن به بعدی
 
 /* ---------- آیکون‌ها ---------- */
 const Icon = ({ children }: { children: ReactNode }) => (
@@ -65,6 +66,18 @@ const icons = {
       <path d="M12 16v-5" />
       <path d="M12 13c0-1.5 1-2 2-2s2 .7 2 2v3" />
     </Icon>
+  ),
+  chat: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true">
+      <path d="M5 5h14a3 3 0 013 3v7a3 3 0 01-3 3h-6l-4 3v-3H5a3 3 0 01-3-3V8a3 3 0 013-3z" />
+      <circle cx="9" cy="11.5" r="1.3" fill="#cdc9e3" />
+      <circle cx="15" cy="11.5" r="1.3" fill="#cdc9e3" />
+    </svg>
+  ),
+  chevron: (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
   ),
   check: (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -209,103 +222,218 @@ const MockShell = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
+/* داشبورد با جزئیات کامل مثل نمونه */
+const StatCard = ({ value, i = 0 }: { value: string; i?: number }) => (
+  <div
+    className="fx-up flex flex-col justify-between rounded-md bg-white p-1.5 sm:rounded-lg sm:p-2.5"
+    style={{ animationDelay: `${0.1 + i * 0.12}s` }}
+  >
+    <div className="flex items-center justify-between">
+      <Bar w="45%" h="h-1" />
+      <span className="h-1.5 w-1.5 rounded-sm bg-[#8f9be0] sm:h-2.5 sm:w-2.5" />
+    </div>
+    <p className="mt-1 text-[9px] font-black leading-none sm:text-base md:text-xl">{value}</p>
+    <Bar w="30%" h="h-0.5" />
+  </div>
+);
+
+const ListRow = () => (
+  <div className="flex items-center gap-1.5 rounded-md bg-[#f6f4ef] p-1 sm:p-1.5">
+    <span className="h-2 w-2 rounded-full bg-[#d9d4f5] sm:h-3 sm:w-3" />
+    <div className="flex-1 space-y-0.5">
+      <Bar w="70%" h="h-0.5 sm:h-1" c="bg-black/50" />
+      <Bar w="45%" h="h-0.5 sm:h-1" />
+    </div>
+    <Bar w="14%" h="h-0.5 sm:h-1" c="bg-black/40" />
+  </div>
+);
+
 const MockDashboard = () => (
-  <MockShell>
-    <div className="flex h-full gap-3">
-      <div className="flex w-8 flex-col items-center gap-3 rounded-xl bg-[#111] py-3">
-        {[0, 1, 2, 3].map((i) => (
-          <span key={i} className="h-3 w-3 rounded-sm bg-white/50" />
+  <div dir="ltr" className="h-full w-full overflow-hidden bg-[#efece6] p-2 sm:p-3">
+    <div className="flex h-full gap-2 sm:gap-3">
+      {/* نوار کناری تیره */}
+      <div className="flex w-5 flex-col items-center gap-2 rounded-lg bg-[#111] py-2 sm:w-7 sm:rounded-xl sm:py-3">
+        <span className="h-2 w-2 rounded-full bg-white sm:h-3 sm:w-3" />
+        {[0, 1, 2, 3, 4].map((i) => (
+          <span key={i} className={`h-2 w-2 rounded-sm sm:h-3 sm:w-3 ${i === 0 ? "bg-white/80" : "bg-white/35"}`} />
         ))}
+        <span className="mt-auto h-3 w-3 rounded-full bg-[#f0b8a0] sm:h-4 sm:w-4" />
       </div>
-      <div className="flex flex-1 flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1.5">
-            <Bar w="90px" c="bg-black/70" h="h-3" />
-            <Bar w="140px" />
+
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:gap-2.5">
+        {/* سربرگ: سلام + جستجو */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="space-y-1">
+            <Bar w="70px" c="bg-black/75" h="h-2 sm:h-3" />
+            <Bar w="110px" h="h-1" />
           </div>
-          <Bar w="90px" c="bg-white" h="h-5" />
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="space-y-2 rounded-lg bg-white p-2.5">
-              <Bar w="50%" />
-              <Bar w="35%" c="bg-black/70" h="h-3" />
+          <div className="flex items-center gap-1.5">
+            <div className="flex h-3 w-16 items-center justify-end rounded-full bg-white px-1 sm:h-5 sm:w-32">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#111] sm:h-3 sm:w-3" />
             </div>
-          ))}
+            <span className="h-3 w-3 rounded-full bg-white sm:h-5 sm:w-5" />
+            <span className="h-3 w-3 rounded-full bg-white sm:h-5 sm:w-5" />
+            <span className="h-3 w-10 rounded-full bg-white sm:h-5 sm:w-16" />
+          </div>
         </div>
-        <div className="grid min-h-0 flex-1 grid-cols-[1.7fr_1fr] gap-2">
-          <div className="rounded-lg bg-white p-3">
-            <Bar w="30%" c="bg-black/70" h="h-3" />
-            <svg viewBox="0 0 200 70" className="mt-2 h-[70%] w-full" fill="none" preserveAspectRatio="none">
-              <path d="M0 60 C 20 70, 30 30, 55 38 S 90 62, 110 40 S 150 20, 170 26 S 190 10, 200 8" stroke="#3fb68b" strokeWidth="2.5" />
+
+        {/* کارت‌های آماری */}
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+          <StatCard value="6" i={0} />
+          <StatCard value="11" i={1} />
+          <StatCard value="1" i={2} />
+          <StatCard value="$20,320" i={3} />
+        </div>
+
+        {/* نمودار + حلقه */}
+        <div className="grid min-h-0 flex-[1.5] grid-cols-[2.1fr_1fr] gap-1.5 sm:gap-2">
+          <div className="flex flex-col rounded-md bg-white p-1.5 sm:rounded-lg sm:p-2.5">
+            <Bar w="25%" h="h-1" />
+            <p className="mt-1 text-[10px] font-black leading-none sm:text-lg md:text-2xl">$20,320</p>
+            <svg viewBox="0 0 300 90" className="mt-1 min-h-0 flex-1" preserveAspectRatio="none" fill="none">
+              <defs>
+                <linearGradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor="#d98e80" />
+                  <stop offset="100%" stopColor="#4fc08d" />
+                </linearGradient>
+                <linearGradient id="areaGrad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#4fc08d" stopOpacity="0.22" />
+                  <stop offset="100%" stopColor="#4fc08d" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0 80 C 20 88, 35 50, 60 55 S 95 72, 115 52 S 150 30, 175 34 S 215 16, 240 22 S 280 8, 300 6 L300 90 L0 90 Z"
+                fill="url(#areaGrad)"
+                className="fx-up"
+                style={{ animationDelay: "1.2s" }}
+              />
+              <path
+                d="M0 80 C 20 88, 35 50, 60 55 S 95 72, 115 52 S 150 30, 175 34 S 215 16, 240 22 S 280 8, 300 6"
+                stroke="url(#lineGrad)"
+                pathLength="1"
+                className="fx-draw"
+                strokeWidth="3"
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
             </svg>
           </div>
-          <div className="flex items-center justify-center rounded-lg bg-[#111] p-3">
-            <svg viewBox="0 0 100 100" className="h-full max-h-28">
-              <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="9" />
-              <circle cx="50" cy="50" r="38" fill="none" stroke="#3fb68b" strokeWidth="9" strokeLinecap="round" strokeDasharray="223 239" transform="rotate(-90 50 50)" />
+          <div className="flex flex-col items-center justify-center rounded-md bg-[#111] p-1.5 sm:rounded-lg sm:p-2.5">
+            <svg viewBox="0 0 100 100" className="h-full max-h-24 w-full">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="8" />
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#4fc08d" strokeWidth="8" strokeLinecap="round" strokeDasharray="223 239" className="fx-ring" transform="rotate(-90 50 50)" />
+              <text x="50" y="55" textAnchor="middle" fontSize="17" fontWeight="900" fill="#fff">93.5%</text>
             </svg>
+          </div>
+        </div>
+
+        {/* ردیف پایین */}
+        <div className="grid min-h-0 flex-1 grid-cols-[1fr_1fr_0.8fr_1fr] gap-1.5 sm:gap-2">
+          <div className="space-y-1 overflow-hidden rounded-md bg-white p-1.5 sm:rounded-lg sm:p-2">
+            <Bar w="55%" c="bg-black/70" h="h-1 sm:h-1.5" />
+            <ListRow />
+            <ListRow />
+            <ListRow />
+          </div>
+          <div className="space-y-1 overflow-hidden rounded-md bg-white p-1.5 sm:rounded-lg sm:p-2">
+            <Bar w="60%" c="bg-black/70" h="h-1 sm:h-1.5" />
+            <ListRow />
+            <ListRow />
+            <ListRow />
+          </div>
+          <Photo from="#6fc3e8" to="#c46a4d" className="h-full" />
+          <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-md bg-white p-1.5 sm:rounded-lg sm:p-2">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="space-y-0.5 rounded bg-[#f6f4ef] p-1">
+                <Bar w="60%" h="h-0.5" />
+                <Bar w="80%" h="h-0.5 sm:h-1" c="bg-black/50" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </div>
-  </MockShell>
+  </div>
 );
 
 const MockStore = () => (
-  <MockShell>
-    <div className="flex h-full flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <Bar w="70px" c="bg-black/70" h="h-3" />
-        <div className="flex gap-2">
-          <Bar w="30px" />
-          <Bar w="30px" />
-          <Bar w="30px" />
-        </div>
-        <Bar w="24px" c="bg-black/70" h="h-4" />
+  <div
+    dir="ltr"
+    className="relative h-full w-full overflow-hidden"
+    style={{ background: "linear-gradient(120deg,#f3e7ad,#f0dfa0 45%,#d9a47c)" }}
+  >
+    {/* چهره */}
+    <div className="absolute left-[30%] top-[8%] h-[110%] w-[40%] rounded-[45%] bg-gradient-to-b from-[#c98d68] to-[#a8694a] opacity-80" />
+    <div className="absolute right-[20%] top-[32%] h-[38%] w-[9%] rotate-12 rounded-full bg-[#d9a07a]/80" />
+    {/* نوار بالا */}
+    <div className="absolute inset-x-[3%] top-[4%] flex items-center justify-between rounded-md bg-white px-2 py-1.5 sm:px-3 sm:py-2">
+      <span className="h-3 w-3 rounded-[3px] bg-[#111] sm:h-5 sm:w-5" />
+      <div className="flex gap-2 sm:gap-4">
+        <Bar w="22px" h="h-1 sm:h-1.5" c="bg-black/60" />
+        <Bar w="16px" h="h-1 sm:h-1.5" c="bg-black/60" />
+        <Bar w="26px" h="h-1 sm:h-1.5" c="bg-black/60" />
+        <Bar w="18px" h="h-1 sm:h-1.5" c="bg-black/60" />
       </div>
-      <Photo from="#f4b183" to="#e8806a" className="h-[34%]" />
-      <div className="grid flex-1 grid-cols-4 gap-2">
-        {[
-          ["#cfe3d4", "#8fbf9f"],
-          ["#f2d9a6", "#e1b35f"],
-          ["#d3d9f0", "#8f9be0"],
-          ["#f3c9d3", "#e58aa0"],
-        ].map(([a, b], i) => (
-          <div key={i} className="flex flex-col gap-1.5 rounded-lg bg-white p-2">
-            <Photo from={a} to={b} className="flex-1" />
-            <Bar w="80%" />
-            <Bar w="40%" c="bg-black/70" />
-          </div>
-        ))}
+      <div className="flex gap-1.5">
+        <span className="h-2.5 w-2.5 rounded-full border-2 border-[#333] sm:h-3.5 sm:w-3.5" />
+        <span className="h-2.5 w-2.5 rounded-[3px] border-2 border-[#333] sm:h-3.5 sm:w-3.5" />
       </div>
     </div>
-  </MockShell>
+    {/* تیتر */}
+    <div className="absolute inset-x-0 top-[27%] flex flex-col items-center gap-1.5 sm:gap-2.5">
+      <div className="fx-up w-[22%]" style={{ animationDelay: "0.1s" }}>
+        <Bar w="100%" c="bg-white" h="h-2.5 sm:h-4" />
+      </div>
+      <div className="fx-up w-[38%]" style={{ animationDelay: "0.25s" }}>
+        <Bar w="100%" c="bg-white" h="h-4 sm:h-7" />
+      </div>
+      <div className="fx-up w-[28%]" style={{ animationDelay: "0.4s" }}>
+        <Bar w="100%" c="bg-white" h="h-2.5 sm:h-4" />
+      </div>
+      <div className="mt-1 h-3 w-[14%] rounded-sm bg-white sm:h-5" />
+    </div>
+    {/* کارت محصول */}
+    <div className="absolute bottom-[5%] left-1/2 w-[28%] -translate-x-1/2">
+      <div className="fx-up flex gap-2 rounded-lg bg-white p-1.5 shadow-xl sm:p-2.5" style={{ animationDelay: "0.6s" }}>
+        <Photo from="#c9d3e8" to="#8c93c4" className="aspect-square w-[34%]" />
+        <div className="flex-1 space-y-1">
+          <Bar w="85%" c="bg-black/60" h="h-1 sm:h-1.5" />
+          <p className="text-[8px] font-black leading-none sm:text-sm">$29.99</p>
+          <Bar w="90%" h="h-0.5 sm:h-1" />
+          <div className="h-2 w-8 rounded-sm bg-[#111] sm:h-3.5 sm:w-14" />
+        </div>
+      </div>
+    </div>
+  </div>
 );
 
 const MockSite = () => (
-  <MockShell>
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#111] text-[9px] font-black text-white">RF</span>
-        <div className="flex gap-2">
-          <Bar w="28px" />
-          <Bar w="28px" />
-          <Bar w="28px" />
-        </div>
-      </div>
-      <div className="grid flex-1 grid-cols-2 items-center gap-4">
-        <div className="space-y-3">
-          <Bar w="95%" c="bg-black/80" h="h-4" />
-          <Bar w="70%" c="bg-black/80" h="h-4" />
-          <Bar w="85%" />
-          <Bar w="60%" />
-          <div className="h-6 w-20 rounded-full" style={{ backgroundColor: ACCENT }} />
-        </div>
-        <Photo from="#cdd5f7" to="#8c7be8" className="h-full" />
-      </div>
+  <div
+    dir="ltr"
+    className="relative h-full w-full overflow-hidden"
+    style={{ background: "linear-gradient(160deg,#d9c9b6,#bfa78f)" }}
+  >
+    <div className="absolute right-[6%] top-[6%] flex gap-2">
+      <span className="h-3 w-3 rounded-full border-2 border-white sm:h-4 sm:w-4" />
+      <span className="h-3 w-3 rounded-[3px] border-2 border-white sm:h-4 sm:w-4" />
     </div>
-  </MockShell>
+    <div className="absolute -left-[4%] top-[22%] h-[62%] w-[30%] rounded-2xl bg-gradient-to-r from-[#8f1414] via-[#e23a30] to-[#a81c1c] shadow-xl">
+      <div className="absolute inset-x-0 top-[38%] h-[22%] bg-white/90" />
+    </div>
+    <div className="absolute right-[8%] top-[34%] w-[42%] space-y-2">
+      <div className="fx-up" style={{ animationDelay: "0.1s" }}>
+        <Bar w="90%" c="bg-white" h="h-3 sm:h-6" />
+      </div>
+      <div className="fx-up" style={{ animationDelay: "0.25s" }}>
+        <Bar w="65%" c="bg-white" h="h-3 sm:h-6" />
+      </div>
+      <div className="fx-up space-y-1" style={{ animationDelay: "0.4s" }}>
+        <Bar w="80%" c="bg-white/70" h="h-1 sm:h-1.5" />
+        <Bar w="55%" c="bg-white/70" h="h-1 sm:h-1.5" />
+      </div>
+      <div className="h-3 w-16 rounded-full bg-[#111] sm:h-5 sm:w-24" />
+    </div>
+  </div>
 );
 
 const MockApp = () => (
@@ -320,7 +448,11 @@ const MockApp = () => (
           <div key={col} className="space-y-2 rounded-lg bg-black/5 p-2">
             <Bar w="50%" c="bg-black/50" />
             {Array.from({ length: n }).map((_, i) => (
-              <div key={i} className="space-y-1.5 rounded-md bg-white p-2">
+              <div
+                key={i}
+                className="fx-up space-y-1.5 rounded-md bg-white p-2"
+                style={{ animationDelay: `${0.1 + col * 0.2 + i * 0.12}s` }}
+              >
                 <Bar w="85%" />
                 <Bar w="50%" />
               </div>
@@ -340,10 +472,14 @@ const MockPortfolio = () => (
         <Bar w="60px" />
       </div>
       <div className="grid flex-1 grid-cols-[1.2fr_1fr] gap-2">
-        <Photo from="#d9c7b0" to="#a98f74" className="h-full" />
+        <Photo from="#d9c7b0" to="#a98f74" className="fx-up h-full" />
         <div className="grid grid-rows-2 gap-2">
-          <Photo from="#f6c9a0" to="#e58d5b" />
-          <Photo from="#bcd0e8" to="#6f93c4" />
+          <div className="fx-up" style={{ animationDelay: "0.25s" }}>
+            <Photo from="#f6c9a0" to="#e58d5b" className="h-full" />
+          </div>
+          <div className="fx-up" style={{ animationDelay: "0.5s" }}>
+            <Photo from="#bcd0e8" to="#6f93c4" className="h-full" />
+          </div>
         </div>
       </div>
       <p className="font-serif text-3xl font-black italic leading-none sm:text-5xl">Portfolio</p>
@@ -359,12 +495,30 @@ const mocks: Record<string, ReactNode> = {
   portfolio: <MockPortfolio />,
 };
 
+/* موقعیت هر اسلاید نسبت به اسلاید فعال (چرخش مثل اسلایدر) */
+const slidePos: Record<string, string> = {
+  "0": "left-[4%] top-0 z-30 w-[92%] sm:left-[24%] sm:w-[52%]",
+  "-1": "left-[-10%] top-[12%] z-20 w-[34%] -rotate-[7deg] max-sm:opacity-0",
+  "1": "left-[76%] top-[14%] z-20 w-[34%] rotate-[6deg] max-sm:opacity-0",
+  "-2": "left-[-52%] top-[12%] z-10 w-[34%] -rotate-12 opacity-0 pointer-events-none",
+  "2": "left-[118%] top-[14%] z-10 w-[34%] rotate-12 opacity-0 pointer-events-none",
+};
+
 export default function DesignerPage() {
   const [tab, setTab] = useState("dash");
   const [audience, setAudience] = useState(audiences[0].id);
   const [typed, setTyped] = useState("");
+  const [activeNav, setActiveNav] = useState(navItems[0].id);
+  const [paused, setPaused] = useState(false);
+
+  /* رفتن به نمونه‌ی بعدی (وقتی نوار لودینگ پر شد) */
+  const nextTab = () => {
+    const i = showcaseTabs.findIndex((t) => t.id === tab);
+    setTab(showcaseTabs[(i + 1) % showcaseTabs.length].id);
+  };
 
   const activeTab = showcaseTabs.find((t) => t.id === tab) ?? showcaseTabs[0];
+  const activeIdx = showcaseTabs.findIndex((t) => t.id === tab);
   const activeAudience = audiences.find((a) => a.id === audience) ?? audiences[0];
 
   /* افکت تایپ در کادر پرامپت */
@@ -406,10 +560,31 @@ export default function DesignerPage() {
     <main className="min-h-screen bg-white text-[#111]">
       <Header />
 
+      {/* انیمیشن‌های نمونه‌کارها */}
+      <style>{`
+        @keyframes fxUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        @keyframes fxIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+        @keyframes fxDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+        @keyframes fxRing{from{stroke-dasharray:0 239}to{stroke-dasharray:223 239}}
+        @keyframes fxFloatL{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(-7deg) translateY(-14px)}}
+        @keyframes fxFloatR{0%,100%{transform:rotate(6deg) translateY(0)}50%{transform:rotate(6deg) translateY(-12px)}}
+        @keyframes tabFill{from{width:0}to{width:100%}}
+        .fx-in{animation:fxIn .55s ease both}
+        .fx-up{opacity:0;animation:fxUp .6s ease forwards}
+        .fx-draw{stroke-dasharray:1;stroke-dashoffset:1;animation:fxDraw 1.8s ease .3s forwards}
+        .fx-ring{animation:fxRing 1.6s ease .4s both}
+        .slide-off .fx-up{animation:none;opacity:1}
+        .slide-off .fx-draw{animation:none;stroke-dashoffset:0}
+        .slide-off .fx-ring{animation:none}
+        @media (prefers-reduced-motion: reduce){
+          .fx-in,.fx-up,.fx-draw,.fx-ring{animation:none;opacity:1;stroke-dashoffset:0}
+        }
+      `}</style>
+
       {/* ---------- نوار بالای صفحه ---------- */}
-      <div className="sticky top-0 z-40 border-b border-black/5 bg-white/85 backdrop-blur">
+      <div className="sticky top-0 z-40 border-b border-black/5 bg-[#c6c2db]/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1500px] items-center gap-2 px-4 py-2.5 md:px-8">
-          <Link href="/" className="whitespace-nowrap px-2 text-base font-black">
+          <Link href="/" className="whitespace-nowrap px-2 text-base font-black text-[#111]">
             Roman Fard
           </Link>
           <span className="mx-1 hidden h-6 w-px bg-black/15 sm:block" />
@@ -418,24 +593,37 @@ export default function DesignerPage() {
               <a
                 key={n.id}
                 href={`#${n.id}`}
-                className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-[#333] transition hover:bg-black/5"
+                onClick={() => setActiveNav(n.id)}
+                className={`whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-[#222] transition ${
+                  activeNav === n.id ? "bg-white/70 shadow-sm" : "hover:bg-white/40"
+                }`}
               >
                 {n.label}
               </a>
             ))}
           </nav>
+          <button
+            type="button"
+            className="hidden items-center gap-1.5 whitespace-nowrap px-2 text-sm font-bold text-[#222] sm:inline-flex"
+          >
+            پروژه‌های من
+            {icons.chevron}
+          </button>
+          <span className="hidden text-[#2b2b3a] sm:inline-flex" aria-hidden="true">
+            {icons.chat}
+          </span>
           <a
             href="#contact"
             className="whitespace-nowrap rounded-lg px-5 py-2.5 text-sm font-black text-white transition hover:brightness-110"
-            style={{ backgroundColor: ACCENT }}
+            style={{ backgroundColor: "#5a3fc0" }}
           >
-            شروع پروژه
+            شروع رایگان
           </a>
         </div>
       </div>
 
       {/* ---------- بخش اصلی (هیرو) ---------- */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#5f5c96] via-[#9e9cc8] to-[#ececf6] pb-16 pt-14 text-white md:pt-20">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#5c5892] via-[#7f7cb2] via-60% to-[#dddcec] pb-16 pt-14 text-white md:pt-20">
         <div className="mx-auto max-w-[900px] px-6 text-center">
           <p className="text-sm font-bold text-white/80">
             <Link href="/" className="transition hover:text-white">
@@ -453,17 +641,16 @@ export default function DesignerPage() {
           </p>
 
           {/* کادر پرامپت */}
-          <div className="mx-auto mt-9 flex max-w-[820px] items-center gap-3 rounded-full border-2 border-[#9fd6ff] bg-white py-2 pe-2 ps-7 shadow-[0_0_0_4px_rgba(255,255,255,0.35),0_0_46px_rgba(110,190,255,0.65)]">
+          <div className="mx-auto mt-9 flex max-w-[820px] items-center gap-3 rounded-full border-[3px] border-[#7b5cf0] bg-white py-2 pe-2 ps-7 shadow-[0_0_0_4px_rgba(255,255,255,0.35),0_0_42px_rgba(150,120,255,0.75)]">
             <p className="flex-1 truncate text-start text-base text-[#111] md:text-lg" aria-live="off">
               {typed}
               <span className="ms-0.5 inline-block h-5 w-0.5 translate-y-1 animate-pulse bg-[#111]" />
             </p>
             <a
               href="#contact"
-              className="whitespace-nowrap rounded-full px-6 py-3 text-sm font-black text-white transition hover:brightness-110"
-              style={{ backgroundColor: ACCENT }}
+              className="whitespace-nowrap rounded-full bg-[#8e8e99] px-6 py-3 text-sm font-black text-white transition hover:bg-[#5b47d9]"
             >
-              شروع پروژه
+              شروع ساخت رایگان
             </a>
           </div>
 
@@ -473,7 +660,7 @@ export default function DesignerPage() {
               <a
                 key={c}
                 href="#contact"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-[#4b4a85]/60 px-4 py-2 text-[13px] font-bold text-white backdrop-blur transition hover:bg-[#4b4a85]"
+                className="inline-flex items-center gap-2 rounded-md border border-white/25 bg-[#6a67a2]/70 px-3.5 py-1.5 text-[13px] font-bold text-white backdrop-blur transition hover:bg-[#4b4a85]"
               >
                 {c}
                 {icons.arrow}
@@ -482,33 +669,42 @@ export default function DesignerPage() {
           </div>
         </div>
 
-        {/* صحنه‌ی نمایش */}
-        <div className="relative mx-auto mt-14 h-[260px] max-w-[1500px] sm:h-[380px] md:h-[470px]">
-          {/* کارت چپ */}
-          <div className="absolute -left-[14%] top-[10%] hidden w-[40%] -rotate-6 overflow-hidden rounded-[28px] border-4 border-white/50 bg-white shadow-2xl sm:block">
-            <div className="aspect-[16/10]">
-              <MockPortfolio />
-            </div>
+        {/* صحنه‌ی نمایش: اسلایدر چرخشی */}
+        <div className="relative mx-auto mt-14 max-w-[1500px]">
+          <div className="invisible mx-auto w-[92%] p-1.5 sm:w-[52%]">
+            <div className="aspect-[16/9.6]" />
           </div>
-          {/* کارت راست */}
-          <div className="absolute -right-[14%] top-[8%] hidden w-[40%] rotate-6 overflow-hidden rounded-[28px] border-4 border-white/50 bg-white shadow-2xl sm:block">
-            <div className="aspect-[16/10]">
-              <MockSite />
-            </div>
-          </div>
-          {/* کارت مرکزی */}
-          <div className="absolute left-1/2 top-0 w-[90%] -translate-x-1/2 overflow-hidden rounded-[28px] border-4 border-white/60 bg-white shadow-[0_30px_80px_rgba(40,30,100,0.35)] sm:w-[58%]">
-            <div key={tab} className="aspect-[16/10]">
-              {mocks[tab]}
-            </div>
-          </div>
+          {showcaseTabs.map((t, i) => {
+            const n = showcaseTabs.length;
+            const offset = ((i - activeIdx + n + 2) % n) - 2;
+            const active = offset === 0;
+            const key = String(offset === 0 ? 0 : -offset); /* چیدمان راست‌به‌چپ */
+            return (
+              <div
+                key={t.id}
+                aria-hidden={!active}
+                onClick={() => !active && setTab(t.id)}
+                onMouseEnter={() => active && setPaused(true)}
+                onMouseLeave={() => active && setPaused(false)}
+                className={`slide ${active ? "" : "slide-off cursor-pointer"} absolute rounded-[30px] border border-white/35 bg-white/20 p-1.5 shadow-[0_30px_80px_rgba(40,30,100,0.25)] transition-all duration-700 ease-in-out ${slidePos[key]}`}
+              >
+                <div className="overflow-hidden rounded-[24px] bg-white">
+                  <div key={active ? t.id : "idle"} className="aspect-[16/9.6]">
+                    {mocks[t.id]}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* تب‌ها */}
         <div className="mx-auto mt-6 max-w-full px-4">
           <div
             role="tablist"
-            className="mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-white/70 p-1.5 shadow-sm backdrop-blur"
+            className="mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-[#e7e5f0] p-1.5"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
           >
             {showcaseTabs.map((t) => (
               <button
@@ -516,15 +712,26 @@ export default function DesignerPage() {
                 role="tab"
                 aria-selected={tab === t.id}
                 onClick={() => setTab(t.id)}
-                className={`whitespace-nowrap rounded-full px-6 py-3 text-sm font-black transition md:px-8 ${
-                  tab === t.id ? "bg-[#111] text-white" : "text-[#222] hover:bg-black/5"
+                className={`relative overflow-hidden whitespace-nowrap rounded-full px-6 py-3 text-sm font-black transition md:px-8 ${
+                  tab === t.id ? "bg-[#4d4d55] text-white" : "text-[#222] hover:bg-black/5"
                 }`}
               >
-                {t.label}
+                {tab === t.id && (
+                  <span
+                    key={tab}
+                    className="absolute inset-y-0 start-0 bg-[#111]"
+                    style={{
+                      animation: `tabFill ${TAB_MS}ms linear forwards`,
+                      animationPlayState: paused ? "paused" : "running",
+                    }}
+                    onAnimationEnd={nextTab}
+                  />
+                )}
+                <span className="relative">{t.label}</span>
               </button>
             ))}
           </div>
-          <p className="mx-auto mt-6 max-w-2xl text-center text-base leading-8 text-[#333]">
+          <p key={tab} className="fx-up mx-auto mt-6 max-w-2xl text-center text-base leading-8 text-[#333]">
             {activeTab.caption}
           </p>
           <div className="mt-6 text-center">

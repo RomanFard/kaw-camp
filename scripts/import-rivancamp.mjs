@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════
-// Import از ریوان به دیتابیس پستگرس (کرگدن) + آپلود عکس در Supabase
+// Import از ریوان به دیتابیس پستگرس (Neon) + آپلود عکس در Supabase
 // ═══════════════════════════════════════════
 import { createClient } from "@supabase/supabase-js";
 import pg from "pg";
@@ -28,7 +28,7 @@ const SKIP_IMAGES = hasFlag("--skip-images");
 const SKIP_BRANDS = hasFlag("--skip-brands");
 
 console.log("═══════════════════════════════════════════");
-console.log("🚀 KAW CAMP — Import به PostgreSQL (کرگدن)");
+console.log("🚀 KAW CAMP — Import به PostgreSQL (Neon)");
 console.log("═══════════════════════════════════════════");
 console.log("حالت:", RUN ? "🔴 اجرای واقعی" : "🟢 Dry-run");
 console.log("تعداد:", LIMIT);
@@ -190,7 +190,18 @@ async function downloadImage(url) {
 async function main() {
   const env = await loadEnv();
   const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-  const pool = new Pool({ connectionString: env.DATABASE_URL });
+  
+  const pool = new Pool({ 
+    connectionString: env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    max: 5,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000
+  });
+
+  pool.on('error', (err) => {
+    console.error('⚠️ خطای شبکه دیتابیس:', err.message);
+  });
 
   console.log("📥 خواندن برندها و محصولات موجود از PostgreSQL...");
   const { rows: existingBrands } = await pool.query("SELECT name, order_index FROM brands");
@@ -217,7 +228,19 @@ async function main() {
     const shortName = rp.name.length > 45 ? rp.name.slice(0, 45) + "…" : rp.name;
 
     try {
-      if (slugSet.has(rp.slug) || idSet.has(String(rp.id))) { skipped++; continue; }
+      const localId = String(rp.id);
+
+      // 🆕 چک کردن تکراری بودن (این بخش قبلاً جا افتاده بود)
+      if (slugSet.has(rp.slug) || idSet.has(localId)) {
+        skipped++; 
+        continue;
+      }
+
+      // 🆕 رد کردن محصولات ناموجود
+      if (rp.is_in_stock === false) {
+        console.log(`  [${num}] ⏭ ناموجود: ${shortName}`);
+        skipped++; continue;
+      }
 
       const catIds = productCatMap[rp.id] || [];
       const catSlugs = catIds.map((id) => catMap[id]?.slug).filter(Boolean);
@@ -233,7 +256,6 @@ async function main() {
 
       const rawImages = (rp.images || []).slice(0, MAX_IMAGES);
       const uploadedUrls = [];
-      const localId = String(rp.id);
 
       if (!SKIP_IMAGES && rawImages.length > 0) {
         for (let imgIdx = 0; imgIdx < rawImages.length; imgIdx++) {
@@ -254,7 +276,6 @@ async function main() {
         inserted++; continue;
       }
 
-      // درج در پستگرس
       const sql = `
         INSERT INTO products (
           id, name, slug, price, old_price, cost_price, category, image, images, 
@@ -269,10 +290,14 @@ async function main() {
         null, null, null, null, JSON.stringify(attributesToSpecs(rp.attributes))
       ];
       
-      await pool.query(sql, values);
-      
-      console.log(`  [${num}] ✅ ${shortName} → ${kawCat}`);
-      inserted++; slugSet.add(rp.slug); idSet.add(localId);
+      try {
+        await pool.query(sql, values);
+        console.log(`  [${num}] ✅ ${shortName} → ${kawCat}`);
+        inserted++; slugSet.add(rp.slug); idSet.add(localId);
+      } catch (dbErr) {
+        console.log(`  [${num}] ❌ خطای دیتابیس برای ${shortName}: ${dbErr.message}`);
+        failed++;
+      }
     } catch (e) {
       console.log(`  [${num}] ❌ ${shortName}: ${e.message}`);
       failed++;
@@ -283,11 +308,15 @@ async function main() {
     console.log(`\n🏷 درج ${newBrands.length} برند جدید...`);
     for (const b of newBrands) {
       maxBrandOrder++;
-      await pool.query(
-        `INSERT INTO brands (name, logo, href, order_index, is_active) VALUES ($1, $2, $3, $4, $5)`,
-        [b.name, "", `/products?brand=${b.name}`, maxBrandOrder, true]
-      );
-      console.log(`   ✅ ${b.name}`);
+      try {
+        await pool.query(
+          `INSERT INTO brands (name, logo, href, order_index, is_active) VALUES ($1, $2, $3, $4, $5)`,
+          [b.name, "", `/products?brand=${b.name}`, maxBrandOrder, true]
+        );
+        console.log(`   ✅ ${b.name}`);
+      } catch (bErr) {
+         console.log(`   ❌ خطا در درج برند ${b.name}: ${bErr.message}`);
+      }
     }
   }
 
